@@ -1,9 +1,0 @@
----
-title: "Topic 2"
-author: "Eric Jackson"
-date: "2023-09-08"
-categories: [code, analysis]
-image: "image.jpg"
----
-
-# Background
