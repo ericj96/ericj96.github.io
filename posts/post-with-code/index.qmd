@@ -145,7 +145,7 @@ exogenous_features=['High_mean_lag3', 'High_mean_lag7',
        'day_of_week']
        
        
-exogenous_features=['High_mean_lag3','week']
+#exogenous_features=['High_mean_lag3','week']
       
 ```
 
@@ -186,21 +186,16 @@ plt.show()
 ```{python}
 fig, ax = plt.subplots(figsize=(10,6))
 plt.plot(df_train["High"])
-#plt.plot(df_valid["High"])
 plt.plot(df_valid["Forecast_ARIMAX"])
 plt.legend(['Training Data','Test Data'],loc='best')
 plt.ylabel('Temperature (C)')
-#plt.savefig('model.png',dpi=1200)
 plt.show()
-
 
 fig, ax = plt.subplots(figsize=(10,6))
 plt.plot(df_valid["High"])
-#plt.plot(df_valid["High"])
 plt.plot(df_valid["Forecast_ARIMAX"])
 plt.legend(['Truth','ARIMA Model'],loc='lower left')
 plt.ylabel('Temperature (C)')
-#plt.savefig('model2.png',dpi=1200)
 plt.show()
 
 ```
@@ -288,8 +283,10 @@ from sklearn.metrics import f1_score,recall_score,precision_score
 from sklearn.metrics import mean_squared_error
 from tabulate import tabulate
 from collections import OrderedDict
-
-
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import ConfusionMatrixDisplay
+from sklearn.metrics import confusion_matrix
+from numpy import array
 
 def perf_measure(y_actual, y_hat):
     TP = 0
@@ -309,9 +306,6 @@ def perf_measure(y_actual, y_hat):
 
     return(TP, FP, TN, FN)
 
-
-
-
 df_truth=pd.read_csv('./truth.csv')
 anom=anom.map(lambda val:1 if val==-1 else 0)
 #calculate F1 score
@@ -322,7 +316,6 @@ TP, FP, TN, FN=perf_measure(df_truth['Anom'].values, anom.values)
 fpr=FP/(TN+FP)
 final=OrderedDict()
 final['OCSVM']=[f1,rec,prec,fpr]
-
 
 a2=catfish_sales['anomaly']
 a2=a2.map(lambda val:1 if val==-1 else 0)
@@ -336,4 +329,9 @@ df=pd.DataFrame(final)
 df.index=['F1','Recall','Precision','FPR']
 print(tabulate(df, headers='keys', tablefmt='psql'))
 
+#cm=np.array([TP,FP],[FN,TN])
+cm=confusion_matrix(df_truth['Anom'].values,a2.values)
+cmd=ConfusionMatrixDisplay(cm)
+cmd.plot()
+plt.show()
 ```

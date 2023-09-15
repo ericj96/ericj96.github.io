@@ -318,7 +318,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>       <span class="st">'day_of_week'</span>]</span>
 <span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>       </span>
 <span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>       </span>
-<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>exogenous_features<span class="op">=</span>[<span class="st">'High_mean_lag3'</span>,<span class="st">'week'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a><span class="co">#exogenous_features=['High_mean_lag3','week']</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
@@ -344,36 +344,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">MAE of Auto ARIMAX:"</span>, mean_absolute_error(df_valid.High, df_valid.Forecast_ARIMAX))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Performing stepwise search to minimize aic
- ARIMA(2,0,2)(0,0,0)[0] intercept   : AIC=3072.751, Time=3.91 sec
- ARIMA(0,0,0)(0,0,0)[0] intercept   : AIC=6637.987, Time=1.16 sec
- ARIMA(1,0,0)(0,0,0)[0] intercept   : AIC=3389.503, Time=3.05 sec
- ARIMA(0,0,1)(0,0,0)[0] intercept   : AIC=4259.244, Time=2.65 sec
- ARIMA(0,0,0)(0,0,0)[0]             : AIC=6688.243, Time=0.64 sec
- ARIMA(1,0,2)(0,0,0)[0] intercept   : AIC=3130.618, Time=3.62 sec
- ARIMA(2,0,1)(0,0,0)[0] intercept   : AIC=3181.655, Time=3.07 sec
- ARIMA(3,0,2)(0,0,0)[0] intercept   : AIC=3097.031, Time=4.54 sec
- ARIMA(2,0,3)(0,0,0)[0] intercept   : AIC=3133.775, Time=4.16 sec
- ARIMA(1,0,1)(0,0,0)[0] intercept   : AIC=3271.556, Time=3.45 sec
- ARIMA(1,0,3)(0,0,0)[0] intercept   : AIC=3127.658, Time=4.59 sec
- ARIMA(3,0,1)(0,0,0)[0] intercept   : AIC=3166.529, Time=4.07 sec
- ARIMA(3,0,3)(0,0,0)[0] intercept   : AIC=3062.532, Time=5.80 sec
- ARIMA(4,0,3)(0,0,0)[0] intercept   : AIC=3077.630, Time=5.97 sec
- ARIMA(3,0,4)(0,0,0)[0] intercept   : AIC=3066.100, Time=6.51 sec
- ARIMA(2,0,4)(0,0,0)[0] intercept   : AIC=3112.572, Time=5.89 sec
- ARIMA(4,0,2)(0,0,0)[0] intercept   : AIC=3172.202, Time=5.10 sec
- ARIMA(4,0,4)(0,0,0)[0] intercept   : AIC=3061.916, Time=6.94 sec
- ARIMA(5,0,4)(0,0,0)[0] intercept   : AIC=3049.563, Time=7.19 sec
- ARIMA(5,0,3)(0,0,0)[0] intercept   : AIC=3074.573, Time=6.54 sec
- ARIMA(5,0,5)(0,0,0)[0] intercept   : AIC=3043.957, Time=8.19 sec
- ARIMA(4,0,5)(0,0,0)[0] intercept   : AIC=3054.015, Time=7.64 sec
- ARIMA(5,0,5)(0,0,0)[0]             : AIC=3096.432, Time=7.64 sec
+ ARIMA(2,0,2)(0,0,0)[0] intercept   : AIC=2960.826, Time=14.66 sec
+ ARIMA(0,0,0)(0,0,0)[0] intercept   : AIC=5711.667, Time=1.30 sec
+ ARIMA(1,0,0)(0,0,0)[0] intercept   : AIC=3359.247, Time=10.56 sec
+ ARIMA(0,0,1)(0,0,0)[0] intercept   : AIC=3726.632, Time=12.85 sec
+ ARIMA(0,0,0)(0,0,0)[0]             : AIC=5709.707, Time=13.54 sec
+ ARIMA(1,0,2)(0,0,0)[0] intercept   : AIC=2904.191, Time=15.28 sec
+ ARIMA(0,0,2)(0,0,0)[0] intercept   : AIC=2912.739, Time=14.10 sec
+ ARIMA(1,0,1)(0,0,0)[0] intercept   : AIC=3067.819, Time=13.83 sec
+ ARIMA(1,0,3)(0,0,0)[0] intercept   : AIC=2930.144, Time=15.97 sec
+ ARIMA(0,0,3)(0,0,0)[0] intercept   : AIC=2936.070, Time=14.79 sec
+ ARIMA(2,0,1)(0,0,0)[0] intercept   : AIC=2957.813, Time=12.95 sec
+ ARIMA(2,0,3)(0,0,0)[0] intercept   : AIC=2898.815, Time=16.18 sec
+ ARIMA(3,0,3)(0,0,0)[0] intercept   : AIC=2805.639, Time=17.25 sec
+ ARIMA(3,0,2)(0,0,0)[0] intercept   : AIC=2962.492, Time=15.64 sec
+ ARIMA(4,0,3)(0,0,0)[0] intercept   : AIC=2810.038, Time=17.34 sec
+ ARIMA(3,0,4)(0,0,0)[0] intercept   : AIC=2785.353, Time=21.22 sec
+ ARIMA(2,0,4)(0,0,0)[0] intercept   : AIC=2897.289, Time=18.66 sec
+ ARIMA(4,0,4)(0,0,0)[0] intercept   : AIC=2807.535, Time=19.46 sec
+ ARIMA(3,0,5)(0,0,0)[0] intercept   : AIC=2789.723, Time=20.93 sec
+ ARIMA(2,0,5)(0,0,0)[0] intercept   : AIC=2846.091, Time=20.72 sec
+ ARIMA(4,0,5)(0,0,0)[0] intercept   : AIC=2791.733, Time=22.39 sec
+ ARIMA(3,0,4)(0,0,0)[0]             : AIC=2809.734, Time=18.13 sec
 
-Best model:  ARIMA(5,0,5)(0,0,0)[0] intercept
-Total fit time: 112.342 seconds
+Best model:  ARIMA(3,0,4)(0,0,0)[0] intercept
+Total fit time: 347.760 seconds
 
-RMSE of Auto ARIMAX: 0.7153457717072086
+RMSE of Auto ARIMAX: 0.6141699692631081
 
-MAE of Auto ARIMAX: 0.32255422754379454</code></pre>
+MAE of Auto ARIMAX: 0.2635940364491945</code></pre>
 </div>
 </div>
 <p><a href="#fig-arima">Figure&nbsp;1</a></p>
@@ -390,22 +389,17 @@ MAE of Auto ARIMAX: 0.32255422754379454</code></pre>
 <div class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>plt.plot(df_train[<span class="st">"High"</span>])</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#plt.plot(df_valid["High"])</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>plt.plot(df_valid[<span class="st">"Forecast_ARIMAX"</span>])</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Training Data'</span>,<span class="st">'Test Data'</span>],loc<span class="op">=</span><span class="st">'best'</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Temperature (C)'</span>)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#plt.savefig('model.png',dpi=1200)</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>plt.plot(df_valid[<span class="st">"High"</span>])</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">#plt.plot(df_valid["High"])</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>plt.plot(df_valid[<span class="st">"Forecast_ARIMAX"</span>])</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Truth'</span>,<span class="st">'ARIMA Model'</span>],loc<span class="op">=</span><span class="st">'lower left'</span>)</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Temperature (C)'</span>)</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">#plt.savefig('model2.png',dpi=1200)</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>plt.plot(df_valid[<span class="st">"Forecast_ARIMAX"</span>])</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Training Data'</span>,<span class="st">'Test Data'</span>],loc<span class="op">=</span><span class="st">'best'</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Temperature (C)'</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>plt.plot(df_valid[<span class="st">"High"</span>])</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>plt.plot(df_valid[<span class="st">"Forecast_ARIMAX"</span>])</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Truth'</span>,<span class="st">'ARIMA Model'</span>],loc<span class="op">=</span><span class="st">'lower left'</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Temperature (C)'</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <p><img src="index_files/figure-html/cell-5-output-1.png" width="808" height="485"></p>
 </div>
@@ -464,7 +458,7 @@ MAE of Auto ARIMAX: 0.32255422754379454</code></pre>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Anomalies detected with OCSVM'</span>)</span>
 <span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-7-output-1.png" width="821" height="505"></p>
+<p><img src="index_files/figure-html/cell-7-output-1.png" width="808" height="505"></p>
 </div>
 </div>
 </section>
@@ -496,7 +490,7 @@ MAE of Auto ARIMAX: 0.32255422754379454</code></pre>
 <span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Anomalies detected with Isolation Forest'</span>)</span>
 <span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-8-output-1.png" width="821" height="505"></p>
+<p><img src="index_files/figure-html/cell-8-output-1.png" width="808" height="505"></p>
 </div>
 </div>
 </section>
@@ -508,62 +502,69 @@ MAE of Auto ARIMAX: 0.32255422754379454</code></pre>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tabulate <span class="im">import</span> tabulate</span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> OrderedDict</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> perf_measure(y_actual, y_hat):</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    TP <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    FP <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    TN <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    FN <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(y_hat)): </span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y_actual[i]<span class="op">==</span>y_hat[i]<span class="op">==</span><span class="dv">1</span>:</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>           TP <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y_hat[i]<span class="op">==</span><span class="dv">1</span> <span class="kw">and</span> y_actual[i]<span class="op">!=</span>y_hat[i]:</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>           FP <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y_actual[i]<span class="op">==</span>y_hat[i]<span class="op">==</span><span class="dv">0</span>:</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>           TN <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y_hat[i]<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> y_actual[i]<span class="op">!=</span>y_hat[i]:</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>           FN <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>(TP, FP, TN, FN)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> precision_recall_curve</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> ConfusionMatrixDisplay</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> confusion_matrix</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy <span class="im">import</span> array</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> perf_measure(y_actual, y_hat):</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    TP <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    FP <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    TN <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    FN <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(y_hat)): </span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y_actual[i]<span class="op">==</span>y_hat[i]<span class="op">==</span><span class="dv">1</span>:</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>           TP <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y_hat[i]<span class="op">==</span><span class="dv">1</span> <span class="kw">and</span> y_actual[i]<span class="op">!=</span>y_hat[i]:</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>           FP <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y_actual[i]<span class="op">==</span>y_hat[i]<span class="op">==</span><span class="dv">0</span>:</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>           TN <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y_hat[i]<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> y_actual[i]<span class="op">!=</span>y_hat[i]:</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>           FN <span class="op">+=</span> <span class="dv">1</span></span>
 <span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>(TP, FP, TN, FN)</span>
 <span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>df_truth<span class="op">=</span>pd.read_csv(<span class="st">'./truth.csv'</span>)</span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>anom<span class="op">=</span>anom.<span class="bu">map</span>(<span class="kw">lambda</span> val:<span class="dv">1</span> <span class="cf">if</span> val<span class="op">==-</span><span class="dv">1</span> <span class="cf">else</span> <span class="dv">0</span>)</span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate F1 score</span></span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>f1<span class="op">=</span>f1_score(df_truth[<span class="st">'Anom'</span>].values, anom.values)</span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>rec<span class="op">=</span>recall_score(df_truth[<span class="st">'Anom'</span>].values, anom.values)</span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>prec<span class="op">=</span>precision_score(df_truth[<span class="st">'Anom'</span>].values, anom.values)</span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>TP, FP, TN, FN<span class="op">=</span>perf_measure(df_truth[<span class="st">'Anom'</span>].values, anom.values)</span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>fpr<span class="op">=</span>FP<span class="op">/</span>(TN<span class="op">+</span>FP)</span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>final<span class="op">=</span>OrderedDict()</span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>final[<span class="st">'OCSVM'</span>]<span class="op">=</span>[f1,rec,prec,fpr]</span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>a2<span class="op">=</span>catfish_sales[<span class="st">'anomaly'</span>]</span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>a2<span class="op">=</span>a2.<span class="bu">map</span>(<span class="kw">lambda</span> val:<span class="dv">1</span> <span class="cf">if</span> val<span class="op">==-</span><span class="dv">1</span> <span class="cf">else</span> <span class="dv">0</span>)</span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>f1<span class="op">=</span>f1_score(df_truth[<span class="st">'Anom'</span>].values, a2.values)</span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>rec<span class="op">=</span>recall_score(df_truth[<span class="st">'Anom'</span>].values, a2.values)</span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>prec<span class="op">=</span>precision_score(df_truth[<span class="st">'Anom'</span>].values, a2.values)</span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>TP, FP, TN, FN<span class="op">=</span>perf_measure(df_truth[<span class="st">'Anom'</span>].values, a2.values)</span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>fpr<span class="op">=</span>FP<span class="op">/</span>(TN<span class="op">+</span>FP)</span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>final[<span class="st">'IsoFor'</span>]<span class="op">=</span>[f1,rec,prec,fpr]</span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>df<span class="op">=</span>pd.DataFrame(final)</span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>df.index<span class="op">=</span>[<span class="st">'F1'</span>,<span class="st">'Recall'</span>,<span class="st">'Precision'</span>,<span class="st">'FPR'</span>]</span>
-<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tabulate(df, headers<span class="op">=</span><span class="st">'keys'</span>, tablefmt<span class="op">=</span><span class="st">'psql'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>df_truth<span class="op">=</span>pd.read_csv(<span class="st">'./truth.csv'</span>)</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>anom<span class="op">=</span>anom.<span class="bu">map</span>(<span class="kw">lambda</span> val:<span class="dv">1</span> <span class="cf">if</span> val<span class="op">==-</span><span class="dv">1</span> <span class="cf">else</span> <span class="dv">0</span>)</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate F1 score</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>f1<span class="op">=</span>f1_score(df_truth[<span class="st">'Anom'</span>].values, anom.values)</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>rec<span class="op">=</span>recall_score(df_truth[<span class="st">'Anom'</span>].values, anom.values)</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>prec<span class="op">=</span>precision_score(df_truth[<span class="st">'Anom'</span>].values, anom.values)</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>TP, FP, TN, FN<span class="op">=</span>perf_measure(df_truth[<span class="st">'Anom'</span>].values, anom.values)</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>fpr<span class="op">=</span>FP<span class="op">/</span>(TN<span class="op">+</span>FP)</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>final<span class="op">=</span>OrderedDict()</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>final[<span class="st">'OCSVM'</span>]<span class="op">=</span>[f1,rec,prec,fpr]</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>a2<span class="op">=</span>catfish_sales[<span class="st">'anomaly'</span>]</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>a2<span class="op">=</span>a2.<span class="bu">map</span>(<span class="kw">lambda</span> val:<span class="dv">1</span> <span class="cf">if</span> val<span class="op">==-</span><span class="dv">1</span> <span class="cf">else</span> <span class="dv">0</span>)</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>f1<span class="op">=</span>f1_score(df_truth[<span class="st">'Anom'</span>].values, a2.values)</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>rec<span class="op">=</span>recall_score(df_truth[<span class="st">'Anom'</span>].values, a2.values)</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>prec<span class="op">=</span>precision_score(df_truth[<span class="st">'Anom'</span>].values, a2.values)</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>TP, FP, TN, FN<span class="op">=</span>perf_measure(df_truth[<span class="st">'Anom'</span>].values, a2.values)</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>fpr<span class="op">=</span>FP<span class="op">/</span>(TN<span class="op">+</span>FP)</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>final[<span class="st">'IsoFor'</span>]<span class="op">=</span>[f1,rec,prec,fpr]</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>df<span class="op">=</span>pd.DataFrame(final)</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>df.index<span class="op">=</span>[<span class="st">'F1'</span>,<span class="st">'Recall'</span>,<span class="st">'Precision'</span>,<span class="st">'FPR'</span>]</span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tabulate(df, headers<span class="op">=</span><span class="st">'keys'</span>, tablefmt<span class="op">=</span><span class="st">'psql'</span>))</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="co">#cm=np.array([TP,FP],[FN,TN])</span></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>cm<span class="op">=</span>confusion_matrix(df_truth[<span class="st">'Anom'</span>].values,a2.values)</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>cmd<span class="op">=</span>ConfusionMatrixDisplay(cm)</span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>cmd.plot()</span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>+-----------+------------+-------------+
-|           |      OCSVM |      IsoFor |
-|-----------+------------+-------------|
-| F1        | 0.714286   | 0.20155     |
-| Recall    | 0.565217   | 0.113043    |
-| Precision | 0.970149   | 0.928571    |
-| FPR       | 0.00163666 | 0.000818331 |
-+-----------+------------+-------------+</code></pre>
+<pre><code>+-----------+-------------+----------+
+|           |       OCSVM |   IsoFor |
+|-----------+-------------+----------|
+| F1        | 0.718232    | 0.217054 |
+| Recall    | 0.565217    | 0.121739 |
+| Precision | 0.984848    | 1        |
+| FPR       | 0.000818331 | 0        |
++-----------+-------------+----------+</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-9-output-2.png" width="513" height="429"></p>
 </div>
 </div>
 
