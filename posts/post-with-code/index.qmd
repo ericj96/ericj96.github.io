@@ -252,10 +252,10 @@ plt.show()
 ######### Isolation Forest ################
 import sklearn
 from sklearn.ensemble import IsolationForest
-catfish_sales=df_valid
+isofor=df_valid
 outliers_fraction = float(.01)
 scaler = sklearn.preprocessing.StandardScaler()
-np_scaled = scaler.fit_transform(catfish_sales['Forecast_ARIMAX'].values.reshape(-1, 1))
+np_scaled = scaler.fit_transform(isofor['Forecast_ARIMAX'].values.reshape(-1, 1))
 data = pd.DataFrame(np_scaled)
 # train isolation forest
 model =  IsolationForest(contamination=outliers_fraction)
@@ -263,11 +263,11 @@ model.fit(data)
 
 
 
-catfish_sales['anomaly'] = model.predict(data)
+isofor['anomaly'] = model.predict(data)
 # visualization
 fig, ax = plt.subplots(figsize=(10,6))
-a = catfish_sales.loc[catfish_sales['anomaly'] == -1, ['Forecast_ARIMAX']] #anomaly
-ax.plot(catfish_sales.index, catfish_sales['Forecast_ARIMAX'], color='black', label = 'Normal')
+a = isofor.loc[isofor['anomaly'] == -1, ['Forecast_ARIMAX']] #anomaly
+ax.plot(isofor.index, isofor['Forecast_ARIMAX'], color='black', label = 'Normal')
 ax.scatter(a.index,a['Forecast_ARIMAX'], color='red', label = 'Anomaly')
 plt.legend(['Wheel Temperature','Anomaly'])
 plt.ylabel('Temperature (C)')
@@ -278,6 +278,7 @@ plt.show()
 # Final Results
 
 ```{python}
+#| code-fold: true
 ######################### calculate statistics ###########################
 from sklearn.metrics import f1_score,recall_score,precision_score
 from sklearn.metrics import mean_squared_error
@@ -305,7 +306,9 @@ def perf_measure(y_actual, y_hat):
            FN += 1
 
     return(TP, FP, TN, FN)
+```
 
+```{python}
 df_truth=pd.read_csv('./truth.csv')
 anom=anom.map(lambda val:1 if val==-1 else 0)
 #calculate F1 score
@@ -317,7 +320,7 @@ fpr=FP/(TN+FP)
 final=OrderedDict()
 final['OCSVM']=[f1,rec,prec,fpr]
 
-a2=catfish_sales['anomaly']
+a2=isofor['anomaly']
 a2=a2.map(lambda val:1 if val==-1 else 0)
 f1=f1_score(df_truth['Anom'].values, a2.values)
 rec=recall_score(df_truth['Anom'].values, a2.values)
@@ -329,7 +332,11 @@ df=pd.DataFrame(final)
 df.index=['F1','Recall','Precision','FPR']
 print(tabulate(df, headers='keys', tablefmt='psql'))
 
-#cm=np.array([TP,FP],[FN,TN])
+cm=confusion_matrix(df_truth['Anom'].values,anom.values)
+cmd=ConfusionMatrixDisplay(cm)
+cmd.plot()
+plt.show()
+
 cm=confusion_matrix(df_truth['Anom'].values,a2.values)
 cmd=ConfusionMatrixDisplay(cm)
 cmd.plot()
