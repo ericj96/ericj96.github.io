@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="anomaly.png" class="img-fluid figure-img" width="636"></p>
-<figcaption class="figure-caption">Example of anomaly in telemetry</figcaption>
+<figcaption class="figure-caption">Example of anomaly in telemetry data</figcaption>
 </figure>
 </div>
 </section>
@@ -217,6 +217,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Data Setup &amp; Preprocessing</h1>
 <p>Unfold below code to see setup. Basics are generating 28 features</p>
 <p>setting up training data set and validation data set</p>
+<p>A visualization of the separation between training and test data can be seen in in <a href="#fig-arima2">Figure&nbsp;1</a>, with the first 75% used for training and the remaining 25% used for test data.</p>
 <div class="cell" data-execution_count="1">
 <details>
 <summary>Code</summary>
@@ -321,10 +322,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a><span class="co">#exogenous_features=['High_mean_lag3','week']</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+<div class="cell" data-execution_count="2">
+<div class="cell-output cell-output-display">
+<div id="fig-arima2" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-arima2-output-1.png" width="808" height="485" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;1: Training data is first 75% of wheel temperature data, with the remaining 25% used as the test data for verification</figcaption>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="arima-model" class="level1">
 <h1>ARIMA Model</h1>
-<div class="cell" data-execution_count="2">
+<p>The first step in accurately identifying anomalies with telemetry data is to forecast future data. The ARIMA model is a statistical based model that is specifically made and used for forecasting time series data. Many machine learning algorithms struggle with time series data and are prone to overfitting, so ARIMA is a great option for analyzing spacecraft telemetry data.</p>
+<p>ARIMA works best with data that is stationary, meaning that most input data will need to be differenced before running the model. This was accomplished in the preprocessing stage above, but the auto_arima function will still perform an Augmented Dickey-Fuller (ADF) test to check for stationary data by looking if a unit root is present in the data.</p>
+<p>There are 3 hyperparameters that are used as input for the auto_arima function (with 3 more parameters if seasonal modeling is desired). These parameters are used to optimize the below equation. Auto_arima will iterate through multiple variations of each parameter to find the best combination with the lowest prediction error (Akaike Information Criteria or AIC).</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://en.wikipedia.org/wiki/Autoregressive_integrated_moving_average"><img src="https://wikimedia.org/api/rest_v1/media/math/render/svg/b6ebbe31d07e994b209c391e3d6f8f5d88e267c3.png" class="img-fluid figure-img" alt="{\displaystyle \left(1-\sum _{i"></a></p>
+<figcaption class="figure-caption">Generalized ARIMA model function</figcaption>
+</figure>
+</div>
+<p>Where:</p>
+<ul>
+<li><p>p = order of auto-regressive model</p></li>
+<li><p>d = order of first-differencing</p></li>
+<li><p>q = order of moving-average model</p></li>
+</ul>
+<div class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pmdarima <span class="im">import</span> auto_arima</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_absolute_error</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -344,87 +370,73 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">MAE of Auto ARIMAX:"</span>, mean_absolute_error(df_valid.High, df_valid.Forecast_ARIMAX))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Performing stepwise search to minimize aic
- ARIMA(2,0,2)(0,0,0)[0] intercept   : AIC=2960.826, Time=14.62 sec
+ ARIMA(2,0,2)(0,0,0)[0] intercept   : AIC=2960.826, Time=15.54 sec
  ARIMA(0,0,0)(0,0,0)[0] intercept   : AIC=5711.667, Time=1.30 sec
- ARIMA(1,0,0)(0,0,0)[0] intercept   : AIC=3359.247, Time=10.52 sec
- ARIMA(0,0,1)(0,0,0)[0] intercept   : AIC=3726.632, Time=12.76 sec
- ARIMA(0,0,0)(0,0,0)[0]             : AIC=5709.707, Time=13.42 sec
- ARIMA(1,0,2)(0,0,0)[0] intercept   : AIC=2904.191, Time=15.18 sec
- ARIMA(0,0,2)(0,0,0)[0] intercept   : AIC=2912.739, Time=14.05 sec
- ARIMA(1,0,1)(0,0,0)[0] intercept   : AIC=3067.819, Time=13.77 sec
- ARIMA(1,0,3)(0,0,0)[0] intercept   : AIC=2930.144, Time=15.70 sec
- ARIMA(0,0,3)(0,0,0)[0] intercept   : AIC=2936.070, Time=14.68 sec
- ARIMA(2,0,1)(0,0,0)[0] intercept   : AIC=2957.813, Time=12.91 sec
- ARIMA(2,0,3)(0,0,0)[0] intercept   : AIC=2898.815, Time=16.12 sec
- ARIMA(3,0,3)(0,0,0)[0] intercept   : AIC=2805.639, Time=17.13 sec
- ARIMA(3,0,2)(0,0,0)[0] intercept   : AIC=2962.492, Time=15.65 sec
- ARIMA(4,0,3)(0,0,0)[0] intercept   : AIC=2810.038, Time=17.37 sec
- ARIMA(3,0,4)(0,0,0)[0] intercept   : AIC=2785.353, Time=21.11 sec
- ARIMA(2,0,4)(0,0,0)[0] intercept   : AIC=2897.289, Time=18.63 sec
- ARIMA(4,0,4)(0,0,0)[0] intercept   : AIC=2807.535, Time=19.63 sec
- ARIMA(3,0,5)(0,0,0)[0] intercept   : AIC=2789.723, Time=21.01 sec
- ARIMA(2,0,5)(0,0,0)[0] intercept   : AIC=2846.091, Time=20.94 sec
- ARIMA(4,0,5)(0,0,0)[0] intercept   : AIC=2791.733, Time=22.36 sec
- ARIMA(3,0,4)(0,0,0)[0]             : AIC=2809.734, Time=18.42 sec
+ ARIMA(1,0,0)(0,0,0)[0] intercept   : AIC=3359.247, Time=10.82 sec
+ ARIMA(0,0,1)(0,0,0)[0] intercept   : AIC=3726.632, Time=13.09 sec
+ ARIMA(0,0,0)(0,0,0)[0]             : AIC=5709.707, Time=14.29 sec
+ ARIMA(1,0,2)(0,0,0)[0] intercept   : AIC=2904.191, Time=15.88 sec
+ ARIMA(0,0,2)(0,0,0)[0] intercept   : AIC=2912.739, Time=14.28 sec
+ ARIMA(1,0,1)(0,0,0)[0] intercept   : AIC=3067.819, Time=13.85 sec
+ ARIMA(1,0,3)(0,0,0)[0] intercept   : AIC=2930.144, Time=17.32 sec
+ ARIMA(0,0,3)(0,0,0)[0] intercept   : AIC=2936.070, Time=16.18 sec
+ ARIMA(2,0,1)(0,0,0)[0] intercept   : AIC=2957.813, Time=14.07 sec
+ ARIMA(2,0,3)(0,0,0)[0] intercept   : AIC=2898.815, Time=16.53 sec
+ ARIMA(3,0,3)(0,0,0)[0] intercept   : AIC=2805.639, Time=17.64 sec
+ ARIMA(3,0,2)(0,0,0)[0] intercept   : AIC=2962.492, Time=17.25 sec
+ ARIMA(4,0,3)(0,0,0)[0] intercept   : AIC=2810.038, Time=18.72 sec
+ ARIMA(3,0,4)(0,0,0)[0] intercept   : AIC=2785.353, Time=22.07 sec
+ ARIMA(2,0,4)(0,0,0)[0] intercept   : AIC=2897.289, Time=20.04 sec
+ ARIMA(4,0,4)(0,0,0)[0] intercept   : AIC=2807.535, Time=20.42 sec
+ ARIMA(3,0,5)(0,0,0)[0] intercept   : AIC=2789.723, Time=21.74 sec
+ ARIMA(2,0,5)(0,0,0)[0] intercept   : AIC=2846.091, Time=21.45 sec
+ ARIMA(4,0,5)(0,0,0)[0] intercept   : AIC=2791.733, Time=22.70 sec
+ ARIMA(3,0,4)(0,0,0)[0]             : AIC=2809.734, Time=18.33 sec
 
 Best model:  ARIMA(3,0,4)(0,0,0)[0] intercept
-Total fit time: 347.274 seconds
+Total fit time: 363.557 seconds
 
 RMSE of Auto ARIMAX: 0.6141699692631081
 
 MAE of Auto ARIMAX: 0.2635940364491945</code></pre>
 </div>
 </div>
-<p><a href="#fig-arima">Figure&nbsp;1</a></p>
-<div class="cell" data-fig-width="30%" data-execution_count="3">
+<p>It can be seen that the auto_arima function performed fairly quickly, finding an optimal model in less than 6 minutes with an RMSE of 0.614 and MAE of 0.263. A visual representation of the ARIMA forecast compared to the actual telemetry data can be seen in <a href="#fig-arima">Figure&nbsp;2</a></p>
+<div class="cell" data-fig-width="30%" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div id="fig-arima" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="index_files/figure-html/fig-arima-output-1.png" width="1087" height="592" class="figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;1: Initial ARIMA forecast on reaction wheel temperature data</figcaption>
+<p><img src="index_files/figure-html/fig-arima-output-1.png" width="790" height="444" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;2: Initial ARIMA forecast on reaction wheel temperature data</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>plt.plot(df_train[<span class="st">"High"</span>])</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>plt.plot(df_valid[<span class="st">"Forecast_ARIMAX"</span>])</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Training Data'</span>,<span class="st">'Test Data'</span>],loc<span class="op">=</span><span class="st">'best'</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Temperature (C)'</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>plt.plot(df_valid[<span class="st">"High"</span>])</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>plt.plot(df_valid[<span class="st">"Forecast_ARIMAX"</span>])</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Truth'</span>,<span class="st">'ARIMA Model'</span>],loc<span class="op">=</span><span class="st">'lower left'</span>)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Temperature (C)'</span>)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-5-output-1.png" width="808" height="485"></p>
-</div>
-<div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-5-output-2.png" width="808" height="485"></p>
-</div>
-</div>
+<p>In order to determine the accuracy of the anomaly detection methods used below, a set of truth data points needed to be manually chosen. These points were identified to be points in time where an anomaly took place based on personal experience of operational spacecraft data. 115 out of 1137 total points were marked as anomalous. <a href="#fig-truth">Figure&nbsp;3</a> identifies the anomalies, marked in red.</p>
 <div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">############ Truth ################</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>df_truth<span class="op">=</span>pd.read_csv(<span class="st">'./truth.csv'</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>df_truth.Date <span class="op">=</span> pd.to_datetime(df_truth.Date, <span class="bu">format</span><span class="op">=</span><span class="st">"%m/</span><span class="sc">%d</span><span class="st">/%Y"</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>df_truth.set_index(<span class="st">"Date"</span>, drop<span class="op">=</span><span class="va">True</span>, inplace<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>anom<span class="op">=</span>df_truth[<span class="st">'Anom'</span>]</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>anom<span class="op">=</span>anom.<span class="bu">map</span>(<span class="kw">lambda</span> val:<span class="dv">1</span> <span class="cf">if</span> val<span class="op">==-</span><span class="dv">1</span> <span class="cf">else</span> <span class="dv">0</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>a<span class="op">=</span>df_truth.loc[df_truth[<span class="st">'Anom'</span>]<span class="op">==</span><span class="dv">1</span>,[<span class="st">'High'</span>]]</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>ax.plot(df_truth.index,df_truth[<span class="st">'High'</span>], color<span class="op">=</span><span class="st">'black'</span>, label <span class="op">=</span> <span class="st">'ARIMA'</span>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>ax.scatter(a.index,a.values, color<span class="op">=</span><span class="st">'red'</span>, label <span class="op">=</span> <span class="st">'Anomaly'</span>)</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Wheel Temperature'</span>,<span class="st">'Anomaly'</span>])</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Temperature (C)'</span>)</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Truth Anomalies'</span>)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_truth<span class="op">=</span>pd.read_csv(<span class="st">'./truth.csv'</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df_truth.Date <span class="op">=</span> pd.to_datetime(df_truth.Date, <span class="bu">format</span><span class="op">=</span><span class="st">"%m/</span><span class="sc">%d</span><span class="st">/%Y"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>df_truth.set_index(<span class="st">"Date"</span>, drop<span class="op">=</span><span class="va">True</span>, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>anom<span class="op">=</span>df_truth[<span class="st">'Anom'</span>]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>anom<span class="op">=</span>anom.<span class="bu">map</span>(<span class="kw">lambda</span> val:<span class="dv">1</span> <span class="cf">if</span> val<span class="op">==-</span><span class="dv">1</span> <span class="cf">else</span> <span class="dv">0</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>a<span class="op">=</span>df_truth.loc[df_truth[<span class="st">'Anom'</span>]<span class="op">==</span><span class="dv">1</span>,[<span class="st">'High'</span>]]</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>ax.plot(df_truth.index,df_truth[<span class="st">'High'</span>], color<span class="op">=</span><span class="st">'black'</span>, label <span class="op">=</span> <span class="st">'ARIMA'</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>ax.scatter(a.index,a.values, color<span class="op">=</span><span class="st">'red'</span>, label <span class="op">=</span> <span class="st">'Anomaly'</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Wheel Temperature'</span>,<span class="st">'Anomaly'</span>])</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Temperature (C)'</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Truth Anomalies'</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-6-output-1.png" width="808" height="505"></p>
+<div id="fig-truth" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-truth-output-1.png" width="808" height="505" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;3: Set of anomalous data points to be used as truth</figcaption>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -433,30 +445,30 @@ MAE of Auto ARIMAX: 0.2635940364491945</code></pre>
 <p>One class support vector machine algorithm</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="https://www.researchgate.net/publication/362912442/figure/fig4/AS:11431281080912015@1661430301368/Schematic-of-the-OCSVM_W640.jpg" class="img-fluid figure-img" width="408"></p>
-<figcaption class="figure-caption">OCSVM</figcaption>
+<p><a href="https://www.researchgate.net/publication/362912442_Anomaly_Detection_in_Satellite_Telemetry_Data_Using_a_Sparse_Feature-Based_Method/figures?lo=1"><img src="https://www.researchgate.net/publication/362912442/figure/fig4/AS:11431281080912015@1661430301368/Schematic-of-the-OCSVM_W640.jpg" class="img-fluid figure-img" width="408"></a></p>
+<figcaption class="figure-caption">OCSVM example visualization</figcaption>
 </figure>
 </div>
 <div class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">############# OCSVM ##################</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>data2<span class="op">=</span>df_valid[<span class="st">"Forecast_ARIMAX"</span>]</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span>svm.OneClassSVM(nu<span class="op">=</span><span class="fl">0.05</span>,kernel<span class="op">=</span><span class="st">'poly'</span>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>model.fit(data2.values.reshape(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>))</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>anom<span class="op">=</span>(pd.Series(model.predict(data2.values.reshape(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>))))</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>df2<span class="op">=</span>pd.DataFrame()</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>df2[<span class="st">'Time'</span>]<span class="op">=</span>data2.index</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>df2[<span class="st">'data'</span>]<span class="op">=</span>data2.values</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>df2[<span class="st">'anom'</span>]<span class="op">=</span>anom</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>a<span class="op">=</span>df2.loc[df2[<span class="st">'anom'</span>]<span class="op">==-</span><span class="dv">1</span>,[<span class="st">'Time'</span>,<span class="st">'data'</span>]]</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>df2.set_index(<span class="st">"Time"</span>, drop<span class="op">=</span><span class="va">True</span>, inplace<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>ax.plot(df2.index, df2[<span class="st">'data'</span>], color<span class="op">=</span><span class="st">'black'</span>, label <span class="op">=</span> <span class="st">'ARIMA'</span>)</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>ax.scatter(a[<span class="st">'Time'</span>].values,a[<span class="st">'data'</span>], color<span class="op">=</span><span class="st">'red'</span>, label <span class="op">=</span> <span class="st">'Anomaly'</span>)</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Wheel Temperature'</span>,<span class="st">'Anomaly'</span>])</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Temperature (C)'</span>)</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Anomalies detected with OCSVM'</span>)</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">############# OCSVM ##################</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>data2<span class="op">=</span>df_valid[<span class="st">"Forecast_ARIMAX"</span>]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span>svm.OneClassSVM(nu<span class="op">=</span><span class="fl">0.05</span>,kernel<span class="op">=</span><span class="st">'poly'</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>model.fit(data2.values.reshape(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>anom<span class="op">=</span>(pd.Series(model.predict(data2.values.reshape(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>))))</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>df2<span class="op">=</span>pd.DataFrame()</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>df2[<span class="st">'Time'</span>]<span class="op">=</span>data2.index</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>df2[<span class="st">'data'</span>]<span class="op">=</span>data2.values</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>df2[<span class="st">'anom'</span>]<span class="op">=</span>anom</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>a<span class="op">=</span>df2.loc[df2[<span class="st">'anom'</span>]<span class="op">==-</span><span class="dv">1</span>,[<span class="st">'Time'</span>,<span class="st">'data'</span>]]</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>df2.set_index(<span class="st">"Time"</span>, drop<span class="op">=</span><span class="va">True</span>, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>ax.plot(df2.index, df2[<span class="st">'data'</span>], color<span class="op">=</span><span class="st">'black'</span>, label <span class="op">=</span> <span class="st">'ARIMA'</span>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>ax.scatter(a[<span class="st">'Time'</span>].values,a[<span class="st">'data'</span>], color<span class="op">=</span><span class="st">'red'</span>, label <span class="op">=</span> <span class="st">'Anomaly'</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Wheel Temperature'</span>,<span class="st">'Anomaly'</span>])</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Temperature (C)'</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Anomalies detected with OCSVM'</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <p><img src="index_files/figure-html/cell-7-output-1.png" width="808" height="505"></p>
 </div>
@@ -465,30 +477,30 @@ MAE of Auto ARIMAX: 0.2635940364491945</code></pre>
 <section id="isolation-forest" class="level1">
 <h1>Isolation Forest</h1>
 <div class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">######### Isolation Forest ################</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sklearn</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> IsolationForest</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>isofor<span class="op">=</span>df_valid</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>outliers_fraction <span class="op">=</span> <span class="bu">float</span>(<span class="fl">.01</span>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>scaler <span class="op">=</span> sklearn.preprocessing.StandardScaler()</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>np_scaled <span class="op">=</span> scaler.fit_transform(isofor[<span class="st">'Forecast_ARIMAX'</span>].values.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.DataFrame(np_scaled)</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># train isolation forest</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span>  IsolationForest(contamination<span class="op">=</span>outliers_fraction)</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>model.fit(data)</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>isofor[<span class="st">'anomaly'</span>] <span class="op">=</span> model.predict(data)</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># visualization</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> isofor.loc[isofor[<span class="st">'anomaly'</span>] <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>, [<span class="st">'Forecast_ARIMAX'</span>]] <span class="co">#anomaly</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>ax.plot(isofor.index, isofor[<span class="st">'Forecast_ARIMAX'</span>], color<span class="op">=</span><span class="st">'black'</span>, label <span class="op">=</span> <span class="st">'Normal'</span>)</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>ax.scatter(a.index,a[<span class="st">'Forecast_ARIMAX'</span>], color<span class="op">=</span><span class="st">'red'</span>, label <span class="op">=</span> <span class="st">'Anomaly'</span>)</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Wheel Temperature'</span>,<span class="st">'Anomaly'</span>])</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Temperature (C)'</span>)</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Anomalies detected with Isolation Forest'</span>)</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">######### Isolation Forest ################</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sklearn</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> IsolationForest</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>isofor<span class="op">=</span>df_valid</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>outliers_fraction <span class="op">=</span> <span class="bu">float</span>(<span class="fl">.01</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>scaler <span class="op">=</span> sklearn.preprocessing.StandardScaler()</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>np_scaled <span class="op">=</span> scaler.fit_transform(isofor[<span class="st">'Forecast_ARIMAX'</span>].values.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.DataFrame(np_scaled)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># train isolation forest</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span>  IsolationForest(contamination<span class="op">=</span>outliers_fraction)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>model.fit(data)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>isofor[<span class="st">'anomaly'</span>] <span class="op">=</span> model.predict(data)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co"># visualization</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> isofor.loc[isofor[<span class="st">'anomaly'</span>] <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>, [<span class="st">'Forecast_ARIMAX'</span>]] <span class="co">#anomaly</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>ax.plot(isofor.index, isofor[<span class="st">'Forecast_ARIMAX'</span>], color<span class="op">=</span><span class="st">'black'</span>, label <span class="op">=</span> <span class="st">'Normal'</span>)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>ax.scatter(a.index,a[<span class="st">'Forecast_ARIMAX'</span>], color<span class="op">=</span><span class="st">'red'</span>, label <span class="op">=</span> <span class="st">'Anomaly'</span>)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Wheel Temperature'</span>,<span class="st">'Anomaly'</span>])</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Temperature (C)'</span>)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Anomalies detected with Isolation Forest'</span>)</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <p><img src="index_files/figure-html/cell-8-output-1.png" width="808" height="505"></p>
 </div>
@@ -499,77 +511,77 @@ MAE of Auto ARIMAX: 0.2635940364491945</code></pre>
 <div class="cell" data-execution_count="8">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">######################### calculate statistics ###########################</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> f1_score,recall_score,precision_score</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tabulate <span class="im">import</span> tabulate</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> OrderedDict</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> precision_recall_curve</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> ConfusionMatrixDisplay</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> confusion_matrix</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy <span class="im">import</span> array</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> perf_measure(y_actual, y_hat):</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    TP <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    FP <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    TN <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    FN <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(y_hat)): </span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y_actual[i]<span class="op">==</span>y_hat[i]<span class="op">==</span><span class="dv">1</span>:</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>           TP <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y_hat[i]<span class="op">==</span><span class="dv">1</span> <span class="kw">and</span> y_actual[i]<span class="op">!=</span>y_hat[i]:</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>           FP <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y_actual[i]<span class="op">==</span>y_hat[i]<span class="op">==</span><span class="dv">0</span>:</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>           TN <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y_hat[i]<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> y_actual[i]<span class="op">!=</span>y_hat[i]:</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>           FN <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>(TP, FP, TN, FN)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">######################### calculate statistics ###########################</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> f1_score,recall_score,precision_score</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tabulate <span class="im">import</span> tabulate</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> OrderedDict</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> precision_recall_curve</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> ConfusionMatrixDisplay</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> confusion_matrix</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy <span class="im">import</span> array</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> perf_measure(y_actual, y_hat):</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    TP <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    FP <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    TN <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    FN <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(y_hat)): </span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y_actual[i]<span class="op">==</span>y_hat[i]<span class="op">==</span><span class="dv">1</span>:</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>           TP <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y_hat[i]<span class="op">==</span><span class="dv">1</span> <span class="kw">and</span> y_actual[i]<span class="op">!=</span>y_hat[i]:</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>           FP <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y_actual[i]<span class="op">==</span>y_hat[i]<span class="op">==</span><span class="dv">0</span>:</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>           TN <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y_hat[i]<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> y_actual[i]<span class="op">!=</span>y_hat[i]:</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>           FN <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>(TP, FP, TN, FN)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df_truth<span class="op">=</span>pd.read_csv(<span class="st">'./truth.csv'</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>anom<span class="op">=</span>anom.<span class="bu">map</span>(<span class="kw">lambda</span> val:<span class="dv">1</span> <span class="cf">if</span> val<span class="op">==-</span><span class="dv">1</span> <span class="cf">else</span> <span class="dv">0</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate F1 score</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>f1<span class="op">=</span>f1_score(df_truth[<span class="st">'Anom'</span>].values, anom.values)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>rec<span class="op">=</span>recall_score(df_truth[<span class="st">'Anom'</span>].values, anom.values)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>prec<span class="op">=</span>precision_score(df_truth[<span class="st">'Anom'</span>].values, anom.values)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>TP, FP, TN, FN<span class="op">=</span>perf_measure(df_truth[<span class="st">'Anom'</span>].values, anom.values)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>fpr<span class="op">=</span>FP<span class="op">/</span>(TN<span class="op">+</span>FP)</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>final<span class="op">=</span>OrderedDict()</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>final[<span class="st">'OCSVM'</span>]<span class="op">=</span>[f1,rec,prec,fpr]</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>a2<span class="op">=</span>isofor[<span class="st">'anomaly'</span>]</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>a2<span class="op">=</span>a2.<span class="bu">map</span>(<span class="kw">lambda</span> val:<span class="dv">1</span> <span class="cf">if</span> val<span class="op">==-</span><span class="dv">1</span> <span class="cf">else</span> <span class="dv">0</span>)</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>f1<span class="op">=</span>f1_score(df_truth[<span class="st">'Anom'</span>].values, a2.values)</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>rec<span class="op">=</span>recall_score(df_truth[<span class="st">'Anom'</span>].values, a2.values)</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>prec<span class="op">=</span>precision_score(df_truth[<span class="st">'Anom'</span>].values, a2.values)</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>TP, FP, TN, FN<span class="op">=</span>perf_measure(df_truth[<span class="st">'Anom'</span>].values, a2.values)</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>fpr<span class="op">=</span>FP<span class="op">/</span>(TN<span class="op">+</span>FP)</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>final[<span class="st">'IsoFor'</span>]<span class="op">=</span>[f1,rec,prec,fpr]</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>df<span class="op">=</span>pd.DataFrame(final)</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>df.index<span class="op">=</span>[<span class="st">'F1'</span>,<span class="st">'Recall'</span>,<span class="st">'Precision'</span>,<span class="st">'FPR'</span>]</span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tabulate(df, headers<span class="op">=</span><span class="st">'keys'</span>, tablefmt<span class="op">=</span><span class="st">'psql'</span>))</span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>cm<span class="op">=</span>confusion_matrix(df_truth[<span class="st">'Anom'</span>].values,anom.values)</span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>cmd<span class="op">=</span>ConfusionMatrixDisplay(cm)</span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>cmd.plot()</span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>cm<span class="op">=</span>confusion_matrix(df_truth[<span class="st">'Anom'</span>].values,a2.values)</span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>cmd<span class="op">=</span>ConfusionMatrixDisplay(cm)</span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>cmd.plot()</span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df_truth<span class="op">=</span>pd.read_csv(<span class="st">'./truth.csv'</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>anom<span class="op">=</span>anom.<span class="bu">map</span>(<span class="kw">lambda</span> val:<span class="dv">1</span> <span class="cf">if</span> val<span class="op">==-</span><span class="dv">1</span> <span class="cf">else</span> <span class="dv">0</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate F1 score</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>f1<span class="op">=</span>f1_score(df_truth[<span class="st">'Anom'</span>].values, anom.values)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>rec<span class="op">=</span>recall_score(df_truth[<span class="st">'Anom'</span>].values, anom.values)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>prec<span class="op">=</span>precision_score(df_truth[<span class="st">'Anom'</span>].values, anom.values)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>TP, FP, TN, FN<span class="op">=</span>perf_measure(df_truth[<span class="st">'Anom'</span>].values, anom.values)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>fpr<span class="op">=</span>FP<span class="op">/</span>(TN<span class="op">+</span>FP)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>final<span class="op">=</span>OrderedDict()</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>final[<span class="st">'OCSVM'</span>]<span class="op">=</span>[f1,rec,prec,fpr]</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>a2<span class="op">=</span>isofor[<span class="st">'anomaly'</span>]</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>a2<span class="op">=</span>a2.<span class="bu">map</span>(<span class="kw">lambda</span> val:<span class="dv">1</span> <span class="cf">if</span> val<span class="op">==-</span><span class="dv">1</span> <span class="cf">else</span> <span class="dv">0</span>)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>f1<span class="op">=</span>f1_score(df_truth[<span class="st">'Anom'</span>].values, a2.values)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>rec<span class="op">=</span>recall_score(df_truth[<span class="st">'Anom'</span>].values, a2.values)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>prec<span class="op">=</span>precision_score(df_truth[<span class="st">'Anom'</span>].values, a2.values)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>TP, FP, TN, FN<span class="op">=</span>perf_measure(df_truth[<span class="st">'Anom'</span>].values, a2.values)</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>fpr<span class="op">=</span>FP<span class="op">/</span>(TN<span class="op">+</span>FP)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>final[<span class="st">'IsoFor'</span>]<span class="op">=</span>[f1,rec,prec,fpr]</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>df<span class="op">=</span>pd.DataFrame(final)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>df.index<span class="op">=</span>[<span class="st">'F1'</span>,<span class="st">'Recall'</span>,<span class="st">'Precision'</span>,<span class="st">'FPR'</span>]</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tabulate(df, headers<span class="op">=</span><span class="st">'keys'</span>, tablefmt<span class="op">=</span><span class="st">'psql'</span>))</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>cm<span class="op">=</span>confusion_matrix(df_truth[<span class="st">'Anom'</span>].values,anom.values)</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>cmd<span class="op">=</span>ConfusionMatrixDisplay(cm)</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>cmd.plot()</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>cm<span class="op">=</span>confusion_matrix(df_truth[<span class="st">'Anom'</span>].values,a2.values)</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>cmd<span class="op">=</span>ConfusionMatrixDisplay(cm)</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>cmd.plot()</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>+-----------+-------------+-------------+
-|           |       OCSVM |      IsoFor |
-|-----------+-------------+-------------|
-| F1        | 0.718232    | 0.20155     |
-| Recall    | 0.565217    | 0.113043    |
-| Precision | 0.984848    | 0.928571    |
-| FPR       | 0.000818331 | 0.000818331 |
-+-----------+-------------+-------------+</code></pre>
+<pre><code>+-----------+-------------+----------+
+|           |       OCSVM |   IsoFor |
+|-----------+-------------+----------|
+| F1        | 0.718232    | 0.217054 |
+| Recall    | 0.565217    | 0.121739 |
+| Precision | 0.984848    | 1        |
+| FPR       | 0.000818331 | 0        |
++-----------+-------------+----------+</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="index_files/figure-html/cell-10-output-2.png" width="513" height="429"></p>

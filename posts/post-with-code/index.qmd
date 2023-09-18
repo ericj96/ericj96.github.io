@@ -36,13 +36,15 @@ Spacecraft will generate a massive amount of data the longer they are on orbit, 
 
 -   Goal: Utilize ARIMA & OCSVM to create a hybrid anomaly detection method and compare results with other common algorithms/methods
 
-![Example of anomaly in telemetry](anomaly.png){width="636"}
+![Example of anomaly in telemetry data](anomaly.png){width="636"}
 
 # Data Setup & Preprocessing
 
 Unfold below code to see setup. Basics are generating 28 features
 
 setting up training data set and validation data set
+
+A visualization of the separation between training and test data can be seen in in @fig-arima2, with the first 75% used for training and the remaining 25% used for test data.
 
 ```{python}
 #| code-fold: true
@@ -149,7 +151,35 @@ exogenous_features=['High_mean_lag3', 'High_mean_lag7',
       
 ```
 
+```{python}
+#| echo: False 
+#| label: fig-arima2
+#| fig-cap: "Training data is first 75% of wheel temperature data, with the remaining 25% used as the test data for verification"
+fig, ax = plt.subplots(figsize=(10,6))
+plt.plot(df_train["High"])
+plt.plot(df_valid["High"])
+plt.legend(['Training Data','Test Data'],loc='best')
+plt.ylabel('Temperature (C)')
+plt.show()
+```
+
 # ARIMA Model
+
+The first step in accurately identifying anomalies with telemetry data is to forecast future data. The ARIMA model is a statistical based model that is specifically made and used for forecasting time series data. Many machine learning algorithms struggle with time series data and are prone to overfitting, so ARIMA is a great option for analyzing spacecraft telemetry data.
+
+ARIMA works best with data that is stationary, meaning that most input data will need to be differenced before running the model. This was accomplished in the preprocessing stage above, but the auto_arima function will still perform an Augmented Dickey-Fuller (ADF) test to check for stationary data by looking if a unit root is present in the data.
+
+There are 3 hyperparameters that are used as input for the auto_arima function (with 3 more parameters if seasonal modeling is desired). These parameters are used to optimize the below equation. Auto_arima will iterate through multiple variations of each parameter to find the best combination with the lowest prediction error (Akaike Information Criteria or AIC).
+
+[![Generalized ARIMA model function](https://wikimedia.org/api/rest_v1/media/math/render/svg/b6ebbe31d07e994b209c391e3d6f8f5d88e267c3){alt="{\\displaystyle \\left(1-\\sum _{i"}](https://en.wikipedia.org/wiki/Autoregressive_integrated_moving_average)
+
+Where:
+
+-   p = order of auto-regressive model
+
+-   d = order of first-differencing
+
+-   q = order of moving-average model
 
 ```{python}
 from pmdarima import auto_arima
@@ -171,37 +201,24 @@ print("\nRMSE of Auto ARIMAX:", np.sqrt(mean_squared_error(df_valid.High, df_val
 print("\nMAE of Auto ARIMAX:", mean_absolute_error(df_valid.High, df_valid.Forecast_ARIMAX))
 ```
 
-@fig-arima
+It can be seen that the auto_arima function performed fairly quickly, finding an optimal model in less than 6 minutes with an RMSE of 0.614 and MAE of 0.263. A visual representation of the ARIMA forecast compared to the actual telemetry data can be seen in @fig-arima
 
 ```{python}
 #| echo: False 
 #| fig-width: 30%
 #| label: fig-arima
 #| fig-cap: "Initial ARIMA forecast on reaction wheel temperature data"
-df_valid[["High", "Forecast_ARIMAX"]].plot(figsize=(14, 7))
-plt.legend(['Wheel Temperature','Forecast (ARIMA)'])
+df_valid[["High", "Forecast_ARIMAX"]].plot(figsize=(10, 5))
+plt.legend(['Wheel Temperature (Truth)','Forecast (ARIMA)'])
 plt.show()
 ```
 
-```{python}
-fig, ax = plt.subplots(figsize=(10,6))
-plt.plot(df_train["High"])
-plt.plot(df_valid["Forecast_ARIMAX"])
-plt.legend(['Training Data','Test Data'],loc='best')
-plt.ylabel('Temperature (C)')
-plt.show()
-
-fig, ax = plt.subplots(figsize=(10,6))
-plt.plot(df_valid["High"])
-plt.plot(df_valid["Forecast_ARIMAX"])
-plt.legend(['Truth','ARIMA Model'],loc='lower left')
-plt.ylabel('Temperature (C)')
-plt.show()
-
-```
+In order to determine the accuracy of the anomaly detection methods used below, a set of truth data points needed to be manually chosen. These points were identified to be points in time where an anomaly took place based on personal experience of operational spacecraft data. 115 out of 1137 total points were marked as anomalous. @fig-truth identifies the anomalies, marked in red.
 
 ```{python}
-############ Truth ################
+#| code-fold: true
+#| label: fig-truth
+#| fig-cap: "Set of anomalous data points to be used as truth"
 
 df_truth=pd.read_csv('./truth.csv')
 df_truth.Date = pd.to_datetime(df_truth.Date, format="%m/%d/%Y")
@@ -222,7 +239,7 @@ plt.show()
 
 One class support vector machine algorithm
 
-![OCSVM](https://www.researchgate.net/publication/362912442/figure/fig4/AS:11431281080912015@1661430301368/Schematic-of-the-OCSVM_W640.jpg){width="408"}
+[![OCSVM example visualization ](https://www.researchgate.net/publication/362912442/figure/fig4/AS:11431281080912015@1661430301368/Schematic-of-the-OCSVM_W640.jpg){width="408"}](https://www.researchgate.net/publication/362912442_Anomaly_Detection_in_Satellite_Telemetry_Data_Using_a_Sparse_Feature-Based_Method/figures?lo=1)
 
 ```{python}
 ############# OCSVM ##################
