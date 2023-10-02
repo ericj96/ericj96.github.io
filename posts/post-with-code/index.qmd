@@ -10,39 +10,19 @@ toc-depth: 2
 
 # Background
 
-Spacecraft will generate a massive amount of data the longer they are on orbit, from telemetry data containing voltages, temperatures, etc to raw data from the various types of payloads on orbit
+Every spacecraft that is launched has some form of onboard anomaly responses for most known failure cases in order to safe the vehicle. Normally these are simple low/high limits set for certain monitors (temperature, voltage, etc) with a corresponding response, whether that be a simple visual alarm or powering off certain equipment.
 
--   Spacecraft have onboard anomaly responses for most known failure cases to safe the vehicle
-
--   Normally low/high, red/yellow limits set for certain monitors with corresponding response (either automatic or visual alarm)
-
--   Some anomalies can be hard to predict, multiple components can react slightly out of family to create larger issue
-
--   Benefits of utilizing machine learning for spacecraft:
-
--   Prevents loss of mission over potentially high priority targets
-
--   Automatic response would limit both downtime and human interaction
-
--   Higher award/incentive fees for lower mission outage percentage
-
--   Limits time spent by operators and factory investigating and implementing a fix
-
--   Depending on program and customer, recovery can take anywhere from a few hours to multiple days
-
--   Predict future anomalous conditions and potentially react before an issue were to occur
-
--   Some programs have multiple vehicles on orbit meaning there is a plethora of historical training data available
-
--   Goal: Utilize ARIMA & OCSVM to create a hybrid anomaly detection method and compare results with other common algorithms/methods
+The problem with anomalies in space is that they can be incredibly hard to predict, as multiple components can react slightly out of family to create a larger issue. Spacecraft will also generate a massive amount of data the longer they are on orbit, and manually looking and trending this data from a human standpoint can miss certain anomalies. But, this large amount of data makes them perfect for utilizing machine learning. Machine learning would allow for these anomalies to not only be identified, but also potentially predicted and prevented, allowing the spacecraft to stay in mission over potentially high priority targets (depending on the payload/mission). An automatic response to a predicted anomaly would limit both downtime and human interaction, as the investigation and implementation can take hours to days before returning to mission.
 
 ![Example of anomaly in telemetry data](anomaly.png){width="636"}
 
 # Data Setup & Preprocessing
 
-Unfold below code to see setup. Basics are generating 28 features
+## Preprocessing
 
-setting up training data set and validation data set
+Many spacecraft constellations have decades of on orbit telemetry available, but is mostly proprietary and not available for public use. LASP and NASA releases subsets of data to the public, and this is what was used for this blog post. Reaction wheel temperatures, battery temperatures and voltages, and total bus current datasets were used, each having 750,000+ samples of data over \~14.5 years. Because ARIMA requires the data to be stationary, each of the datasets is first sampled down to a daily mean which brings the size down to only 5346 data points. This will allow for much faster processing. To increase the number of exogenous features, each dataset is also turned into sets of rolling mean and rolling standard deviation in windows of 3, 7, and 30 days.
+
+Unfold the below code to see the setup of the data and how it is preprocessed as mentioned above.
 
 A visualization of the separation between training and test data can be seen in in @fig-arima2, with the first 75% used for training and the remaining 25% used for test data.
 
@@ -145,10 +125,6 @@ exogenous_features=['High_mean_lag3', 'High_mean_lag7',
        'Voltage_mean_lag7', 'Voltage_mean_lag30', 'Voltage_std_lag3',
        'Voltage_std_lag7', 'Voltage_std_lag30', 'month', 'week', 'day',
        'day_of_week']
-       
-       
-#exogenous_features=['High_mean_lag3','week']
-      
 ```
 
 ```{python}
@@ -160,6 +136,30 @@ plt.plot(df_train["High"])
 plt.plot(df_valid["High"])
 plt.legend(['Training Data','Test Data'],loc='best')
 plt.ylabel('Temperature (C)')
+plt.show()
+```
+
+## Truth Data
+
+In order to determine the accuracy of the anomaly detection methods used below, a set of truth data points needed to be manually chosen. These points were identified to be points in time where an anomaly took place based on personal experience of operational spacecraft data. 115 out of 1137 total points were marked as anomalous. @fig-truth identifies the anomalies, marked in red.
+
+```{python}
+#| code-fold: true
+#| label: fig-truth
+#| fig-cap: "Set of anomalous data points to be used as truth"
+
+df_truth=pd.read_csv('./truth.csv')
+df_truth.Date = pd.to_datetime(df_truth.Date, format="%m/%d/%Y")
+df_truth.set_index("Date", drop=True, inplace=True)
+anom=df_truth['Anom']
+anom=anom.map(lambda val:1 if val==-1 else 0)
+a=df_truth.loc[df_truth['Anom']==1,['High']]
+fig, ax = plt.subplots(figsize=(10,6))
+ax.plot(df_truth.index,df_truth['High'], color='black', label = 'ARIMA')
+ax.scatter(a.index,a.values, color='red', label = 'Anomaly')
+plt.legend(['Wheel Temperature','Anomaly'])
+plt.ylabel('Temperature (C)')
+plt.title('Truth Anomalies')
 plt.show()
 ```
 
@@ -213,33 +213,25 @@ plt.legend(['Wheel Temperature (Truth)','Forecast (ARIMA)'])
 plt.show()
 ```
 
-In order to determine the accuracy of the anomaly detection methods used below, a set of truth data points needed to be manually chosen. These points were identified to be points in time where an anomaly took place based on personal experience of operational spacecraft data. 115 out of 1137 total points were marked as anomalous. @fig-truth identifies the anomalies, marked in red.
-
-```{python}
-#| code-fold: true
-#| label: fig-truth
-#| fig-cap: "Set of anomalous data points to be used as truth"
-
-df_truth=pd.read_csv('./truth.csv')
-df_truth.Date = pd.to_datetime(df_truth.Date, format="%m/%d/%Y")
-df_truth.set_index("Date", drop=True, inplace=True)
-anom=df_truth['Anom']
-anom=anom.map(lambda val:1 if val==-1 else 0)
-a=df_truth.loc[df_truth['Anom']==1,['High']]
-fig, ax = plt.subplots(figsize=(10,6))
-ax.plot(df_truth.index,df_truth['High'], color='black', label = 'ARIMA')
-ax.scatter(a.index,a.values, color='red', label = 'Anomaly')
-plt.legend(['Wheel Temperature','Anomaly'])
-plt.ylabel('Temperature (C)')
-plt.title('Truth Anomalies')
-plt.show()
-```
-
 # OCSVM
 
-One class support vector machine algorithm
+One class support vector machine algorithm is an unsupervised machine learning method that maps samples of a higher dimensional subspace and finds a hyperplane separating one-class samples from the origin. This splits the data into both positive and negative classes and tries to minimize the volume of training data in the positive class. In the below example, a two dimensional space is seen to be split by a one dimensional hyperplane, with the distance from the origin maximized. Through this process outliers are identified and flagged.
 
-[![OCSVM example visualization ](https://www.researchgate.net/publication/362912442/figure/fig4/AS:11431281080912015@1661430301368/Schematic-of-the-OCSVM_W640.jpg){width="408"}](https://www.researchgate.net/publication/362912442_Anomaly_Detection_in_Satellite_Telemetry_Data_Using_a_Sparse_Feature-Based_Method/figures?lo=1)
+Advantages:
+
+-   Highly efficient
+
+-   Requires few hyperparameters from the user
+
+-   Eliminated the need for labelled two-class information during training
+
+Inputs:
+
+-   nu (upper bound on fraction of errors, used 0.05)
+
+-   kernel (type of function for kernel method, used poly)
+
+[![OCSVM example visualization](https://www.researchgate.net/publication/362912442/figure/fig4/AS:11431281080912015@1661430301368/Schematic-of-the-OCSVM_W640.jpg){width="408"}](https://www.researchgate.net/publication/362912442_Anomaly_Detection_in_Satellite_Telemetry_Data_Using_a_Sparse_Feature-Based_Method/figures?lo=1)
 
 ```{python}
 ############# OCSVM ##################
@@ -264,6 +256,14 @@ plt.show()
 ```
 
 # Isolation Forest
+
+In order to compare OCSVM against something to prove it's worth in anomaly detection, an additional method was chosen. Isolation Forest is a commonly used outlier detection method which detects outliers utilizing binary trees. This method recursively partitions data points based on randomly selected attribute and then assigned anomaly scores based on number of "splits" needed to isolate a data point. The training dataset is used to build the "trees" and then the validation data is passed through those trees and assigned an anomaly score. Based on the anomaly score, it can be determined which points are outliers.
+
+Advantages:
+
+-   Low memory utilization
+
+-   Works best with large datasets
 
 ```{python}
 ######### Isolation Forest ################
@@ -293,6 +293,8 @@ plt.show()
 ```
 
 # Final Results
+
+As seen from the above plots for OCSVM and Isolation Forest, both methods identified anomalous points to some degree of success, but OCSVM identified multiple sections. When comparing to the truth anomalies, and calculating common metrics (F1, recall, precision, and FPR), the below table shows that OCSVM performed multiple times better than Isolation Forest, with similar precision and FPR.
 
 ```{python}
 #| code-fold: true

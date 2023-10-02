@@ -175,7 +175,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul class="collapse">
   <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background">Background</a></li>
-  <li><a href="#data-setup-preprocessing" id="toc-data-setup-preprocessing" class="nav-link" data-scroll-target="#data-setup-preprocessing">Data Setup &amp; Preprocessing</a></li>
+  <li><a href="#data-setup-preprocessing" id="toc-data-setup-preprocessing" class="nav-link" data-scroll-target="#data-setup-preprocessing">Data Setup &amp; Preprocessing</a>
+  <ul class="collapse">
+  <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing">Preprocessing</a></li>
+  <li><a href="#truth-data" id="toc-truth-data" class="nav-link" data-scroll-target="#truth-data">Truth Data</a></li>
+  </ul></li>
   <li><a href="#arima-model" id="toc-arima-model" class="nav-link" data-scroll-target="#arima-model">ARIMA Model</a></li>
   <li><a href="#ocsvm" id="toc-ocsvm" class="nav-link" data-scroll-target="#ocsvm">OCSVM</a></li>
   <li><a href="#isolation-forest" id="toc-isolation-forest" class="nav-link" data-scroll-target="#isolation-forest">Isolation Forest</a></li>
@@ -191,21 +195,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="background" class="level1">
 <h1>Background</h1>
-<p>Spacecraft will generate a massive amount of data the longer they are on orbit, from telemetry data containing voltages, temperatures, etc to raw data from the various types of payloads on orbit</p>
-<ul>
-<li><p>Spacecraft have onboard anomaly responses for most known failure cases to safe the vehicle</p></li>
-<li><p>Normally low/high, red/yellow limits set for certain monitors with corresponding response (either automatic or visual alarm)</p></li>
-<li><p>Some anomalies can be hard to predict, multiple components can react slightly out of family to create larger issue</p></li>
-<li><p>Benefits of utilizing machine learning for spacecraft:</p></li>
-<li><p>Prevents loss of mission over potentially high priority targets</p></li>
-<li><p>Automatic response would limit both downtime and human interaction</p></li>
-<li><p>Higher award/incentive fees for lower mission outage percentage</p></li>
-<li><p>Limits time spent by operators and factory investigating and implementing a fix</p></li>
-<li><p>Depending on program and customer, recovery can take anywhere from a few hours to multiple days</p></li>
-<li><p>Predict future anomalous conditions and potentially react before an issue were to occur</p></li>
-<li><p>Some programs have multiple vehicles on orbit meaning there is a plethora of historical training data available</p></li>
-<li><p>Goal: Utilize ARIMA &amp; OCSVM to create a hybrid anomaly detection method and compare results with other common algorithms/methods</p></li>
-</ul>
+<p>Every spacecraft that is launched has some form of onboard anomaly responses for most known failure cases in order to safe the vehicle. Normally these are simple low/high limits set for certain monitors (temperature, voltage, etc) with a corresponding response, whether that be a simple visual alarm or powering off certain equipment.</p>
+<p>The problem with anomalies in space is that they can be incredibly hard to predict, as multiple components can react slightly out of family to create a larger issue. Spacecraft will also generate a massive amount of data the longer they are on orbit, and manually looking and trending this data from a human standpoint can miss certain anomalies. But, this large amount of data makes them perfect for utilizing machine learning. Machine learning would allow for these anomalies to not only be identified, but also potentially predicted and prevented, allowing the spacecraft to stay in mission over potentially high priority targets (depending on the payload/mission). An automatic response to a predicted anomaly would limit both downtime and human interaction, as the investigation and implementation can take hours to days before returning to mission.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="anomaly.png" class="img-fluid figure-img" width="636"></p>
@@ -215,8 +206,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="data-setup-preprocessing" class="level1">
 <h1>Data Setup &amp; Preprocessing</h1>
-<p>Unfold below code to see setup. Basics are generating 28 features</p>
-<p>setting up training data set and validation data set</p>
+<section id="preprocessing" class="level2">
+<h2 class="anchored" data-anchor-id="preprocessing">Preprocessing</h2>
+<p>Many spacecraft constellations have decades of on orbit telemetry available, but is mostly proprietary and not available for public use. LASP and NASA releases subsets of data to the public, and this is what was used for this blog post. Reaction wheel temperatures, battery temperatures and voltages, and total bus current datasets were used, each having 750,000+ samples of data over ~14.5 years. Because ARIMA requires the data to be stationary, each of the datasets is first sampled down to a daily mean which brings the size down to only 5346 data points. This will allow for much faster processing. To increase the number of exogenous features, each dataset is also turned into sets of rolling mean and rolling standard deviation in windows of 3, 7, and 30 days.</p>
+<p>Unfold the below code to see the setup of the data and how it is preprocessed as mentioned above.</p>
 <p>A visualization of the separation between training and test data can be seen in in <a href="#fig-arima2">Figure&nbsp;1</a>, with the first 75% used for training and the remaining 25% used for test data.</p>
 <div class="cell" data-execution_count="1">
 <details>
@@ -316,10 +309,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>       <span class="st">'Current_std_lag7'</span>, <span class="st">'Current_std_lag30'</span>, <span class="st">'Voltage_mean_lag3'</span>,</span>
 <span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>       <span class="st">'Voltage_mean_lag7'</span>, <span class="st">'Voltage_mean_lag30'</span>, <span class="st">'Voltage_std_lag3'</span>,</span>
 <span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>       <span class="st">'Voltage_std_lag7'</span>, <span class="st">'Voltage_std_lag30'</span>, <span class="st">'month'</span>, <span class="st">'week'</span>, <span class="st">'day'</span>,</span>
-<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>       <span class="st">'day_of_week'</span>]</span>
-<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>       </span>
-<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>       </span>
-<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a><span class="co">#exogenous_features=['High_mean_lag3','week']</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>       <span class="st">'day_of_week'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell" data-execution_count="2">
@@ -332,6 +322,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+</section>
+<section id="truth-data" class="level2">
+<h2 class="anchored" data-anchor-id="truth-data">Truth Data</h2>
+<p>In order to determine the accuracy of the anomaly detection methods used below, a set of truth data points needed to be manually chosen. These points were identified to be points in time where an anomaly took place based on personal experience of operational spacecraft data. 115 out of 1137 total points were marked as anomalous. <a href="#fig-truth">Figure&nbsp;2</a> identifies the anomalies, marked in red.</p>
+<div class="cell" data-execution_count="3">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df_truth<span class="op">=</span>pd.read_csv(<span class="st">'./truth.csv'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df_truth.Date <span class="op">=</span> pd.to_datetime(df_truth.Date, <span class="bu">format</span><span class="op">=</span><span class="st">"%m/</span><span class="sc">%d</span><span class="st">/%Y"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df_truth.set_index(<span class="st">"Date"</span>, drop<span class="op">=</span><span class="va">True</span>, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>anom<span class="op">=</span>df_truth[<span class="st">'Anom'</span>]</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>anom<span class="op">=</span>anom.<span class="bu">map</span>(<span class="kw">lambda</span> val:<span class="dv">1</span> <span class="cf">if</span> val<span class="op">==-</span><span class="dv">1</span> <span class="cf">else</span> <span class="dv">0</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>a<span class="op">=</span>df_truth.loc[df_truth[<span class="st">'Anom'</span>]<span class="op">==</span><span class="dv">1</span>,[<span class="st">'High'</span>]]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>ax.plot(df_truth.index,df_truth[<span class="st">'High'</span>], color<span class="op">=</span><span class="st">'black'</span>, label <span class="op">=</span> <span class="st">'ARIMA'</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>ax.scatter(a.index,a.values, color<span class="op">=</span><span class="st">'red'</span>, label <span class="op">=</span> <span class="st">'Anomaly'</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Wheel Temperature'</span>,<span class="st">'Anomaly'</span>])</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Temperature (C)'</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Truth Anomalies'</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-truth" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-truth-output-1.png" width="808" height="505" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;2: Set of anomalous data points to be used as truth</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
 </section>
 <section id="arima-model" class="level1">
 <h1>ARIMA Model</h1>
@@ -350,91 +371,64 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>d = order of first-differencing</p></li>
 <li><p>q = order of moving-average model</p></li>
 </ul>
-<div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pmdarima <span class="im">import</span> auto_arima</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_absolute_error</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> auto_arima(</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    df_train[<span class="st">"High"</span>],</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    exogenous<span class="op">=</span>df_train[exogenous_features],</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    trace<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    error_action<span class="op">=</span><span class="st">"ignore"</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    suppress_warnings<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    seasonal<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    m<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>model.fit(df_train.High, exogenous<span class="op">=</span>df_train[exogenous_features])</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> model.predict(n_periods<span class="op">=</span><span class="bu">len</span>(df_valid), exogenous<span class="op">=</span>df_valid[exogenous_features])</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>df_valid.insert(<span class="bu">len</span>(df_valid.columns),<span class="st">"Forecast_ARIMAX"</span>,forecast,<span class="va">True</span>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">RMSE of Auto ARIMAX:"</span>, np.sqrt(mean_squared_error(df_valid.High, df_valid.Forecast_ARIMAX)))</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">MAE of Auto ARIMAX:"</span>, mean_absolute_error(df_valid.High, df_valid.Forecast_ARIMAX))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pmdarima <span class="im">import</span> auto_arima</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_absolute_error</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> auto_arima(</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    df_train[<span class="st">"High"</span>],</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    exogenous<span class="op">=</span>df_train[exogenous_features],</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    trace<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    error_action<span class="op">=</span><span class="st">"ignore"</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    suppress_warnings<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    seasonal<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    m<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>model.fit(df_train.High, exogenous<span class="op">=</span>df_train[exogenous_features])</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> model.predict(n_periods<span class="op">=</span><span class="bu">len</span>(df_valid), exogenous<span class="op">=</span>df_valid[exogenous_features])</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>df_valid.insert(<span class="bu">len</span>(df_valid.columns),<span class="st">"Forecast_ARIMAX"</span>,forecast,<span class="va">True</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">RMSE of Auto ARIMAX:"</span>, np.sqrt(mean_squared_error(df_valid.High, df_valid.Forecast_ARIMAX)))</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">MAE of Auto ARIMAX:"</span>, mean_absolute_error(df_valid.High, df_valid.Forecast_ARIMAX))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Performing stepwise search to minimize aic
- ARIMA(2,0,2)(0,0,0)[0] intercept   : AIC=2960.826, Time=15.54 sec
- ARIMA(0,0,0)(0,0,0)[0] intercept   : AIC=5711.667, Time=1.30 sec
- ARIMA(1,0,0)(0,0,0)[0] intercept   : AIC=3359.247, Time=10.82 sec
- ARIMA(0,0,1)(0,0,0)[0] intercept   : AIC=3726.632, Time=13.09 sec
- ARIMA(0,0,0)(0,0,0)[0]             : AIC=5709.707, Time=14.29 sec
- ARIMA(1,0,2)(0,0,0)[0] intercept   : AIC=2904.191, Time=15.88 sec
- ARIMA(0,0,2)(0,0,0)[0] intercept   : AIC=2912.739, Time=14.28 sec
- ARIMA(1,0,1)(0,0,0)[0] intercept   : AIC=3067.819, Time=13.85 sec
- ARIMA(1,0,3)(0,0,0)[0] intercept   : AIC=2930.144, Time=17.32 sec
- ARIMA(0,0,3)(0,0,0)[0] intercept   : AIC=2936.070, Time=16.18 sec
- ARIMA(2,0,1)(0,0,0)[0] intercept   : AIC=2957.813, Time=14.07 sec
- ARIMA(2,0,3)(0,0,0)[0] intercept   : AIC=2898.815, Time=16.53 sec
- ARIMA(3,0,3)(0,0,0)[0] intercept   : AIC=2805.639, Time=17.64 sec
- ARIMA(3,0,2)(0,0,0)[0] intercept   : AIC=2962.492, Time=17.25 sec
- ARIMA(4,0,3)(0,0,0)[0] intercept   : AIC=2810.038, Time=18.72 sec
- ARIMA(3,0,4)(0,0,0)[0] intercept   : AIC=2785.353, Time=22.07 sec
- ARIMA(2,0,4)(0,0,0)[0] intercept   : AIC=2897.289, Time=20.04 sec
- ARIMA(4,0,4)(0,0,0)[0] intercept   : AIC=2807.535, Time=20.42 sec
- ARIMA(3,0,5)(0,0,0)[0] intercept   : AIC=2789.723, Time=21.74 sec
- ARIMA(2,0,5)(0,0,0)[0] intercept   : AIC=2846.091, Time=21.45 sec
- ARIMA(4,0,5)(0,0,0)[0] intercept   : AIC=2791.733, Time=22.70 sec
- ARIMA(3,0,4)(0,0,0)[0]             : AIC=2809.734, Time=18.33 sec
+ ARIMA(2,0,2)(0,0,0)[0] intercept   : AIC=2960.826, Time=15.08 sec
+ ARIMA(0,0,0)(0,0,0)[0] intercept   : AIC=5711.667, Time=1.35 sec
+ ARIMA(1,0,0)(0,0,0)[0] intercept   : AIC=3359.247, Time=10.77 sec
+ ARIMA(0,0,1)(0,0,0)[0] intercept   : AIC=3726.632, Time=13.07 sec
+ ARIMA(0,0,0)(0,0,0)[0]             : AIC=5709.707, Time=13.79 sec
+ ARIMA(1,0,2)(0,0,0)[0] intercept   : AIC=2904.191, Time=15.63 sec
+ ARIMA(0,0,2)(0,0,0)[0] intercept   : AIC=2912.739, Time=14.50 sec
+ ARIMA(1,0,1)(0,0,0)[0] intercept   : AIC=3067.819, Time=13.95 sec
+ ARIMA(1,0,3)(0,0,0)[0] intercept   : AIC=2930.144, Time=16.32 sec
+ ARIMA(0,0,3)(0,0,0)[0] intercept   : AIC=2936.070, Time=15.12 sec
+ ARIMA(2,0,1)(0,0,0)[0] intercept   : AIC=2957.813, Time=13.33 sec
+ ARIMA(2,0,3)(0,0,0)[0] intercept   : AIC=2898.815, Time=16.69 sec
+ ARIMA(3,0,3)(0,0,0)[0] intercept   : AIC=2805.639, Time=17.81 sec
+ ARIMA(3,0,2)(0,0,0)[0] intercept   : AIC=2962.492, Time=16.12 sec
+ ARIMA(4,0,3)(0,0,0)[0] intercept   : AIC=2810.038, Time=18.12 sec
+ ARIMA(3,0,4)(0,0,0)[0] intercept   : AIC=2785.353, Time=22.62 sec
+ ARIMA(2,0,4)(0,0,0)[0] intercept   : AIC=2897.289, Time=19.36 sec
+ ARIMA(4,0,4)(0,0,0)[0] intercept   : AIC=2807.535, Time=20.25 sec
+ ARIMA(3,0,5)(0,0,0)[0] intercept   : AIC=2789.723, Time=22.73 sec
+ ARIMA(2,0,5)(0,0,0)[0] intercept   : AIC=2846.091, Time=21.91 sec
+ ARIMA(4,0,5)(0,0,0)[0] intercept   : AIC=2791.733, Time=23.10 sec
+ ARIMA(3,0,4)(0,0,0)[0]             : AIC=2809.734, Time=18.70 sec
 
 Best model:  ARIMA(3,0,4)(0,0,0)[0] intercept
-Total fit time: 363.557 seconds
+Total fit time: 360.364 seconds
 
 RMSE of Auto ARIMAX: 0.6141699692631081
 
 MAE of Auto ARIMAX: 0.2635940364491945</code></pre>
 </div>
 </div>
-<p>It can be seen that the auto_arima function performed fairly quickly, finding an optimal model in less than 6 minutes with an RMSE of 0.614 and MAE of 0.263. A visual representation of the ARIMA forecast compared to the actual telemetry data can be seen in <a href="#fig-arima">Figure&nbsp;2</a></p>
-<div class="cell" data-fig-width="30%" data-execution_count="4">
+<p>It can be seen that the auto_arima function performed fairly quickly, finding an optimal model in less than 6 minutes with an RMSE of 0.614 and MAE of 0.263. A visual representation of the ARIMA forecast compared to the actual telemetry data can be seen in <a href="#fig-arima">Figure&nbsp;3</a></p>
+<div class="cell" data-fig-width="30%" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div id="fig-arima" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="index_files/figure-html/fig-arima-output-1.png" width="790" height="444" class="figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;2: Initial ARIMA forecast on reaction wheel temperature data</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<p>In order to determine the accuracy of the anomaly detection methods used below, a set of truth data points needed to be manually chosen. These points were identified to be points in time where an anomaly took place based on personal experience of operational spacecraft data. 115 out of 1137 total points were marked as anomalous. <a href="#fig-truth">Figure&nbsp;3</a> identifies the anomalies, marked in red.</p>
-<div class="cell" data-execution_count="5">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_truth<span class="op">=</span>pd.read_csv(<span class="st">'./truth.csv'</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df_truth.Date <span class="op">=</span> pd.to_datetime(df_truth.Date, <span class="bu">format</span><span class="op">=</span><span class="st">"%m/</span><span class="sc">%d</span><span class="st">/%Y"</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>df_truth.set_index(<span class="st">"Date"</span>, drop<span class="op">=</span><span class="va">True</span>, inplace<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>anom<span class="op">=</span>df_truth[<span class="st">'Anom'</span>]</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>anom<span class="op">=</span>anom.<span class="bu">map</span>(<span class="kw">lambda</span> val:<span class="dv">1</span> <span class="cf">if</span> val<span class="op">==-</span><span class="dv">1</span> <span class="cf">else</span> <span class="dv">0</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>a<span class="op">=</span>df_truth.loc[df_truth[<span class="st">'Anom'</span>]<span class="op">==</span><span class="dv">1</span>,[<span class="st">'High'</span>]]</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>ax.plot(df_truth.index,df_truth[<span class="st">'High'</span>], color<span class="op">=</span><span class="st">'black'</span>, label <span class="op">=</span> <span class="st">'ARIMA'</span>)</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>ax.scatter(a.index,a.values, color<span class="op">=</span><span class="st">'red'</span>, label <span class="op">=</span> <span class="st">'Anomaly'</span>)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Wheel Temperature'</span>,<span class="st">'Anomaly'</span>])</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Temperature (C)'</span>)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Truth Anomalies'</span>)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-display">
-<div id="fig-truth" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="index_files/figure-html/fig-truth-output-1.png" width="808" height="505" class="figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;3: Set of anomalous data points to be used as truth</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;3: Initial ARIMA forecast on reaction wheel temperature data</figcaption>
 </figure>
 </div>
 </div>
@@ -442,7 +436,18 @@ MAE of Auto ARIMAX: 0.2635940364491945</code></pre>
 </section>
 <section id="ocsvm" class="level1">
 <h1>OCSVM</h1>
-<p>One class support vector machine algorithm</p>
+<p>One class support vector machine algorithm is an unsupervised machine learning method that maps samples of a higher dimensional subspace and finds a hyperplane separating one-class samples from the origin. This splits the data into both positive and negative classes and tries to minimize the volume of training data in the positive class. In the below example, a two dimensional space is seen to be split by a one dimensional hyperplane, with the distance from the origin maximized. Through this process outliers are identified and flagged.</p>
+<p>Advantages:</p>
+<ul>
+<li><p>Highly efficient</p></li>
+<li><p>Requires few hyperparameters from the user</p></li>
+<li><p>Eliminated the need for labelled two-class information during training</p></li>
+</ul>
+<p>Inputs:</p>
+<ul>
+<li><p>nu (upper bound on fraction of errors, used 0.05)</p></li>
+<li><p>kernel (type of function for kernel method, used poly)</p></li>
+</ul>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="https://www.researchgate.net/publication/362912442_Anomaly_Detection_in_Satellite_Telemetry_Data_Using_a_Sparse_Feature-Based_Method/figures?lo=1"><img src="https://www.researchgate.net/publication/362912442/figure/fig4/AS:11431281080912015@1661430301368/Schematic-of-the-OCSVM_W640.jpg" class="img-fluid figure-img" width="408"></a></p>
@@ -476,6 +481,12 @@ MAE of Auto ARIMAX: 0.2635940364491945</code></pre>
 </section>
 <section id="isolation-forest" class="level1">
 <h1>Isolation Forest</h1>
+<p>In order to compare OCSVM against something to prove it’s worth in anomaly detection, an additional method was chosen. Isolation Forest is a commonly used outlier detection method which detects outliers utilizing binary trees. This method recursively partitions data points based on randomly selected attribute and then assigned anomaly scores based on number of “splits” needed to isolate a data point. The training dataset is used to build the “trees” and then the validation data is passed through those trees and assigned an anomaly score. Based on the anomaly score, it can be determined which points are outliers.</p>
+<p>Advantages:</p>
+<ul>
+<li><p>Low memory utilization</p></li>
+<li><p>Works best with large datasets</p></li>
+</ul>
 <div class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">######### Isolation Forest ################</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sklearn</span>
@@ -508,6 +519,7 @@ MAE of Auto ARIMAX: 0.2635940364491945</code></pre>
 </section>
 <section id="final-results" class="level1">
 <h1>Final Results</h1>
+<p>As seen from the above plots for OCSVM and Isolation Forest, both methods identified anomalous points to some degree of success, but OCSVM identified multiple sections. When comparing to the truth anomalies, and calculating common metrics (F1, recall, precision, and FPR), the below table shows that OCSVM performed multiple times better than Isolation Forest, with similar precision and FPR.</p>
 <div class="cell" data-execution_count="8">
 <details>
 <summary>Code</summary>
