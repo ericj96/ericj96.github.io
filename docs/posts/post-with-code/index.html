@@ -361,7 +361,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>There are 3 hyperparameters that are used as input for the auto_arima function (with 3 more parameters if seasonal modeling is desired). These parameters are used to optimize the below equation. Auto_arima will iterate through multiple variations of each parameter to find the best combination with the lowest prediction error (Akaike Information Criteria or AIC).</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="https://en.wikipedia.org/wiki/Autoregressive_integrated_moving_average"><img src="https://wikimedia.org/api/rest_v1/media/math/render/svg/b6ebbe31d07e994b209c391e3d6f8f5d88e267c3.png" class="img-fluid figure-img" alt="{\displaystyle \left(1-\sum _{i"></a></p>
+<p><img src="https://wikimedia.org/api/rest_v1/media/math/render/svg/b6ebbe31d07e994b209c391e3d6f8f5d88e267c3.png" class="img-fluid figure-img"></p>
 <figcaption class="figure-caption">Generalized ARIMA model function</figcaption>
 </figure>
 </div>
@@ -391,31 +391,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">MAE of Auto ARIMAX:"</span>, mean_absolute_error(df_valid.High, df_valid.Forecast_ARIMAX))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Performing stepwise search to minimize aic
- ARIMA(2,0,2)(0,0,0)[0] intercept   : AIC=2960.826, Time=15.08 sec
- ARIMA(0,0,0)(0,0,0)[0] intercept   : AIC=5711.667, Time=1.35 sec
- ARIMA(1,0,0)(0,0,0)[0] intercept   : AIC=3359.247, Time=10.77 sec
- ARIMA(0,0,1)(0,0,0)[0] intercept   : AIC=3726.632, Time=13.07 sec
- ARIMA(0,0,0)(0,0,0)[0]             : AIC=5709.707, Time=13.79 sec
- ARIMA(1,0,2)(0,0,0)[0] intercept   : AIC=2904.191, Time=15.63 sec
- ARIMA(0,0,2)(0,0,0)[0] intercept   : AIC=2912.739, Time=14.50 sec
- ARIMA(1,0,1)(0,0,0)[0] intercept   : AIC=3067.819, Time=13.95 sec
- ARIMA(1,0,3)(0,0,0)[0] intercept   : AIC=2930.144, Time=16.32 sec
- ARIMA(0,0,3)(0,0,0)[0] intercept   : AIC=2936.070, Time=15.12 sec
- ARIMA(2,0,1)(0,0,0)[0] intercept   : AIC=2957.813, Time=13.33 sec
- ARIMA(2,0,3)(0,0,0)[0] intercept   : AIC=2898.815, Time=16.69 sec
- ARIMA(3,0,3)(0,0,0)[0] intercept   : AIC=2805.639, Time=17.81 sec
- ARIMA(3,0,2)(0,0,0)[0] intercept   : AIC=2962.492, Time=16.12 sec
- ARIMA(4,0,3)(0,0,0)[0] intercept   : AIC=2810.038, Time=18.12 sec
- ARIMA(3,0,4)(0,0,0)[0] intercept   : AIC=2785.353, Time=22.62 sec
- ARIMA(2,0,4)(0,0,0)[0] intercept   : AIC=2897.289, Time=19.36 sec
- ARIMA(4,0,4)(0,0,0)[0] intercept   : AIC=2807.535, Time=20.25 sec
- ARIMA(3,0,5)(0,0,0)[0] intercept   : AIC=2789.723, Time=22.73 sec
- ARIMA(2,0,5)(0,0,0)[0] intercept   : AIC=2846.091, Time=21.91 sec
- ARIMA(4,0,5)(0,0,0)[0] intercept   : AIC=2791.733, Time=23.10 sec
- ARIMA(3,0,4)(0,0,0)[0]             : AIC=2809.734, Time=18.70 sec
+ ARIMA(2,0,2)(0,0,0)[0] intercept   : AIC=2960.826, Time=14.72 sec
+ ARIMA(0,0,0)(0,0,0)[0] intercept   : AIC=5711.667, Time=1.32 sec
+ ARIMA(1,0,0)(0,0,0)[0] intercept   : AIC=3359.247, Time=10.65 sec
+ ARIMA(0,0,1)(0,0,0)[0] intercept   : AIC=3726.632, Time=12.84 sec
+ ARIMA(0,0,0)(0,0,0)[0]             : AIC=5709.707, Time=13.58 sec
+ ARIMA(1,0,2)(0,0,0)[0] intercept   : AIC=2904.191, Time=15.31 sec
+ ARIMA(0,0,2)(0,0,0)[0] intercept   : AIC=2912.739, Time=14.14 sec
+ ARIMA(1,0,1)(0,0,0)[0] intercept   : AIC=3067.819, Time=13.87 sec
+ ARIMA(1,0,3)(0,0,0)[0] intercept   : AIC=2930.144, Time=15.88 sec
+ ARIMA(0,0,3)(0,0,0)[0] intercept   : AIC=2936.070, Time=14.93 sec
+ ARIMA(2,0,1)(0,0,0)[0] intercept   : AIC=2957.813, Time=12.97 sec
+ ARIMA(2,0,3)(0,0,0)[0] intercept   : AIC=2898.815, Time=16.35 sec
+ ARIMA(3,0,3)(0,0,0)[0] intercept   : AIC=2805.639, Time=17.36 sec
+ ARIMA(3,0,2)(0,0,0)[0] intercept   : AIC=2962.492, Time=15.79 sec
+ ARIMA(4,0,3)(0,0,0)[0] intercept   : AIC=2810.038, Time=17.53 sec
+ ARIMA(3,0,4)(0,0,0)[0] intercept   : AIC=2785.353, Time=21.42 sec
+ ARIMA(2,0,4)(0,0,0)[0] intercept   : AIC=2897.289, Time=18.62 sec
+ ARIMA(4,0,4)(0,0,0)[0] intercept   : AIC=2807.535, Time=19.66 sec
+ ARIMA(3,0,5)(0,0,0)[0] intercept   : AIC=2789.723, Time=20.88 sec
+ ARIMA(2,0,5)(0,0,0)[0] intercept   : AIC=2846.091, Time=20.69 sec
+ ARIMA(4,0,5)(0,0,0)[0] intercept   : AIC=2791.733, Time=22.65 sec
+ ARIMA(3,0,4)(0,0,0)[0]             : AIC=2809.734, Time=18.21 sec
 
 Best model:  ARIMA(3,0,4)(0,0,0)[0] intercept
-Total fit time: 360.364 seconds
+Total fit time: 349.392 seconds
 
 RMSE of Auto ARIMAX: 0.6141699692631081
 
@@ -487,6 +487,12 @@ MAE of Auto ARIMAX: 0.2635940364491945</code></pre>
 <li><p>Low memory utilization</p></li>
 <li><p>Works best with large datasets</p></li>
 </ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Fcf1c1d99-47bb-4a34-aec5-3431a929335f%2FUntitled.png?table=block&amp;id=79c1ba86-2c87-4f38-8c7f-c496f1763aaf&amp;cache=v2" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Example of binary trees used to identify outliers via Isolation Forest</figcaption>
+</figure>
+</div>
 <div class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">######### Isolation Forest ################</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sklearn</span>
@@ -519,7 +525,7 @@ MAE of Auto ARIMAX: 0.2635940364491945</code></pre>
 </section>
 <section id="final-results" class="level1">
 <h1>Final Results</h1>
-<p>As seen from the above plots for OCSVM and Isolation Forest, both methods identified anomalous points to some degree of success, but OCSVM identified multiple sections. When comparing to the truth anomalies, and calculating common metrics (F1, recall, precision, and FPR), the below table shows that OCSVM performed multiple times better than Isolation Forest, with similar precision and FPR.</p>
+<p>As seen from the above plots for OCSVM and Isolation Forest, both methods identified anomalous points to some degree of success, but OCSVM identified multiple sections. When comparing to the truth anomalies, and calculating common metrics (F1, recall, precision, and FPR), the below table shows that OCSVM performed multiple times better than Isolation Forest, with similar precision and FPR. The confusion matrices for both OCSVM (<a href="#fig-cm1">Figure&nbsp;4</a>) and Isolation Forest (<a href="#fig-cm2">Figure&nbsp;5</a>) can be seen below.</p>
 <div class="cell" data-execution_count="8">
 <details>
 <summary>Code</summary>
@@ -553,6 +559,8 @@ MAE of Auto ARIMAX: 0.2635940364491945</code></pre>
 </details>
 </div>
 <div class="cell" data-execution_count="9">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df_truth<span class="op">=</span>pd.read_csv(<span class="st">'./truth.csv'</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>anom<span class="op">=</span>anom.<span class="bu">map</span>(<span class="kw">lambda</span> val:<span class="dv">1</span> <span class="cf">if</span> val<span class="op">==-</span><span class="dv">1</span> <span class="cf">else</span> <span class="dv">0</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate F1 score</span></span>
@@ -574,17 +582,8 @@ MAE of Auto ARIMAX: 0.2635940364491945</code></pre>
 <span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>final[<span class="st">'IsoFor'</span>]<span class="op">=</span>[f1,rec,prec,fpr]</span>
 <span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>df<span class="op">=</span>pd.DataFrame(final)</span>
 <span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>df.index<span class="op">=</span>[<span class="st">'F1'</span>,<span class="st">'Recall'</span>,<span class="st">'Precision'</span>,<span class="st">'FPR'</span>]</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tabulate(df, headers<span class="op">=</span><span class="st">'keys'</span>, tablefmt<span class="op">=</span><span class="st">'psql'</span>))</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>cm<span class="op">=</span>confusion_matrix(df_truth[<span class="st">'Anom'</span>].values,anom.values)</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>cmd<span class="op">=</span>ConfusionMatrixDisplay(cm)</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>cmd.plot()</span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>cm<span class="op">=</span>confusion_matrix(df_truth[<span class="st">'Anom'</span>].values,a2.values)</span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>cmd<span class="op">=</span>ConfusionMatrixDisplay(cm)</span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>cmd.plot()</span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tabulate(df, headers<span class="op">=</span><span class="st">'keys'</span>, tablefmt<span class="op">=</span><span class="st">'psql'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>+-----------+-------------+----------+
 |           |       OCSVM |   IsoFor |
@@ -595,11 +594,25 @@ MAE of Auto ARIMAX: 0.2635940364491945</code></pre>
 | FPR       | 0.000818331 | 0        |
 +-----------+-------------+----------+</code></pre>
 </div>
-<div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-10-output-2.png" width="513" height="429"></p>
 </div>
+<div class="cell" data-fig-width="30%" data-execution_count="10">
 <div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-10-output-3.png" width="513" height="429"></p>
+<div id="fig-cm1" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-cm1-output-1.png" width="513" height="429" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;4: Confusion matrix for OCSVM method</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-fig-width="30%" data-execution_count="11">
+<div class="cell-output cell-output-display">
+<div id="fig-cm2" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-cm2-output-1.png" width="513" height="429" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;5: Confusion matrix for Isolation Forest method</figcaption>
+</figure>
+</div>
 </div>
 </div>
 

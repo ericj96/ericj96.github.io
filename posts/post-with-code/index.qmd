@@ -171,7 +171,7 @@ ARIMA works best with data that is stationary, meaning that most input data will
 
 There are 3 hyperparameters that are used as input for the auto_arima function (with 3 more parameters if seasonal modeling is desired). These parameters are used to optimize the below equation. Auto_arima will iterate through multiple variations of each parameter to find the best combination with the lowest prediction error (Akaike Information Criteria or AIC).
 
-[![Generalized ARIMA model function](https://wikimedia.org/api/rest_v1/media/math/render/svg/b6ebbe31d07e994b209c391e3d6f8f5d88e267c3){alt="{\\displaystyle \\left(1-\\sum _{i"}](https://en.wikipedia.org/wiki/Autoregressive_integrated_moving_average)
+![Generalized ARIMA model function](https://wikimedia.org/api/rest_v1/media/math/render/svg/b6ebbe31d07e994b209c391e3d6f8f5d88e267c3)
 
 Where:
 
@@ -265,6 +265,8 @@ Advantages:
 
 -   Works best with large datasets
 
+![Example of binary trees used to identify outliers via Isolation Forest](https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Fcf1c1d99-47bb-4a34-aec5-3431a929335f%2FUntitled.png?table=block&id=79c1ba86-2c87-4f38-8c7f-c496f1763aaf&cache=v2)
+
 ```{python}
 ######### Isolation Forest ################
 import sklearn
@@ -294,7 +296,7 @@ plt.show()
 
 # Final Results
 
-As seen from the above plots for OCSVM and Isolation Forest, both methods identified anomalous points to some degree of success, but OCSVM identified multiple sections. When comparing to the truth anomalies, and calculating common metrics (F1, recall, precision, and FPR), the below table shows that OCSVM performed multiple times better than Isolation Forest, with similar precision and FPR.
+As seen from the above plots for OCSVM and Isolation Forest, both methods identified anomalous points to some degree of success, but OCSVM identified multiple sections. When comparing to the truth anomalies, and calculating common metrics (F1, recall, precision, and FPR), the below table shows that OCSVM performed multiple times better than Isolation Forest, with similar precision and FPR. The confusion matrices for both OCSVM (@fig-cm1) and Isolation Forest (@fig-cm2) can be seen below.
 
 ```{python}
 #| code-fold: true
@@ -328,6 +330,7 @@ def perf_measure(y_actual, y_hat):
 ```
 
 ```{python}
+#| code-fold: true
 df_truth=pd.read_csv('./truth.csv')
 anom=anom.map(lambda val:1 if val==-1 else 0)
 #calculate F1 score
@@ -350,12 +353,24 @@ final['IsoFor']=[f1,rec,prec,fpr]
 df=pd.DataFrame(final)
 df.index=['F1','Recall','Precision','FPR']
 print(tabulate(df, headers='keys', tablefmt='psql'))
+```
 
+```{python}
+#| echo: False 
+#| fig-width: 30%
+#| label: fig-cm1
+#| fig-cap: "Confusion matrix for OCSVM method"
 cm=confusion_matrix(df_truth['Anom'].values,anom.values)
 cmd=ConfusionMatrixDisplay(cm)
 cmd.plot()
 plt.show()
+```
 
+```{python}
+#| echo: False 
+#| fig-width: 30%
+#| label: fig-cm2
+#| fig-cap: "Confusion matrix for Isolation Forest method"
 cm=confusion_matrix(df_truth['Anom'].values,a2.values)
 cmd=ConfusionMatrixDisplay(cm)
 cmd.plot()
