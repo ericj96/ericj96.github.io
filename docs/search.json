@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Blog",
     "section": "",
-    "text": "Anomaly Detection on Spacecraft Telemetry\n\n\n\n\n\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nSep 8, 2023\n\n\nEric Jackson\n\n\n\n\n\n\n  \n\n\n\n\nHyperparameter Tuning\n\n\n\n\n\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nSep 8, 2023\n\n\nEric Jackson\n\n\n\n\n\n\n  \n\n\n\n\nData Preprocessing\n\n\n\n\n\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nSep 8, 2023\n\n\nEric Jackson\n\n\n\n\n\n\nNo matching items"
+    "text": "Hyperparameter Tuning\n\n\n\n\n\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nOct 6, 2023\n\n\nEric Jackson\n\n\n\n\n\n\n  \n\n\n\n\nAnomaly Detection on Spacecraft Telemetry\n\n\n\n\n\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nSep 8, 2023\n\n\nEric Jackson\n\n\n\n\n\n\n  \n\n\n\n\nData Preprocessing\n\n\n\n\n\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nSep 8, 2023\n\n\nEric Jackson\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/post-with-code/index.html",
@@ -16,7 +16,7 @@
   {
     "objectID": "posts/Topic_2/index.html",
     "href": "posts/Topic_2/index.html",
-    "title": "Topic 2",
+    "title": "Hyperparameter Tuning",
     "section": "",
     "text": "Background"
   },
@@ -30,7 +30,7 @@
   {
     "objectID": "posts/Topic_3/index.html",
     "href": "posts/Topic_3/index.html",
-    "title": "Topic 3",
+    "title": "Data Preprocessing",
     "section": "",
     "text": "Background"
   },
