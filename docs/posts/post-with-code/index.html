@@ -361,7 +361,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>There are 3 hyperparameters that are used as input for the auto_arima function (with 3 more parameters if seasonal modeling is desired). These parameters are used to optimize the below equation. Auto_arima will iterate through multiple variations of each parameter to find the best combination with the lowest prediction error (Akaike Information Criteria or AIC).</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="arima.jpg" class="img-fluid figure-img"></p>
+<p><img src="https://wikimedia.org/api/rest_v1/media/math/render/svg/b6ebbe31d07e994b209c391e3d6f8f5d88e267c3.png" class="img-fluid figure-img"></p>
 <figcaption class="figure-caption">Generalized ARIMA model function</figcaption>
 </figure>
 </div>
@@ -391,31 +391,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">MAE of Auto ARIMAX:"</span>, mean_absolute_error(df_valid.High, df_valid.Forecast_ARIMAX))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Performing stepwise search to minimize aic
- ARIMA(2,0,2)(0,0,0)[0] intercept   : AIC=2960.826, Time=14.69 sec
- ARIMA(0,0,0)(0,0,0)[0] intercept   : AIC=5711.667, Time=1.30 sec
+ ARIMA(2,0,2)(0,0,0)[0] intercept   : AIC=2960.826, Time=14.61 sec
+ ARIMA(0,0,0)(0,0,0)[0] intercept   : AIC=5711.667, Time=1.29 sec
  ARIMA(1,0,0)(0,0,0)[0] intercept   : AIC=3359.247, Time=10.65 sec
- ARIMA(0,0,1)(0,0,0)[0] intercept   : AIC=3726.632, Time=12.81 sec
- ARIMA(0,0,0)(0,0,0)[0]             : AIC=5709.707, Time=13.54 sec
- ARIMA(1,0,2)(0,0,0)[0] intercept   : AIC=2904.191, Time=15.26 sec
- ARIMA(0,0,2)(0,0,0)[0] intercept   : AIC=2912.739, Time=14.07 sec
- ARIMA(1,0,1)(0,0,0)[0] intercept   : AIC=3067.819, Time=13.66 sec
- ARIMA(1,0,3)(0,0,0)[0] intercept   : AIC=2930.144, Time=15.71 sec
- ARIMA(0,0,3)(0,0,0)[0] intercept   : AIC=2936.070, Time=14.73 sec
- ARIMA(2,0,1)(0,0,0)[0] intercept   : AIC=2957.813, Time=12.93 sec
- ARIMA(2,0,3)(0,0,0)[0] intercept   : AIC=2898.815, Time=16.29 sec
- ARIMA(3,0,3)(0,0,0)[0] intercept   : AIC=2805.639, Time=17.25 sec
- ARIMA(3,0,2)(0,0,0)[0] intercept   : AIC=2962.492, Time=15.68 sec
- ARIMA(4,0,3)(0,0,0)[0] intercept   : AIC=2810.038, Time=17.37 sec
- ARIMA(3,0,4)(0,0,0)[0] intercept   : AIC=2785.353, Time=21.18 sec
- ARIMA(2,0,4)(0,0,0)[0] intercept   : AIC=2897.289, Time=18.48 sec
+ ARIMA(0,0,1)(0,0,0)[0] intercept   : AIC=3726.632, Time=12.77 sec
+ ARIMA(0,0,0)(0,0,0)[0]             : AIC=5709.707, Time=13.45 sec
+ ARIMA(1,0,2)(0,0,0)[0] intercept   : AIC=2904.191, Time=15.19 sec
+ ARIMA(0,0,2)(0,0,0)[0] intercept   : AIC=2912.739, Time=14.02 sec
+ ARIMA(1,0,1)(0,0,0)[0] intercept   : AIC=3067.819, Time=13.62 sec
+ ARIMA(1,0,3)(0,0,0)[0] intercept   : AIC=2930.144, Time=15.69 sec
+ ARIMA(0,0,3)(0,0,0)[0] intercept   : AIC=2936.070, Time=14.70 sec
+ ARIMA(2,0,1)(0,0,0)[0] intercept   : AIC=2957.813, Time=12.88 sec
+ ARIMA(2,0,3)(0,0,0)[0] intercept   : AIC=2898.815, Time=16.14 sec
+ ARIMA(3,0,3)(0,0,0)[0] intercept   : AIC=2805.639, Time=17.15 sec
+ ARIMA(3,0,2)(0,0,0)[0] intercept   : AIC=2962.492, Time=15.60 sec
+ ARIMA(4,0,3)(0,0,0)[0] intercept   : AIC=2810.038, Time=17.36 sec
+ ARIMA(3,0,4)(0,0,0)[0] intercept   : AIC=2785.353, Time=21.12 sec
+ ARIMA(2,0,4)(0,0,0)[0] intercept   : AIC=2897.289, Time=18.44 sec
  ARIMA(4,0,4)(0,0,0)[0] intercept   : AIC=2807.535, Time=19.47 sec
- ARIMA(3,0,5)(0,0,0)[0] intercept   : AIC=2789.723, Time=20.83 sec
- ARIMA(2,0,5)(0,0,0)[0] intercept   : AIC=2846.091, Time=20.85 sec
- ARIMA(4,0,5)(0,0,0)[0] intercept   : AIC=2791.733, Time=22.13 sec
- ARIMA(3,0,4)(0,0,0)[0]             : AIC=2809.734, Time=18.41 sec
+ ARIMA(3,0,5)(0,0,0)[0] intercept   : AIC=2789.723, Time=20.97 sec
+ ARIMA(2,0,5)(0,0,0)[0] intercept   : AIC=2846.091, Time=20.54 sec
+ ARIMA(4,0,5)(0,0,0)[0] intercept   : AIC=2791.733, Time=22.28 sec
+ ARIMA(3,0,4)(0,0,0)[0]             : AIC=2809.734, Time=17.98 sec
 
 Best model:  ARIMA(3,0,4)(0,0,0)[0] intercept
-Total fit time: 347.313 seconds
+Total fit time: 345.930 seconds
 
 RMSE of Auto ARIMAX: 0.6141699692631081
 
@@ -585,14 +585,14 @@ MAE of Auto ARIMAX: 0.2635940364491945</code></pre>
 <span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tabulate(df, headers<span class="op">=</span><span class="st">'keys'</span>, tablefmt<span class="op">=</span><span class="st">'psql'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>+-----------+-------------+----------+
-|           |       OCSVM |   IsoFor |
-|-----------+-------------+----------|
-| F1        | 0.718232    | 0.217054 |
-| Recall    | 0.565217    | 0.121739 |
-| Precision | 0.984848    | 1        |
-| FPR       | 0.000818331 | 0        |
-+-----------+-------------+----------+</code></pre>
+<pre><code>+-----------+-------------+-------------+
+|           |       OCSVM |      IsoFor |
+|-----------+-------------+-------------|
+| F1        | 0.718232    | 0.20155     |
+| Recall    | 0.565217    | 0.113043    |
+| Precision | 0.984848    | 0.928571    |
+| FPR       | 0.000818331 | 0.000818331 |
++-----------+-------------+-------------+</code></pre>
 </div>
 </div>
 <div class="cell" data-fig-width="30%" data-execution_count="10">
