@@ -18,7 +18,7 @@
     "href": "posts/Topic_2/index.html",
     "title": "Hyperparameter Tuning",
     "section": "",
-    "text": "Background"
+    "text": "When a machine learning model is being trained, one of the most important parts of the process is choosing valid hyperparameters. Hyperparameters are parameters whose value can be used to control the learning process, while other parameters are simply derived during the training process. These hyperparameters do not necessarily impact or influence the performance of the model, but impact the speed and quality of the learning process. As such, the hyperparameters are set prior to training the model and not during.\nExamples of common hyperparameters include:\n\nLearning rate and network size in Long short-term memory (LSTM)\nk in k-nearest neighbors\nThe penalty in most classifier methods"
   },
   {
     "objectID": "about.html",
@@ -47,5 +47,26 @@
     "title": "Anomaly Detection on Spacecraft Telemetry",
     "section": "Truth Data",
     "text": "Truth Data\nIn order to determine the accuracy of the anomaly detection methods used below, a set of truth data points needed to be manually chosen. These points were identified to be points in time where an anomaly took place based on personal experience of operational spacecraft data. 115 out of 1137 total points were marked as anomalous. Figure 2 identifies the anomalies, marked in red.\n\n\nCode\ndf_truth=pd.read_csv('./truth.csv')\ndf_truth.Date = pd.to_datetime(df_truth.Date, format=\"%m/%d/%Y\")\ndf_truth.set_index(\"Date\", drop=True, inplace=True)\nanom=df_truth['Anom']\nanom=anom.map(lambda val:1 if val==-1 else 0)\na=df_truth.loc[df_truth['Anom']==1,['High']]\nfig, ax = plt.subplots(figsize=(10,6))\nax.plot(df_truth.index,df_truth['High'], color='black', label = 'ARIMA')\nax.scatter(a.index,a.values, color='red', label = 'Anomaly')\nplt.legend(['Wheel Temperature','Anomaly'])\nplt.ylabel('Temperature (C)')\nplt.title('Truth Anomalies')\nplt.show()\n\n\n\n\n\nFigure 2: Set of anomalous data points to be used as truth"
+  },
+  {
+    "objectID": "posts/Topic_2/index.html#grid-search",
+    "href": "posts/Topic_2/index.html#grid-search",
+    "title": "Hyperparameter Tuning",
+    "section": "Grid Search",
+    "text": "Grid Search\n\nfrom sklearn.model_selection import GridSearchCV \n\n# defining parameter range \nparam_grid = {'C': [0.1, 1, 10, 100, 1000,10000], \n            'gamma': [1, 0.1, 0.01, 0.001, 0.0001,0.00001], \n            'kernel': ['rbf']} \n\ngrid = GridSearchCV(SVC(), param_grid,refit = True, verbose = 1) \n\n# fitting the model for grid search \ngrid.fit(X_train, y_train) \n\ngrid_predictions = grid.predict(X_test) \n\n# print classification report \nprint(classification_report(y_test, grid_predictions)) \nprint('%f\\n%s' % (grid.best_score_,grid.best_params_))\n\nFitting 5 folds for each of 36 candidates, totalling 180 fits\n              precision    recall  f1-score   support\n\n           0       0.94      0.89      0.91        66\n           1       0.94      0.96      0.95       105\n\n    accuracy                           0.94       171\n   macro avg       0.94      0.93      0.93       171\nweighted avg       0.94      0.94      0.94       171\n\n0.959747\n{'C': 100, 'gamma': 1e-05, 'kernel': 'rbf'}"
+  },
+  {
+    "objectID": "posts/Topic_2/index.html#random-search",
+    "href": "posts/Topic_2/index.html#random-search",
+    "title": "Hyperparameter Tuning",
+    "section": "Random Search",
+    "text": "Random Search\n\nfrom sklearn.model_selection import RandomizedSearchCV\nclf = RandomizedSearchCV(estimator=SVC(),\n                   param_distributions=param_grid,\n                   verbose=1)\n                   \nclf.fit(X_train, y_train) \nclf_predictions = clf.predict(X_test) \n\n# print classification report \nprint(classification_report(y_test, clf_predictions)) \nprint('%f\\n%s' % (clf.best_score_,clf.best_params_))\n\nFitting 5 folds for each of 10 candidates, totalling 50 fits\n              precision    recall  f1-score   support\n\n           0       0.95      0.91      0.93        66\n           1       0.94      0.97      0.96       105\n\n    accuracy                           0.95       171\n   macro avg       0.95      0.94      0.94       171\nweighted avg       0.95      0.95      0.95       171\n\n0.952278\n{'kernel': 'rbf', 'gamma': 1e-05, 'C': 1000}"
+  },
+  {
+    "objectID": "posts/Topic_2/index.html#bayesian-optimization",
+    "href": "posts/Topic_2/index.html#bayesian-optimization",
+    "title": "Hyperparameter Tuning",
+    "section": "Bayesian Optimization",
+    "text": "Bayesian Optimization\n\ndef warn(*args, **kwargs):\n    pass\nimport warnings\nwarnings.warn = warn\nfrom pandas import read_csv\nfrom sklearn.model_selection import cross_val_score\nfrom sklearn.svm import SVC\nfrom sklearn.model_selection import RepeatedStratifiedKFold\nfrom skopt import BayesSearchCV\n\nbayes = BayesSearchCV(SVC(), param_grid) \n\n# fitting the model for grid search \nbayes.fit(X_train, y_train) \n\nbayes_predictions = bayes.predict(X_test) \n\n# print classification report \nprint(classification_report(y_test, bayes_predictions)) \nprint('%f\\n%s' % (bayes.best_score_,bayes.best_params_))\n\n              precision    recall  f1-score   support\n\n           0       0.94      0.89      0.91        66\n           1       0.94      0.96      0.95       105\n\n    accuracy                           0.94       171\n   macro avg       0.94      0.93      0.93       171\nweighted avg       0.94      0.94      0.94       171\n\n0.959747\nOrderedDict([('C', 100.0), ('gamma', 1e-05), ('kernel', 'rbf')])\n\n\n\nimport matplotlib.pyplot as plt\nfrom skopt.plots import plot_convergence\nres=pd.DataFrame(bayes.cv_results_)\nres2=pd.DataFrame(grid.cv_results_)\nres3=pd.DataFrame(clf.cv_results_)\nres.mean_test_score.plot(figsize=(10,10))\nres2.mean_test_score.plot(figsize=(10,10))\nres3.mean_test_score.plot(figsize=(10,10))\nplt.legend(['Bayes','Grid','Random'])\nplt.show()\nplt.clf()\n\n\n\n\n&lt;Figure size 672x480 with 0 Axes&gt;"
   }
 ]

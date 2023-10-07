@@ -4,6 +4,127 @@ author: "Eric Jackson"
 date: "2023-10-06"
 categories: [code, analysis]
 image: "image.jpg"
+toc: true
+toc-depth: 2
 ---
 
 # Background
+
+When a machine learning model is being trained, one of the most important parts of the process is choosing valid hyperparameters. Hyperparameters are parameters whose value can be used to control the learning process, while other parameters are simply derived during the training process. These hyperparameters do not necessarily impact or influence the performance of the model, but impact the speed and quality of the learning process. As such, the hyperparameters are set prior to training the model and not during.
+
+Examples of common hyperparameters include:
+
+-   Learning rate and network size in Long short-term memory (LSTM)
+
+-   k in k-nearest neighbors
+
+-   The penalty in most classifier methods
+
+# Tuning Techniques
+
+The goal of finding optimal hyperparameters is to determine the best combination of hyperparameters that optimize the model. This can be done manually but is extremely time intensive. Thus, there are several solutions available to perform this tuning automatically.
+
+```{python}
+#| code-fold: true
+
+# Setting up basic SVM to compare with optimized hyperparameters
+import pandas as pd 
+import numpy as np 
+from sklearn.metrics import classification_report, confusion_matrix 
+from sklearn.datasets import load_breast_cancer 
+from sklearn.svm import SVC 
+from sklearn.model_selection import train_test_split 
+
+cancer = load_breast_cancer() 
+
+df_feat = pd.DataFrame(cancer['data'], 
+					columns = cancer['feature_names']) 
+
+df_target = pd.DataFrame(cancer['target'], columns =['Cancer']) 
+					
+X_train, X_test, y_train, y_test = train_test_split(df_feat, np.ravel(df_target),test_size = 0.30, random_state = 101) 
+
+model = SVC() 
+model.fit(X_train, y_train) 
+
+# print prediction results 
+predictions = model.predict(X_test) 
+print(classification_report(y_test, predictions)) 
+```
+
+## Grid Search
+
+```{python}
+from sklearn.model_selection import GridSearchCV 
+
+# defining parameter range 
+param_grid = {'C': [0.1, 1, 10, 100, 1000,10000], 
+			'gamma': [1, 0.1, 0.01, 0.001, 0.0001,0.00001], 
+			'kernel': ['rbf']} 
+
+grid = GridSearchCV(SVC(), param_grid,refit = True, verbose = 1) 
+
+# fitting the model for grid search 
+grid.fit(X_train, y_train) 
+
+grid_predictions = grid.predict(X_test) 
+
+# print classification report 
+print(classification_report(y_test, grid_predictions)) 
+print('%f\n%s' % (grid.best_score_,grid.best_params_))
+```
+
+## Random Search
+
+```{python}
+from sklearn.model_selection import RandomizedSearchCV
+clf = RandomizedSearchCV(estimator=SVC(),
+                   param_distributions=param_grid,
+                   verbose=1)
+                   
+clf.fit(X_train, y_train) 
+clf_predictions = clf.predict(X_test) 
+
+# print classification report 
+print(classification_report(y_test, clf_predictions)) 
+print('%f\n%s' % (clf.best_score_,clf.best_params_))
+```
+
+## Bayesian Optimization
+
+```{python}
+def warn(*args, **kwargs):
+    pass
+import warnings
+warnings.warn = warn
+from pandas import read_csv
+from sklearn.model_selection import cross_val_score
+from sklearn.svm import SVC
+from sklearn.model_selection import RepeatedStratifiedKFold
+from skopt import BayesSearchCV
+
+bayes = BayesSearchCV(SVC(), param_grid) 
+
+# fitting the model for grid search 
+bayes.fit(X_train, y_train) 
+
+bayes_predictions = bayes.predict(X_test) 
+
+# print classification report 
+print(classification_report(y_test, bayes_predictions)) 
+print('%f\n%s' % (bayes.best_score_,bayes.best_params_))
+```
+
+```{python}
+import matplotlib.pyplot as plt
+from skopt.plots import plot_convergence
+res=pd.DataFrame(bayes.cv_results_)
+res2=pd.DataFrame(grid.cv_results_)
+res3=pd.DataFrame(clf.cv_results_)
+res.mean_test_score.plot(figsize=(10,10))
+res2.mean_test_score.plot(figsize=(10,10))
+res3.mean_test_score.plot(figsize=(10,10))
+plt.legend(['Bayes','Grid','Random'])
+plt.show()
+plt.clf()
+```
