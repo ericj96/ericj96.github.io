@@ -177,10 +177,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background">Background</a></li>
   <li><a href="#tuning-techniques" id="toc-tuning-techniques" class="nav-link" data-scroll-target="#tuning-techniques">Tuning Techniques</a>
   <ul class="collapse">
+  <li><a href="#baseline-data" id="toc-baseline-data" class="nav-link" data-scroll-target="#baseline-data">Baseline Data</a></li>
   <li><a href="#grid-search" id="toc-grid-search" class="nav-link" data-scroll-target="#grid-search">Grid Search</a></li>
   <li><a href="#random-search" id="toc-random-search" class="nav-link" data-scroll-target="#random-search">Random Search</a></li>
   <li><a href="#bayesian-optimization" id="toc-bayesian-optimization" class="nav-link" data-scroll-target="#bayesian-optimization">Bayesian Optimization</a></li>
   </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
   </ul>
 </nav>
     </div>
@@ -203,170 +205,235 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="tuning-techniques" class="level1">
 <h1>Tuning Techniques</h1>
 <p>The goal of finding optimal hyperparameters is to determine the best combination of hyperparameters that optimize the model. This can be done manually but is extremely time intensive. Thus, there are several solutions available to perform this tuning automatically.</p>
+<section id="baseline-data" class="level2">
+<h2 class="anchored" data-anchor-id="baseline-data">Baseline Data</h2>
+<p>For the purposes of this blog, a basic Support Vector Machine (SVM) classification model will be trained with a built in dataset from the sklearn library. This will give a baseline accuracy and results to compare when attempting to optimize the hyperparameters. The hyperparameters that are used by default with this algorithm are:</p>
+<ul>
+<li><p><em>C</em> - Regularization parameter. The penalty is a squared l2 penalty [default = 1.0]</p></li>
+<li><p><em>Kernel</em> - Kernel type used in algorithm [default = ‘rbf’]</p>
+<ul>
+<li>Note: Linear and RBF kernels were used as the possible options in this example</li>
+</ul></li>
+<li><p><em>Gamma</em> - Kernel coefficient [default = ‘scale’, or 1 / (n_features * X)]</p></li>
+</ul>
 <div class="cell" data-execution_count="1">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Setting up basic SVM to compare with optimized hyperparameters</span></span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Setting up basic SVM to compare with optimized hyperparameters. Using built in dataset of data</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd </span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> classification_report, confusion_matrix </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_breast_cancer </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> classification_report, confusion_matrix, accuracy_score</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_breast_cancer, load_digits</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.svm <span class="im">import</span> SVC </span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split </span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>cancer <span class="op">=</span> load_breast_cancer() </span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>df_feat <span class="op">=</span> pd.DataFrame(cancer[<span class="st">'data'</span>], </span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                    columns <span class="op">=</span> cancer[<span class="st">'feature_names'</span>]) </span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>df_target <span class="op">=</span> pd.DataFrame(cancer[<span class="st">'target'</span>], columns <span class="op">=</span>[<span class="st">'Cancer'</span>]) </span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>                    </span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(df_feat, np.ravel(df_target),test_size <span class="op">=</span> <span class="fl">0.30</span>, random_state <span class="op">=</span> <span class="dv">101</span>) </span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SVC() </span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>model.fit(X_train, y_train) </span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># print prediction results </span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> model.predict(X_test) </span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(classification_report(y_test, predictions)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>cancer<span class="op">=</span>load_digits()</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>df_feat <span class="op">=</span> pd.DataFrame(cancer[<span class="st">'data'</span>],columns <span class="op">=</span> cancer[<span class="st">'feature_names'</span>]) </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>df_target <span class="op">=</span> pd.DataFrame(cancer[<span class="st">'target'</span>], columns <span class="op">=</span>[<span class="st">'Cancer'</span>]) </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(df_feat, np.ravel(df_target),test_size <span class="op">=</span> <span class="fl">0.30</span>, random_state <span class="op">=</span> <span class="dv">101</span>) </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SVC() </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>model.fit(X_train, y_train) </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># print prediction results </span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> model.predict(X_test) </span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(classification_report(y_test, predictions)) </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Accuracy = </span><span class="sc">%3.6f</span><span class="ch">\n</span><span class="st">'</span> <span class="op">%</span> accuracy_score(y_test,predictions))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>              precision    recall  f1-score   support
 
-           0       0.95      0.85      0.90        66
-           1       0.91      0.97      0.94       105
+           0       1.00      0.98      0.99        53
+           1       0.96      1.00      0.98        55
+           2       1.00      1.00      1.00        49
+           3       1.00      1.00      1.00        54
+           4       0.98      0.97      0.98        61
+           5       1.00      0.98      0.99        59
+           6       1.00      1.00      1.00        46
+           7       1.00      1.00      1.00        56
+           8       0.98      0.97      0.97        59
+           9       0.96      1.00      0.98        48
 
-    accuracy                           0.92       171
-   macro avg       0.93      0.91      0.92       171
-weighted avg       0.93      0.92      0.92       171
+    accuracy                           0.99       540
+   macro avg       0.99      0.99      0.99       540
+weighted avg       0.99      0.99      0.99       540
+
+Accuracy = 0.988889
 </code></pre>
 </div>
 </div>
+<p>It is seen that the baseline model performs with an accuracy of 98.89% using C = 1, kernel = rbf, gamma = scale (or around 0.015). This will be compared against with several methods of hyperparameter optimization but is already extremely high for accuracy.</p>
+</section>
 <section id="grid-search" class="level2">
 <h2 class="anchored" data-anchor-id="grid-search">Grid Search</h2>
+<p>The grid search method of optimizing hyperparameters works by running through each combination of parameters and choosing the combination with the highest score at the end.</p>
+<p>The drawback of using grid search is that it is very time intensive due to the large number of combinations that it iterates through</p>
 <div class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> GridSearchCV </span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># defining parameter range </span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>param_grid <span class="op">=</span> {<span class="st">'C'</span>: [<span class="fl">0.1</span>, <span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">1000</span>,<span class="dv">10000</span>], </span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">'gamma'</span>: [<span class="dv">1</span>, <span class="fl">0.1</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>, <span class="fl">0.0001</span>,<span class="fl">0.00001</span>], </span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">'kernel'</span>: [<span class="st">'rbf'</span>]} </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>param_grid <span class="op">=</span> {<span class="st">'C'</span>: [<span class="fl">0.1</span>, <span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">1000</span>], </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">'gamma'</span>: [<span class="dv">1</span>, <span class="fl">0.1</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>, <span class="fl">0.0001</span>], </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">'kernel'</span>: [<span class="st">'rbf'</span>,<span class="st">'linear'</span>]} </span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>grid <span class="op">=</span> GridSearchCV(SVC(), param_grid,refit <span class="op">=</span> <span class="va">True</span>, verbose <span class="op">=</span> <span class="dv">1</span>) </span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># fitting the model for grid search </span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>grid.fit(X_train, y_train) </span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>grid_predictions <span class="op">=</span> grid.predict(X_test) </span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># print classification report </span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(classification_report(y_test, grid_predictions)) </span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'</span><span class="sc">%f</span><span class="ch">\n</span><span class="sc">%s</span><span class="st">'</span> <span class="op">%</span> (grid.best_score_,grid.best_params_))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>grid.fit(X_train, y_train) </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>grid_predictions <span class="op">=</span> grid.predict(X_test) </span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># print classification report </span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(classification_report(y_test, grid_predictions)) </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'</span><span class="sc">%s</span><span class="st">'</span> <span class="op">%</span> (grid.best_params_))</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Accuracy = </span><span class="sc">%3.6f</span><span class="ch">\n</span><span class="st">'</span> <span class="op">%</span> accuracy_score(y_test,grid_predictions))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Fitting 5 folds for each of 36 candidates, totalling 180 fits
+<pre><code>Fitting 5 folds for each of 50 candidates, totalling 250 fits
               precision    recall  f1-score   support
 
-           0       0.94      0.89      0.91        66
-           1       0.94      0.96      0.95       105
+           0       1.00      1.00      1.00        53
+           1       0.96      1.00      0.98        55
+           2       1.00      1.00      1.00        49
+           3       1.00      1.00      1.00        54
+           4       1.00      0.98      0.99        61
+           5       1.00      0.98      0.99        59
+           6       1.00      1.00      1.00        46
+           7       1.00      1.00      1.00        56
+           8       1.00      0.97      0.98        59
+           9       0.96      1.00      0.98        48
 
-    accuracy                           0.94       171
-   macro avg       0.94      0.93      0.93       171
-weighted avg       0.94      0.94      0.94       171
+    accuracy                           0.99       540
+   macro avg       0.99      0.99      0.99       540
+weighted avg       0.99      0.99      0.99       540
 
-0.959747
-{'C': 100, 'gamma': 1e-05, 'kernel': 'rbf'}</code></pre>
+{'C': 1, 'gamma': 0.001, 'kernel': 'rbf'}
+Accuracy = 0.992593
+</code></pre>
 </div>
 </div>
+<p>As seen in the table above, an accuracy of 99.259% was achieved with the hyperparameter values of c=1, gamma = 0.001, and kernel = rbf. This is a slight improvement from the standard parameters, around 0.5% increase in accuracy. As seen in the results section and in <a href="#fig-time">Figure&nbsp;1</a>, the shape of the grid search can be seen in the time it takes for each iteration, as it follows the same pattern for every set of combinations.</p>
 </section>
 <section id="random-search" class="level2">
 <h2 class="anchored" data-anchor-id="random-search">Random Search</h2>
+<p>Random search works similarly to grid search, but moves through it in a random fashion and only uses a fixed number of combinations. This allows for similar optimization results as the grid search in a fraction of the time. As seen in the results section and in <a href="#fig-time">Figure&nbsp;1</a>, the random search is ~6 times faster.</p>
 <div class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> RandomizedSearchCV</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>clf <span class="op">=</span> RandomizedSearchCV(estimator<span class="op">=</span>SVC(),</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                   param_distributions<span class="op">=</span>param_grid,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                   verbose<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>                   </span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>clf.fit(X_train, y_train) </span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>clf_predictions <span class="op">=</span> clf.predict(X_test) </span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># print classification report </span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(classification_report(y_test, clf_predictions)) </span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'</span><span class="sc">%f</span><span class="ch">\n</span><span class="sc">%s</span><span class="st">'</span> <span class="op">%</span> (clf.best_score_,clf.best_params_))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>clf <span class="op">=</span> RandomizedSearchCV(estimator<span class="op">=</span>SVC(),param_distributions<span class="op">=</span>param_grid,verbose<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>clf.fit(X_train, y_train) </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>clf_predictions <span class="op">=</span> clf.predict(X_test) </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># print classification report </span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(classification_report(y_test, clf_predictions)) </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'</span><span class="sc">%s</span><span class="st">'</span> <span class="op">%</span> (clf.best_params_))</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Accuracy = </span><span class="sc">%3.6f</span><span class="ch">\n</span><span class="st">'</span> <span class="op">%</span> accuracy_score(y_test,clf_predictions))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Fitting 5 folds for each of 10 candidates, totalling 50 fits
               precision    recall  f1-score   support
 
-           0       0.95      0.91      0.93        66
-           1       0.94      0.97      0.96       105
+           0       1.00      1.00      1.00        53
+           1       0.95      0.96      0.95        55
+           2       1.00      1.00      1.00        49
+           3       1.00      1.00      1.00        54
+           4       0.95      0.97      0.96        61
+           5       0.98      0.98      0.98        59
+           6       1.00      0.96      0.98        46
+           7       1.00      0.96      0.98        56
+           8       0.93      0.97      0.95        59
+           9       0.98      0.98      0.98        48
 
-    accuracy                           0.95       171
-   macro avg       0.95      0.94      0.94       171
-weighted avg       0.95      0.95      0.95       171
+    accuracy                           0.98       540
+   macro avg       0.98      0.98      0.98       540
+weighted avg       0.98      0.98      0.98       540
 
-0.952278
-{'kernel': 'rbf', 'gamma': 1e-05, 'C': 1000}</code></pre>
+{'kernel': 'linear', 'gamma': 0.01, 'C': 1000}
+Accuracy = 0.977778
+</code></pre>
 </div>
 </div>
+<p>Because of the randomness of the random search, the optimal value(s) change every time this method is ran. For the iteration performed at the time of this blog post, the random search method determined optimal values worse than both the grid and Bayesian search methods.</p>
 </section>
 <section id="bayesian-optimization" class="level2">
 <h2 class="anchored" data-anchor-id="bayesian-optimization">Bayesian Optimization</h2>
+<p>Bayesian optimization works differently than the other two commonly used methods mentioned above, it uses Bayes Theorem to find the minimum or maximum of an objective function. Because of this difference, not all parameter values are used and a fixed number of hyperparameter combinations are iterated through (default number of iterations is 50). Bayesian optimization is usually used to optimize expensive to evaluate functions, which is not necessarily the case for this example as the data being used is somewhat basic for the purposes of this blog post.</p>
 <div class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> warn(<span class="op">*</span>args, <span class="op">**</span>kwargs):</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>warnings.warn <span class="op">=</span> warn</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pandas <span class="im">import</span> read_csv</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> cross_val_score</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.svm <span class="im">import</span> SVC</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> RepeatedStratifiedKFold</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skopt <span class="im">import</span> BayesSearchCV</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skopt <span class="im">import</span> BayesSearchCV</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>bayes <span class="op">=</span> BayesSearchCV(SVC(), param_grid) </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>bayes.fit(X_train, y_train) </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>bayes_predictions <span class="op">=</span> bayes.predict(X_test) </span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>bayes <span class="op">=</span> BayesSearchCV(SVC(), param_grid) </span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># fitting the model for grid search </span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>bayes.fit(X_train, y_train) </span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>bayes_predictions <span class="op">=</span> bayes.predict(X_test) </span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co"># print classification report </span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(classification_report(y_test, bayes_predictions)) </span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'</span><span class="sc">%f</span><span class="ch">\n</span><span class="sc">%s</span><span class="st">'</span> <span class="op">%</span> (bayes.best_score_,bayes.best_params_))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># print classification report </span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(classification_report(y_test, bayes_predictions)) </span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'</span><span class="sc">%s</span><span class="st">'</span> <span class="op">%</span> (bayes.best_params_))</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Accuracy = </span><span class="sc">%3.6f</span><span class="ch">\n</span><span class="st">'</span> <span class="op">%</span> accuracy_score(y_test,bayes_predictions))</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>ac3<span class="op">=</span>accuracy_score(y_test,bayes_predictions)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>              precision    recall  f1-score   support
 
-           0       0.94      0.89      0.91        66
-           1       0.94      0.96      0.95       105
+           0       1.00      1.00      1.00        53
+           1       0.96      1.00      0.98        55
+           2       1.00      1.00      1.00        49
+           3       1.00      1.00      1.00        54
+           4       1.00      0.98      0.99        61
+           5       1.00      0.98      0.99        59
+           6       1.00      1.00      1.00        46
+           7       1.00      1.00      1.00        56
+           8       1.00      0.97      0.98        59
+           9       0.96      1.00      0.98        48
 
-    accuracy                           0.94       171
-   macro avg       0.94      0.93      0.93       171
-weighted avg       0.94      0.94      0.94       171
+    accuracy                           0.99       540
+   macro avg       0.99      0.99      0.99       540
+weighted avg       0.99      0.99      0.99       540
 
-0.959747
-OrderedDict([('C', 100.0), ('gamma', 1e-05), ('kernel', 'rbf')])</code></pre>
+OrderedDict([('C', 1.0), ('gamma', 0.001), ('kernel', 'rbf')])
+Accuracy = 0.992593
+</code></pre>
 </div>
 </div>
-<div class="cell" data-execution_count="5">
+<p>It is seen that utilizing a Bayesian search optimization identifies the same optimal values as the grid search, c = 1, gamma = 0.001, and kernel = rbf, with an accuracy of 99.259%. This is once again slightly higher than the baseline method by around 0.5%</p>
+</section>
+</section>
+<section id="results" class="level1">
+<h1>Results</h1>
+<p>After optimizing the hyperparameters for this dataset of 8x8 pixel data, both the grid search and Bayesian search identified the same optimal hyperparameters. But, as seen below, the Bayesian search performed this ~30% faster. Since the random search method only sometimes performed better than the baseline method in terms of accuracy, this makes the Bayesian search method the optimal choice between these three methods for its accuracy and speed.</p>
+<div class="cell" data-fig-width="2" data-execution_count="5">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skopt.plots <span class="im">import</span> plot_convergence</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>res<span class="op">=</span>pd.DataFrame(bayes.cv_results_)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>res2<span class="op">=</span>pd.DataFrame(grid.cv_results_)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>res3<span class="op">=</span>pd.DataFrame(clf.cv_results_)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>res.mean_test_score.plot(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">10</span>))</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>res2.mean_test_score.plot(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">10</span>))</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>res3.mean_test_score.plot(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">10</span>))</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Bayes'</span>,<span class="st">'Grid'</span>,<span class="st">'Random'</span>])</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>plt.clf()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-6-output-1.png" width="802" height="781"></p>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>res<span class="op">=</span>pd.DataFrame(bayes.cv_results_)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>res2<span class="op">=</span>pd.DataFrame(grid.cv_results_)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>res3<span class="op">=</span>pd.DataFrame(clf.cv_results_)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Bayes time: </span><span class="sc">%3.3f</span><span class="st"> sec</span><span class="ch">\n</span><span class="st">Grid time: </span><span class="sc">%3.3f</span><span class="st"> sec</span><span class="ch">\n</span><span class="st">Random time: </span><span class="sc">%3.3f</span><span class="st"> sec'</span> <span class="op">%</span> (res.mean_fit_time.<span class="bu">sum</span>(),res2.mean_fit_time.<span class="bu">sum</span>(),res3.mean_fit_time.<span class="bu">sum</span>()))</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>,<span class="dv">6</span>))</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>res.mean_fit_time.plot(figsize<span class="op">=</span>(<span class="dv">9</span>,<span class="dv">6</span>))</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>res2.mean_fit_time.plot(figsize<span class="op">=</span>(<span class="dv">9</span>,<span class="dv">6</span>))</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>res3.mean_fit_time.plot(figsize<span class="op">=</span>(<span class="dv">9</span>,<span class="dv">6</span>))</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Bayes'</span>,<span class="st">'Grid'</span>,<span class="st">'Random'</span>])</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Time taken per iteration'</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Time (sec)'</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Iteration #'</span>)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Bayes time: 1.602 sec
+Grid time: 2.496 sec
+Random time: 0.269 sec</code></pre>
 </div>
 <div class="cell-output cell-output-display">
-<pre><code>&lt;Figure size 672x480 with 0 Axes&gt;</code></pre>
+<div id="fig-time" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-time-output-2.png" width="746" height="523" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;1: Time taken per iteration for each of the 3 optimization methods</figcaption>
+</figure>
+</div>
 </div>
 </div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

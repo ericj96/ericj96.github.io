@@ -131,7 +131,7 @@ exogenous_features=['High_mean_lag3', 'High_mean_lag7',
 #| echo: False 
 #| label: fig-arima2
 #| fig-cap: "Training data is first 75% of wheel temperature data, with the remaining 25% used as the test data for verification"
-fig, ax = plt.subplots(figsize=(10,6))
+fig, ax = plt.subplots(figsize=(9,6))
 plt.plot(df_train["High"])
 plt.plot(df_valid["High"])
 plt.legend(['Training Data','Test Data'],loc='best')
@@ -154,7 +154,7 @@ df_truth.set_index("Date", drop=True, inplace=True)
 anom=df_truth['Anom']
 anom=anom.map(lambda val:1 if val==-1 else 0)
 a=df_truth.loc[df_truth['Anom']==1,['High']]
-fig, ax = plt.subplots(figsize=(10,6))
+fig, ax = plt.subplots(figsize=(9,6))
 ax.plot(df_truth.index,df_truth['High'], color='black', label = 'ARIMA')
 ax.scatter(a.index,a.values, color='red', label = 'Anomaly')
 plt.legend(['Wheel Temperature','Anomaly'])
@@ -208,7 +208,7 @@ It can be seen that the auto_arima function performed fairly quickly, finding an
 #| fig-width: 30%
 #| label: fig-arima
 #| fig-cap: "Initial ARIMA forecast on reaction wheel temperature data"
-df_valid[["High", "Forecast_ARIMAX"]].plot(figsize=(10, 5))
+df_valid[["High", "Forecast_ARIMAX"]].plot(figsize=(9, 5))
 plt.legend(['Wheel Temperature (Truth)','Forecast (ARIMA)'])
 plt.show()
 ```
@@ -236,7 +236,7 @@ Inputs:
 ```{python}
 ############# OCSVM ##################
 
-fig, ax = plt.subplots(figsize=(10,6))
+fig, ax = plt.subplots(figsize=(9,6))
 data2=df_valid["Forecast_ARIMAX"]
 model =svm.OneClassSVM(nu=0.05,kernel='poly')
 model.fit(data2.values.reshape(-1,1))
@@ -284,7 +284,7 @@ model.fit(data)
 
 isofor['anomaly'] = model.predict(data)
 # visualization
-fig, ax = plt.subplots(figsize=(10,6))
+fig, ax = plt.subplots(figsize=(9,6))
 a = isofor.loc[isofor['anomaly'] == -1, ['Forecast_ARIMAX']] #anomaly
 ax.plot(isofor.index, isofor['Forecast_ARIMAX'], color='black', label = 'Normal')
 ax.scatter(a.index,a['Forecast_ARIMAX'], color='red', label = 'Anomaly')

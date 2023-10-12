@@ -24,107 +24,137 @@ Examples of common hyperparameters include:
 
 The goal of finding optimal hyperparameters is to determine the best combination of hyperparameters that optimize the model. This can be done manually but is extremely time intensive. Thus, there are several solutions available to perform this tuning automatically.
 
+## Baseline Data
+
+For the purposes of this blog, a basic Support Vector Machine (SVM) classification model will be trained with a built in dataset from the sklearn library. This will give a baseline accuracy and results to compare when attempting to optimize the hyperparameters. The hyperparameters that are used by default with this algorithm are:
+
+-   *C* - Regularization parameter. The penalty is a squared l2 penalty \[default = 1.0\]
+
+-   *Kernel* - Kernel type used in algorithm \[default = 'rbf'\]
+
+    -   Note: Linear and RBF kernels were used as the possible options in this example
+
+-   *Gamma* - Kernel coefficient \[default = 'scale', or 1 / (n_features \* X)\]
+
 ```{python}
 #| code-fold: true
 
-# Setting up basic SVM to compare with optimized hyperparameters
+# Setting up basic SVM to compare with optimized hyperparameters. Using built in dataset of data
 import pandas as pd 
 import numpy as np 
-from sklearn.metrics import classification_report, confusion_matrix 
-from sklearn.datasets import load_breast_cancer 
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+from sklearn.datasets import load_breast_cancer, load_digits
 from sklearn.svm import SVC 
 from sklearn.model_selection import train_test_split 
 
 cancer = load_breast_cancer() 
-
-df_feat = pd.DataFrame(cancer['data'], 
-					columns = cancer['feature_names']) 
-
+cancer=load_digits()
+df_feat = pd.DataFrame(cancer['data'],columns = cancer['feature_names']) 
 df_target = pd.DataFrame(cancer['target'], columns =['Cancer']) 
-					
 X_train, X_test, y_train, y_test = train_test_split(df_feat, np.ravel(df_target),test_size = 0.30, random_state = 101) 
-
 model = SVC() 
 model.fit(X_train, y_train) 
 
 # print prediction results 
 predictions = model.predict(X_test) 
 print(classification_report(y_test, predictions)) 
+print('Accuracy = %3.6f\n' % accuracy_score(y_test,predictions))
 ```
 
+It is seen that the baseline model performs with an accuracy of 98.89% using C = 1, kernel = rbf, gamma = scale (or around 0.015). This will be compared against with several methods of hyperparameter optimization but is already extremely high for accuracy.
+
 ## Grid Search
+
+The grid search method of optimizing hyperparameters works by running through each combination of parameters and choosing the combination with the highest score at the end.
+
+The drawback of using grid search is that it is very time intensive due to the large number of combinations that it iterates through
 
 ```{python}
 from sklearn.model_selection import GridSearchCV 
 
 # defining parameter range 
-param_grid = {'C': [0.1, 1, 10, 100, 1000,10000], 
-			'gamma': [1, 0.1, 0.01, 0.001, 0.0001,0.00001], 
-			'kernel': ['rbf']} 
+param_grid = {'C': [0.1, 1, 10, 100, 1000], 
+			'gamma': [1, 0.1, 0.01, 0.001, 0.0001], 
+			'kernel': ['rbf','linear']} 
 
 grid = GridSearchCV(SVC(), param_grid,refit = True, verbose = 1) 
-
-# fitting the model for grid search 
 grid.fit(X_train, y_train) 
-
 grid_predictions = grid.predict(X_test) 
 
 # print classification report 
 print(classification_report(y_test, grid_predictions)) 
-print('%f\n%s' % (grid.best_score_,grid.best_params_))
+print('%s' % (grid.best_params_))
+print('Accuracy = %3.6f\n' % accuracy_score(y_test,grid_predictions))
 ```
+
+As seen in the table above, an accuracy of 99.259% was achieved with the hyperparameter values of c=1, gamma = 0.001, and kernel = rbf. This is a slight improvement from the standard parameters, around 0.5% increase in accuracy. As seen in the results section and in @fig-time, the shape of the grid search can be seen in the time it takes for each iteration, as it follows the same pattern for every set of combinations.
 
 ## Random Search
 
+Random search works similarly to grid search, but moves through it in a random fashion and only uses a fixed number of combinations. This allows for similar optimization results as the grid search in a fraction of the time. As seen in the results section and in @fig-time, the random search is \~6 times faster.
+
 ```{python}
 from sklearn.model_selection import RandomizedSearchCV
-clf = RandomizedSearchCV(estimator=SVC(),
-                   param_distributions=param_grid,
-                   verbose=1)
-                   
+
+clf = RandomizedSearchCV(estimator=SVC(),param_distributions=param_grid,verbose=1)
 clf.fit(X_train, y_train) 
 clf_predictions = clf.predict(X_test) 
 
 # print classification report 
 print(classification_report(y_test, clf_predictions)) 
-print('%f\n%s' % (clf.best_score_,clf.best_params_))
+print('%s' % (clf.best_params_))
+print('Accuracy = %3.6f\n' % accuracy_score(y_test,clf_predictions))
 ```
 
+Because of the randomness of the random search, the optimal value(s) change every time this method is ran. For the iteration performed at the time of this blog post, the random search method determined optimal values worse than both the grid and Bayesian search methods.
+
 ## Bayesian Optimization
+
+Bayesian optimization works differently than the other two commonly used methods mentioned above, it uses Bayes Theorem to find the minimum or maximum of an objective function. Because of this difference, not all parameter values are used and a fixed number of hyperparameter combinations are iterated through (default number of iterations is 50). Bayesian optimization is usually used to optimize expensive to evaluate functions, which is not necessarily the case for this example as the data being used is somewhat basic for the purposes of this blog post.
 
 ```{python}
 def warn(*args, **kwargs):
     pass
 import warnings
 warnings.warn = warn
-from pandas import read_csv
-from sklearn.model_selection import cross_val_score
-from sklearn.svm import SVC
-from sklearn.model_selection import RepeatedStratifiedKFold
 from skopt import BayesSearchCV
 
 bayes = BayesSearchCV(SVC(), param_grid) 
-
-# fitting the model for grid search 
 bayes.fit(X_train, y_train) 
-
 bayes_predictions = bayes.predict(X_test) 
 
 # print classification report 
 print(classification_report(y_test, bayes_predictions)) 
-print('%f\n%s' % (bayes.best_score_,bayes.best_params_))
+print('%s' % (bayes.best_params_))
+print('Accuracy = %3.6f\n' % accuracy_score(y_test,bayes_predictions))
+ac3=accuracy_score(y_test,bayes_predictions)
 ```
 
+It is seen that utilizing a Bayesian search optimization identifies the same optimal values as the grid search, c = 1, gamma = 0.001, and kernel = rbf, with an accuracy of 99.259%. This is once again slightly higher than the baseline method by around 0.5%
+
+# Results
+
+After optimizing the hyperparameters for this dataset of 8x8 pixel data, both the grid search and Bayesian search identified the same optimal hyperparameters. But, as seen below, the Bayesian search performed this \~30% faster. Since the random search method only sometimes performed better than the baseline method in terms of accuracy, this makes the Bayesian search method the optimal choice between these three methods for its accuracy and speed.
+
 ```{python}
+#| label: fig-time
+#| fig-cap: "Time taken per iteration for each of the 3 optimization methods"
+#| code-fold: true
+#| fig-width: 2
 import matplotlib.pyplot as plt
 from skopt.plots import plot_convergence
+
 res=pd.DataFrame(bayes.cv_results_)
 res2=pd.DataFrame(grid.cv_results_)
 res3=pd.DataFrame(clf.cv_results_)
-res.mean_test_score.plot(figsize=(10,10))
-res2.mean_test_score.plot(figsize=(10,10))
-res3.mean_test_score.plot(figsize=(10,10))
+print('Bayes time: %3.3f sec\nGrid time: %3.3f sec\nRandom time: %3.3f sec' % (res.mean_fit_time.sum(),res2.mean_fit_time.sum(),res3.mean_fit_time.sum()))
+plt.figure(figsize=(9,6))
+res.mean_fit_time.plot(figsize=(9,6))
+res2.mean_fit_time.plot(figsize=(9,6))
+res3.mean_fit_time.plot(figsize=(9,6))
 plt.legend(['Bayes','Grid','Random'])
+plt.title('Time taken per iteration')
+plt.ylabel('Time (sec)')
+plt.xlabel('Iteration #')
 plt.show()
-plt.clf()
 ```
