@@ -2,8 +2,244 @@
 title: "Data Preprocessing"
 author: "Eric Jackson"
 date: "2023-09-08"
-categories: [code, analysis]
+categories: [code, analysis,data,preprocessing]
 image: "image.jpg"
+toc: true
+toc-depth: 2
 ---
 
 # Background
+
+For any machine learning model, there is a set of data that will be input into it. Generally the data will be broken into multiple sets, consisting of training data and test data. The training data will be the portion or set of data that is used to train the model, and the test data is what the trained model is run on to produce results.
+
+Before one can use datasets, it's generally necessary to do some form of preprocessing to the raw data to ensure that the model can run efficiently and accurately. This can be as simple as removing NaN or Null values and as complex as performing statistical analysis to remove outliers and normalizing the data.
+
+-   splitting into training and testing
+
+-   converting categorical values into numerical
+
+# Data Preprocessing
+
+## Dropping Null/NaN values
+
+One of the first steps in importing datasets is to drop any NaN or null values. These values will generally cause issues when running and machine learning model and are best to remove immediately. Luckily, there are several built in functions to perform this.
+
+```{python}
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# import dataset 
+df=pd.read_csv('./WheelTemperature.csv')
+df.Date = pd.to_datetime(df.Date, format="%m/%d/%Y %H:%M")
+df.isna().sum()
+```
+
+It can be seen above that there are 17 NaN values in this dataset, and they can easily be removed with one call to dropna(). As seen below there are now 0 rows with NaN values.
+
+```{python}
+df=df.dropna()
+df.isna().sum()
+```
+
+## Missing Data and Resampling
+
+Another common issue with datasets is missing data or data that needs to be sampled up or down. In this example, there are 769,746 rows of data containing temperature data every 10 minutes for 14 years. Because temperature in this scenario doesn't change that rapidly, and to improve the simplicity of this example, the data can be downsampled to a much lower rate, every 12 hours for example. This downsampling will be a mean of all values over that time period and reduces the dataset to just 10,691 rows.
+
+```{python}
+print('Size of dataset before resampling: %d rows' % len(df))
+df=df.set_index('Date')
+df=df.resample('12H').mean()
+print('Size of dataset after resampling: %d rows' % len(df))
+```
+
+As far as missing data, it is seen below in @fig-missingdata that there is a large chunk of missing data in 2018 from June to July.
+
+```{python}
+#| label: fig-missingdata
+#| fig-cap: "Example of missing data in raw data"
+#| 
+# dropping data to pretend there is missing data
+df=df.drop(df.loc['6/1/2015':'8/1/2015'].index)
+plt.figure(figsize=(9,6))
+plt.plot(df.loc['2015'],marker='o')
+plt.show()
+```
+
+By interpolating with the time option (since this is a time series dataset), it is seen below in @fig-missingdatafixed that a linear fit is used to generate data points for the missing set, thus reducing any issues with the model ingesting the missing data.
+
+```{python}
+#| label: fig-missingdatafixed
+#| fig-cap: "Example of interpolated data to fill missing raw data"
+
+df=df.resample('12H').mean().interpolate('time')
+plt.figure(figsize=(9,6))
+plt.plot(df.loc['2015'],marker='o')
+plt.plot(df.loc['6/1/2015':'8/1/2015'],marker='o',color='r')
+plt.legend(['Raw data','Interpolated Data'])
+plt.show()
+```
+
+## Normalizing and Statistical Analysis
+
+```{python}
+
+from pmdarima import auto_arima
+from sklearn.metrics import mean_absolute_error
+df=df.resample('48H').mean().interpolate('time')
+df_train=df[:int(0.8*(len(df)))]
+df_valid=df[int(0.8*(len(df))):]
+exogenous_features=['High']
+model = auto_arima(
+	df_train["High"],
+	exogenous=df_train[exogenous_features],
+	trace=True,
+	error_action="ignore",
+	suppress_warnings=True,
+    seasonal=True,
+    m=1)
+model.fit(df_train.High, exogenous=df_train[exogenous_features])
+forecast = model.predict(n_periods=len(df_valid), exogenous=df_valid[exogenous_features])
+df_valid.insert(len(df_valid.columns),"Forecast_ARIMAX",forecast,True)
+
+```
+
+```{python}
+from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_squared_error
+print("\nRMSE of Auto ARIMAX:", np.sqrt(mean_squared_error(df_valid.High, df_valid.Forecast_ARIMAX)))
+print("\nMAE of Auto ARIMAX:", mean_absolute_error(df_valid.High, df_valid.Forecast_ARIMAX))
+
+#df_valid[["High", "Forecast_ARIMAX"]].plot(figsize=(9, 5))
+#plt.legend(['Wheel Temperature (Truth)','Forecast (ARIMA)'])
+#plt.show()
+
+
+plt.figure()
+plt.plot((df_valid.High-df_valid.Forecast_ARIMAX)/df_valid.High*100)
+plt.show()
+```
+
+```{python}
+lag_features=["High"]
+window1 = 3
+window2 = 7
+window3 = 30
+
+df_rolled_3d = df[lag_features].rolling(window=window1, min_periods=0)
+df_rolled_7d = df[lag_features].rolling(window=window2, min_periods=0)
+df_rolled_30d = df[lag_features].rolling(window=window3, min_periods=0)
+
+df_mean_3d = df_rolled_3d.mean().shift(1).reset_index()
+df_mean_7d = df_rolled_7d.mean().shift(1).reset_index()
+df_mean_30d = df_rolled_30d.mean().shift(1).reset_index()
+
+df_std_3d = df_rolled_3d.std().shift(1).reset_index()
+df_std_7d = df_rolled_7d.std().shift(1).reset_index()
+df_std_30d = df_rolled_30d.std().shift(1).reset_index()
+
+df_mean_3d.set_index("Date", drop=True, inplace=True)
+df_mean_7d.set_index("Date", drop=True, inplace=True)
+df_mean_30d.set_index("Date", drop=True, inplace=True)
+df_std_3d.set_index("Date", drop=True, inplace=True)
+df_std_7d.set_index("Date", drop=True, inplace=True)
+df_std_30d.set_index("Date", drop=True, inplace=True)
+
+for feature in lag_features:
+    
+    df[f"{feature}_mean_lag{window1}"] = df_mean_3d[feature]
+    df[f"{feature}_mean_lag{window2}"] = df_mean_7d[feature]
+    df[f"{feature}_mean_lag{window3}"] = df_mean_30d[feature]
+    
+    df[f"{feature}_std_lag{window1}"] = df_std_3d[feature]
+    df[f"{feature}_std_lag{window2}"] = df_std_7d[feature]
+    df[f"{feature}_std_lag{window3}"] = df_std_30d[feature]
+
+
+
+exogenous_features=['High_mean_lag3', 'High_mean_lag7',
+       'High_mean_lag30', 'High_std_lag3', 'High_std_lag7', 'High_std_lag30']
+       
+
+```
+
+```{python}
+df=df.dropna()       
+df_train=df[:int(0.8*(len(df)))]
+df_valid=df[int(0.8*(len(df))):]
+
+model = auto_arima(
+	df_train["High"],
+	exogenous=df_train[exogenous_features],
+	trace=True,
+	error_action="ignore",
+	suppress_warnings=True,
+    seasonal=True,
+    m=1)
+model.fit(df_train.High, exogenous=df_train[exogenous_features])
+forecast = model.predict(n_periods=len(df_valid), exogenous=df_valid[exogenous_features])
+df_valid.insert(len(df_valid.columns),"Forecast_ARIMAX",forecast,True)
+```
+
+```{python}
+plt.figure()
+#plt.plot((df_valid.High-df_valid.Forecast_ARIMAX)/df_valid.High*100)
+df_valid[["High", "Forecast_ARIMAX"]].plot(figsize=(9, 5))
+plt.show()
+```
+
+```{python}
+df = pd.read_csv("https://raw.githubusercontent.com/AileenNielsen/TimeSeriesAnalysisWithPython/master/data/AirPassengers.csv")
+
+#string to date format
+df['Month'] = pd.to_datetime(df['Month'],infer_datetime_format=True)
+df = df.set_index(['Month'])
+n_periods=24
+#Determine rolling statistics
+df["rolling_avg"] = df["#Passengers"].rolling(window=12).mean() #window size 12 denotes 12 months, giving rolling mean at yearly level
+df["rolling_std"] = df["#Passengers"].rolling(window=12).std()
+df=df.dropna()
+
+df['month_index'] = df.index.month
+SARIMAX_model = auto_arima(df[['#Passengers']], exogenous=df[['month_index']],
+                           start_p=1, start_q=1,
+                           test='adf',
+                           max_p=3, max_q=3, m=12,
+                           start_P=0, seasonal=True,
+                           d=None, D=1, 
+                           trace=False,
+                           error_action='ignore',  
+                           suppress_warnings=True, 
+                           stepwise=True)
+
+
+
+
+forecast_df = pd.DataFrame({"month_index":pd.date_range(df.index[-1], periods = n_periods, freq='MS').month},
+                    index = pd.date_range(df.index[-1] + pd.DateOffset(months=1), periods = n_periods, freq='MS'))
+
+fitted, confint = SARIMAX_model.predict(n_periods=n_periods, 
+                                        return_conf_int=True,
+                                        exogenous=forecast_df[['month_index']])
+index_of_fc = pd.date_range(df.index[-1] + pd.DateOffset(months=1), periods = n_periods, freq='MS')
+
+# make series for plotting purpose
+fitted_series = pd.Series(fitted, index=index_of_fc)
+lower_series = pd.Series(confint[:, 0], index=index_of_fc)
+upper_series = pd.Series(confint[:, 1], index=index_of_fc)
+
+# Plot
+plt.figure(figsize=(15,7))
+plt.plot(df["#Passengers"], color='#1f76b4')
+plt.plot(fitted_series, color='darkgreen')
+plt.fill_between(lower_series.index, 
+                lower_series, 
+                upper_series, 
+                color='k', alpha=.15)
+
+plt.title("SARIMAX - Forecast of Airline Passengers")
+plt.show()
+
+```

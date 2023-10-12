@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Blog",
     "section": "",
-    "text": "Hyperparameter Tuning\n\n\n\n\n\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nOct 6, 2023\n\n\nEric Jackson\n\n\n\n\n\n\n  \n\n\n\n\nAnomaly Detection on Spacecraft Telemetry\n\n\n\n\n\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nSep 8, 2023\n\n\nEric Jackson\n\n\n\n\n\n\n  \n\n\n\n\nData Preprocessing\n\n\n\n\n\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nSep 8, 2023\n\n\nEric Jackson\n\n\n\n\n\n\nNo matching items"
+    "text": "Hyperparameter Tuning\n\n\n\n\n\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nOct 6, 2023\n\n\nEric Jackson\n\n\n\n\n\n\n  \n\n\n\n\nAnomaly Detection on Spacecraft Telemetry\n\n\n\n\n\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nSep 8, 2023\n\n\nEric Jackson\n\n\n\n\n\n\n  \n\n\n\n\nData Preprocessing\n\n\n\n\n\n\n\ncode\n\n\nanalysis\n\n\ndata\n\n\npreprocessing\n\n\n\n\n\n\n\n\n\n\n\nSep 8, 2023\n\n\nEric Jackson\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/post-with-code/index.html",
@@ -32,7 +32,7 @@
     "href": "posts/Topic_3/index.html",
     "title": "Data Preprocessing",
     "section": "",
-    "text": "Background"
+    "text": "Background\nFor any machine learning model, there is a set of data that will be input into it. Generally the data will be broken into multiple sets, consisting of training data and test data. The training data will be the portion or set of data that is used to train the model, and the test data is what the trained model is run on to produce results.\nBefore one can use datasets, it’s generally necessary to do some form of preprocessing to the raw data to ensure that the model can run efficiently and accurately. This can be as simple as removing NaN or Null values and as complex as performing statistical analysis to remove outliers and normalizing the data.\n\npopulating missing data\ndropping unnecessary data\nsplitting into training and testing\ndropping nan\nconverting categorical values into numerical\ndownsampling data\n\n\n\nData Preprocessing\nOne of the first steps in importing datasets is to drop any NaN or null values. These values will generally cause issues when running and machine learning model and are best to remove immediately. Luckily, there are several built in functions to perform this.\n\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import LabelEncoder\nimport pandas as pd\n\n# import dataset \ndf=pd.read_csv('./WheelTemperature.csv')\ndf.isna().sum()\n\nDate     0\nHigh    17\ndtype: int64\n\ndfdrop=df.dropna()\ndfdrop.isna().sum()\n\nDate    0\nHigh    0\ndtype: int64"
   },
   {
     "objectID": "posts/post-with-code/index.html#preprocessing",
