@@ -53,7 +53,7 @@ plt.show()
 
 DBSCAN is a popular algorithm used mainly for clustering given sets of points. It works by grouping together points that are close together and have multiple nearest neighbors. It considers outliers to be points that are alone in low density regions. [\[1\]](https://en.wikipedia.org/wiki/DBSCAN)
 
-For the example in this blog, a two-dimensional set of data (mean radius and mean smoothness) is used to run through the DBSCAN algorithm. @fig-scatter shows the result with outlier/anomalous data points shown in orange. The default epsilon parameter value of 0.5 was used for the DBSCAN algorithm.
+For the example in this blog, a two-dimensional set of data (mean radius and mean smoothness) is used to run through the DBSCAN algorithm. @fig-scatter shows the result with outlier/anomalous data points shown in orange. Since DBSCAN is most known for being a clustering algorithm, the bottom plot shows the different clusters that the algorithm identified. The default epsilon parameter value of 0.5 was used for the DBSCAN algorithm.
 
 ```{python}
 #| code-fold: true
