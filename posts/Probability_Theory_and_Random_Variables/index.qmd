@@ -1,0 +1,15 @@
+---
+title: "Probability theory and random variables"
+author: "Eric Jackson"
+date: "2023-10-06"
+categories: [code, analysis]
+image: "image.jpg"
+toc: true
+toc-depth: 2
+---
+
+# Background
+
+## Probability Theory
+
+## Random Variables

@@ -26,5 +26,20 @@
   },
   "posts/Topic_3/test_code.ipynb": {
     "test_code.html": "a232fcc0"
+  },
+  "posts/Probability_Theory_and_Random_Variables/index.qmd": {
+    "index.html": "f3c159ec"
+  },
+  "posts/Anomaly_Outlier_Detection/index.qmd": {
+    "index.html": "858d5b3a"
+  },
+  "posts/Classification/index.qmd": {
+    "index.html": "8aa2c116"
+  },
+  "posts/Clustering/index.qmd": {
+    "index.html": "0e990598"
+  },
+  "posts/Linear_and_Nonlinear_Regression/index.qmd": {
+    "index.html": "08ee8fbb"
   }
 }

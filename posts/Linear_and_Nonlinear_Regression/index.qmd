@@ -1,0 +1,25 @@
+---
+title: "Probability theory and random variables"
+author: "Eric Jackson"
+date: "2023-10-06"
+categories: [code, analysis]
+image: "image.jpg"
+toc: true
+toc-depth: 2
+---
+
+# Background
+
+When a machine learning model is being trained, one of the most important parts of the process is choosing valid hyperparameters. Hyperparameters are parameters whose value can be used to control the learning process, while other parameters are simply derived during the training process. These hyperparameters do not necessarily impact or influence the performance of the model, but impact the speed and quality of the learning process. As such, the hyperparameters are set prior to training the model and not during.
+
+Examples of common hyperparameters include:
+
+-   Learning rate and network size in Long short-term memory (LSTM)
+
+-   k in k-nearest neighbors
+
+-   The penalty in most classifier methods
+
+# Tuning Techniques
+
+The goal of finding optimal hyperparameters is to determine the best combination of hyperparameters that optimize the model. This can be done manually but is extremely time intensive. Thus, there are several solutions available to perform this tuning automatically.

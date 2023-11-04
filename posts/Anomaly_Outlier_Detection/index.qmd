@@ -1,0 +1,139 @@
+---
+title: "Anomaly/Outlier Detection"
+author: "Eric Jackson"
+date: "2023-10-06"
+categories: [code, outlier,anomaly,detection]
+image: "image.jpg"
+toc: true
+toc-depth: 2
+---
+
+# Background
+
+In this blog post, two popular outlier detection algorithms (DBSCAN and Isolation Forest) will be used and compared against each other. Outlier detection is important for preprocessing datasets as there is the potential that outliers can throw off the results of a machine learning model. By removing outliers, it is possible to get a more accurate result. These methods can also be used for anomaly detection in time series data, spacecraft telemetry for example, to identify potential out of ordinary trends in data. This can potentially allow for a preemptive response to an issue (ex: temperature changing, so heaters are powered on/off) and reduces the amount of time that the spacecraft is out of mission.
+
+For simplicity, a known dataset will be imported and used with two features as the dataset. The breast cancer dataset from sklearn is a commonly used binary classification dataset from UC Irvine showing information of tumor characteristics in Wisconsin.
+
+@fig-whisker shows a box and whisker plot of both sets of data for an initial look at the outliers identified through purely statistical means.
+
+```{python}
+#| echo: false
+import pandas as pd
+import numpy as np 
+import matplotlib.pyplot as plt
+from sklearn.cluster import DBSCAN
+from sklearn.datasets import load_breast_cancer
+
+# using imported breast cancer dataset from sklearn
+cancer = load_breast_cancer() 
+X_train = pd.DataFrame(cancer['data'],columns = cancer['feature_names']) 
+data=X_train[["mean radius","mean smoothness"]]
+df=data;
+```
+
+```{python}
+#| label: fig-whisker
+#| fig-cap: "Box/whisker plot of initial data"
+#| code-fold: true
+
+red_circle = dict(markerfacecolor='red', marker='o', markeredgecolor='white')
+fig, axs = plt.subplots(len(df.columns),1, figsize=(8,6))
+for i, ax in enumerate(axs.flat):
+    ax.boxplot(df.iloc[:,i], flierprops=red_circle,vert=False)
+    ax.set_title(df.columns[i])
+    ax.tick_params(axis='y', labelsize=14)
+  
+plt.tight_layout()
+plt.show()
+```
+
+# Outlier Detection Algorithms
+
+## Density-Based Spatial Clustering of Applications with Noise (DBSCAN)
+
+DBSCAN is a popular algorithm used mainly for clustering given sets of points. It works by grouping together points that are close together and have multiple nearest neighbors. It considers outliers to be points that are alone in low density regions. [\[1\]](https://en.wikipedia.org/wiki/DBSCAN)
+
+For the example in this blog, a two-dimensional set of data (mean radius and mean smoothness) is used to run through the DBSCAN algorithm. @fig-scatter shows the result with outlier/anomalous data points shown in orange.
+
+```{python}
+#| code-fold: false
+
+import pandas as pd
+import numpy as np 
+import matplotlib.pyplot as plt
+from sklearn.cluster import DBSCAN
+from sklearn.datasets import load_breast_cancer
+
+# using imported breast cancer dataset from sklearn
+cancer = load_breast_cancer() 
+X_train = pd.DataFrame(cancer['data'],columns = cancer['feature_names']) 
+
+# DBSCAN model training/fitting
+dbscan=DBSCAN()
+dbscan.fit(X_train[["mean radius","mean smoothness"]])
+colors = dbscan.labels_
+outliers=colors.T<0
+normal=colors.T>=0
+print("Number of outliers detected: %d" % sum(i<0 for i in colors.T))
+print("Number of normal samples detected: %d" % sum(i>=0 for i in colors.T))
+```
+
+```{python}
+#| code-fold: true
+#| label: fig-scatter
+#| fig-cap: "Data that the DBSCAN algorithm identifies as an outlier or not"
+#plotting
+fig, ax = plt.subplots(figsize=(9,7))
+plt.plot(X_train["mean radius"][colors==0],X_train["mean smoothness"][colors==0],marker='o',linestyle="None")
+plt.plot(X_train["mean radius"][colors==-1],X_train["mean smoothness"][colors==-1],marker='o',linestyle="None")
+plt.legend(["Valid Data","Data marked as outliers"])
+plt.ylabel("Mean Smoothness")
+plt.xlabel("Mean Radius")
+plt.title("Dataset Outlier Detection via DBSCAN")
+plt.show()
+```
+
+## Isolation Forest
+
+Isolation Forest is another commonly used outlier detection method which detects outliers utilizing binary trees. This method recursively partitions data points based on randomly selected attribute and then assigned anomaly scores based on number of "splits" needed to isolate a data point. The training dataset is used to build the "trees" and then the validation data is passed through those trees and assigned an anomaly score. In the case of this example, the training and validation is the same dataset (only one iteration of the call to the model). Based on the anomaly score, it can be determined which points are outliers. One of the inputs to the Isolation Forest algorithm is the contamination parameter, or the expected percentage of data that will be anomalous. For the purposes of the example, a contamination value of 3% will be used.
+
+Advantages:
+
+-   Low memory utilization
+
+-   Works best with large datasets
+
+Note: Below contains some modified code from [HERE](https://medium.com/mlearning-ai/unsupervised-outlier-detection-with-isolation-forest-eab398c593b2)
+
+```{python}
+from sklearn.ensemble import IsolationForest
+
+outliers_fraction = float(.03)
+model =  IsolationForest(contamination=outliers_fraction)
+data=df.values
+prediction= model.fit_predict(data)
+
+print("Number of outliers detected: {}".format(prediction[prediction < 0].sum()*-1))
+print("Number of normal samples detected: {}".format(prediction[prediction > 0].sum()))
+```
+
+```{python}
+#| code-fold: true
+#| label: fig-isofor
+#| fig-cap: "Data that the Isolation Forest algorithm identifies as an outlier or not"
+
+fig, ax = plt.subplots(figsize=(9,7))
+normal_data = data[np.where(prediction > 0)]
+outliers = data[np.where(prediction < 0)]
+plt.scatter(normal_data[:, 0], normal_data[:, 1])
+plt.scatter(outliers[:, 0], outliers[:, 1])
+plt.title("Dataset Outlier Detection via Isolation Forest")
+plt.ylabel("Mean Smoothness")
+plt.xlabel("Mean Radius")
+plt.legend(["Valid Data","Data marked as outliers"])
+plt.show()
+```
+
+# Conclusion
+
+It can be seen that both DBSCAN and Isolation Forest identified most of the same outlier points, but Isolation Forest identified 10 more total outlier data points, mainly due to the contamination parameter being large (3%). Both methods are valid options, with Isolation Forest being more accurate depending on how accurate the contamination parameter is.

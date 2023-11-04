@@ -14,10 +14,6 @@ For any machine learning model, there is a set of data that will be input into i
 
 Before one can use datasets, it's generally necessary to do some form of preprocessing to the raw data to ensure that the model can run efficiently and accurately. This can be as simple as removing NaN or Null values and as complex as performing statistical analysis to remove outliers and normalizing the data.
 
--   splitting into training and testing
-
--   converting categorical values into numerical
-
 # Data Preprocessing
 
 ## Dropping Null/NaN values
@@ -84,11 +80,13 @@ plt.show()
 
 ## Normalizing and Statistical Analysis
 
+-   removing values more than 2 std dev away
+
 ```{python}
 
 from pmdarima import auto_arima
 from sklearn.metrics import mean_absolute_error
-df=df.resample('48H').mean().interpolate('time')
+df=df.resample('24H').mean().interpolate('time')
 df_train=df[:int(0.8*(len(df)))]
 df_valid=df[int(0.8*(len(df))):]
 exogenous_features=['High']
@@ -98,15 +96,13 @@ model = auto_arima(
 	trace=True,
 	error_action="ignore",
 	suppress_warnings=True,
-    seasonal=True,
+    seasonal=False,
     m=1)
 model.fit(df_train.High, exogenous=df_train[exogenous_features])
 forecast = model.predict(n_periods=len(df_valid), exogenous=df_valid[exogenous_features])
 df_valid.insert(len(df_valid.columns),"Forecast_ARIMAX",forecast,True)
 
-```
 
-```{python}
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import mean_squared_error
 print("\nRMSE of Auto ARIMAX:", np.sqrt(mean_squared_error(df_valid.High, df_valid.Forecast_ARIMAX)))
@@ -120,6 +116,7 @@ print("\nMAE of Auto ARIMAX:", mean_absolute_error(df_valid.High, df_valid.Forec
 plt.figure()
 plt.plot((df_valid.High-df_valid.Forecast_ARIMAX)/df_valid.High*100)
 plt.show()
+
 ```
 
 ```{python}
@@ -171,75 +168,74 @@ df_train=df[:int(0.8*(len(df)))]
 df_valid=df[int(0.8*(len(df))):]
 
 model = auto_arima(
-	df_train["High"],
-	exogenous=df_train[exogenous_features],
+	df_train["High_mean_lag3"],
+	
 	trace=True,
 	error_action="ignore",
 	suppress_warnings=True,
     seasonal=True,
     m=1)
-model.fit(df_train.High, exogenous=df_train[exogenous_features])
-forecast = model.predict(n_periods=len(df_valid), exogenous=df_valid[exogenous_features])
+model.fit(df_train.High_mean_lag3)
+forecast = model.predict(n_periods=len(df_valid))
 df_valid.insert(len(df_valid.columns),"Forecast_ARIMAX",forecast,True)
 ```
 
 ```{python}
 plt.figure()
 #plt.plot((df_valid.High-df_valid.Forecast_ARIMAX)/df_valid.High*100)
-df_valid[["High", "Forecast_ARIMAX"]].plot(figsize=(9, 5))
+#df_valid[["High_mean_lag3", "Forecast_ARIMAX"]].plot(figsize=(9, 5))
+df.High.plot()
 plt.show()
 ```
 
+## Normalization
+
 ```{python}
-df = pd.read_csv("https://raw.githubusercontent.com/AileenNielsen/TimeSeriesAnalysisWithPython/master/data/AirPassengers.csv")
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
+scaler = MinMaxScaler(feature_range=(0, 1))
+rescaledX = scaler.fit_transform(df_train)
+scaler = MinMaxScaler(feature_range=(0, 1))
+rescaledX = scaler.fit_transform(df_train.High.values.reshape(-1,1))
+#scaler = StandardScaler().fit(df_train.High.values.reshape(-1,1))
+#rescaledX = scaler.transform(df_train.High.values.reshape(-1,1))
 
-#string to date format
-df['Month'] = pd.to_datetime(df['Month'],infer_datetime_format=True)
-df = df.set_index(['Month'])
-n_periods=24
-#Determine rolling statistics
-df["rolling_avg"] = df["#Passengers"].rolling(window=12).mean() #window size 12 denotes 12 months, giving rolling mean at yearly level
-df["rolling_std"] = df["#Passengers"].rolling(window=12).std()
-df=df.dropna()
+plt.figure()
+plt.plot(rescaledX)
+plt.show()
 
-df['month_index'] = df.index.month
-SARIMAX_model = auto_arima(df[['#Passengers']], exogenous=df[['month_index']],
-                           start_p=1, start_q=1,
-                           test='adf',
-                           max_p=3, max_q=3, m=12,
-                           start_P=0, seasonal=True,
-                           d=None, D=1, 
-                           trace=False,
-                           error_action='ignore',  
-                           suppress_warnings=True, 
-                           stepwise=True)
+```
+
+## One-Hot Encoding
+
+```{python}
+plt.figure()
+i = 0
+plt.boxplot(rescaledX, vert=False)
+plt.set_ylabel('High')
+plt.show()
+plt.figure()
+plt.plot(rescaledX)
+plt.show()
+q1, q3 = np.percentile(rescaledX, [25, 75])
+iqr = q3 - q1
+
+lower_bound = q1 - (1.5 * iqr)
+upper_bound = q3 + (1.5 * iqr)
+# Drop the outliers
+clean_data = rescaledX[(rescaledX >= lower_bound) 
+                & (rescaledX <= upper_bound)]
+                
+plt.figure()
+plt.plot(clean_data)
+plt.ylim(-0.05,1.05)
+plt.show()
 
 
-
-
-forecast_df = pd.DataFrame({"month_index":pd.date_range(df.index[-1], periods = n_periods, freq='MS').month},
-                    index = pd.date_range(df.index[-1] + pd.DateOffset(months=1), periods = n_periods, freq='MS'))
-
-fitted, confint = SARIMAX_model.predict(n_periods=n_periods, 
-                                        return_conf_int=True,
-                                        exogenous=forecast_df[['month_index']])
-index_of_fc = pd.date_range(df.index[-1] + pd.DateOffset(months=1), periods = n_periods, freq='MS')
-
-# make series for plotting purpose
-fitted_series = pd.Series(fitted, index=index_of_fc)
-lower_series = pd.Series(confint[:, 0], index=index_of_fc)
-upper_series = pd.Series(confint[:, 1], index=index_of_fc)
-
-# Plot
-plt.figure(figsize=(15,7))
-plt.plot(df["#Passengers"], color='#1f76b4')
-plt.plot(fitted_series, color='darkgreen')
-plt.fill_between(lower_series.index, 
-                lower_series, 
-                upper_series, 
-                color='k', alpha=.15)
-
-plt.title("SARIMAX - Forecast of Airline Passengers")
+corr = df.corr()
+import seaborn as sns
+plt.figure(dpi=130)
+sns.heatmap(df.corr(), annot=True, fmt= '.2f')
 plt.show()
 
 ```
