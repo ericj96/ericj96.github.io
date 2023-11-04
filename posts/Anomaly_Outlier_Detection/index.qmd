@@ -82,7 +82,7 @@ def plot_dbscan(dbscan, X, size, show_xlabels=True, show_ylabels=True):
     else:
         plt.tick_params(labelbottom=False)
     if show_ylabels:
-        plt.ylabel("Mean Smoothness", rotation=0)
+        plt.ylabel("Mean Smoothness")
     else:
         plt.tick_params(labelleft=False)
     plt.title(f"eps={dbscan.eps:.2f}, min_samples={dbscan.min_samples}")
@@ -120,7 +120,7 @@ print("Number of normal samples detected: %d" % sum(i>=0 for i in colors.T))
 #| label: fig-scatter
 #| fig-cap: "Data that the DBSCAN algorithm identifies as an outlier or not"
 #plotting
-fig, ax = plt.subplots(figsize=(9,9))
+fig, ax = plt.subplots(figsize=(9,14))
 plt.subplot(211)
 plt.plot(X_train["mean radius"][colors==0],X_train["mean smoothness"][colors==0],marker='o',linestyle="None")
 plt.plot(X_train["mean radius"][colors==-1],X_train["mean smoothness"][colors==-1],marker='o',linestyle="None")
