@@ -57,6 +57,7 @@ For the example in this blog, a two-dimensional set of data (mean radius and mea
 
 ```{python}
 #| code-fold: true
+#| echo: false
 
 def plot_dbscan(dbscan, X, size, show_xlabels=True, show_ylabels=True):
     core_mask = np.zeros_like(dbscan.labels_, dtype=bool)
@@ -119,7 +120,7 @@ print("Number of normal samples detected: %d" % sum(i>=0 for i in colors.T))
 #| label: fig-scatter
 #| fig-cap: "Data that the DBSCAN algorithm identifies as an outlier or not"
 #plotting
-fig, ax = plt.subplots(figsize=(9,7))
+fig, ax = plt.subplots(figsize=(9,9))
 plt.subplot(211)
 plt.plot(X_train["mean radius"][colors==0],X_train["mean smoothness"][colors==0],marker='o',linestyle="None")
 plt.plot(X_train["mean radius"][colors==-1],X_train["mean smoothness"][colors==-1],marker='o',linestyle="None")
@@ -137,7 +138,7 @@ plt.show()
 
 ## Isolation Forest
 
-Isolation Forest is another commonly used outlier detection method which detects outliers utilizing binary trees. This method recursively partitions data points based on randomly selected attribute and then assigned anomaly scores based on number of "splits" needed to isolate a data point. The training dataset is used to build the "trees" and then the validation data is passed through those trees and assigned an anomaly score. In the case of this example, the training and validation is the same dataset (only one iteration of the call to the model). Based on the anomaly score, it can be determined which points are outliers. One of the inputs to the Isolation Forest algorithm is the contamination parameter, or the expected percentage of data that will be anomalous. For the purposes of the example, a contamination value of 3% will be used.
+Isolation Forest is another commonly used outlier detection method which detects outliers utilizing binary trees. This method recursively partitions data points based on randomly selected attribute and then assigned anomaly scores based on number of "splits" needed to isolate a data point. The training dataset is used to build the "trees" and then the validation data is passed through those trees and assigned an anomaly score. In the case of this example, the training and validation is the same dataset (only one iteration of the call to the model). Based on the anomaly score, it can be determined which points are outliers. One of the inputs to the Isolation Forest algorithm is the contamination parameter, or the expected percentage of data that will be anomalous. For the purposes of the example, the default contamination value of 10% will be used.
 
 Advantages:
 
@@ -151,9 +152,9 @@ Note: Below contains some modified code from [HERE](https://medium.com/mlearning
 from sklearn.ensemble import IsolationForest
 
 outliers_fraction = float(.03)
-model =  IsolationForest(contamination=outliers_fraction)
+model =  IsolationForest()
 data=df.values
-prediction= model.fit_predict(data)
+prediction = model.fit_predict(data)
 
 print("Number of outliers detected: {}".format(prediction[prediction < 0].sum()*-1))
 print("Number of normal samples detected: {}".format(prediction[prediction > 0].sum()))
