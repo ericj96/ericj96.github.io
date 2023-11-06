@@ -1,7 +1,7 @@
 ---
-title: "Hyperparameter Tuning"
+title: "(Old blog post) Hyperparameter Tuning"
 author: "Eric Jackson"
-date: "2023-10-06"
+date: "2023-09-02"
 categories: [code, analysis]
 image: "image.jpg"
 toc: true

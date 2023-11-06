@@ -240,7 +240,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="density-based-spatial-clustering-of-applications-with-noise-dbscan" class="level2">
 <h2 class="anchored" data-anchor-id="density-based-spatial-clustering-of-applications-with-noise-dbscan">Density-Based Spatial Clustering of Applications with Noise (DBSCAN)</h2>
 <p>DBSCAN is a popular algorithm used mainly for clustering given sets of points. It works by grouping together points that are close together and have multiple nearest neighbors. It considers outliers to be points that are alone in low density regions. <a href="https://en.wikipedia.org/wiki/DBSCAN">[1]</a></p>
-<p>For the example in this blog, a two-dimensional set of data (mean radius and mean smoothness) is used to run through the DBSCAN algorithm. <a href="#fig-scatter">Figure&nbsp;2</a> shows the result with outlier/anomalous data points shown in orange. Since DBSCAN is most known for being a clustering algorithm, the bottom plot shows the different clusters that the algorithm identified. The default epsilon parameter value of 0.5 was used for the DBSCAN algorithm. This parameter “defines the maximum distance between two samples for one to be considered as in the neighborhood of the other”. <a href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html">[2]</a></p>
+<p>For the example in this blog, a two-dimensional set of data (mean radius and mean smoothness) is used to run through the DBSCAN algorithm. <a href="#fig-scatter">Figure&nbsp;2</a> shows the result with outlier/anomalous data points shown in orange. Since DBSCAN is most known for being a clustering algorithm, the bottom plot shows the different clusters that the algorithm identified. All points with a color and a star indicate a clustered point, of which there are two separate clusters that the algorithm identified. Any point with a red X indicates it is an anomalous/outlier point, and any point that is not surrounded by color and is a period is a non-core point (of which there were only two single points identified as such).</p>
+<p><strong>Note:</strong> The default epsilon parameter value of 0.5 was used for the DBSCAN algorithm. This parameter “defines the maximum distance between two samples for one to be considered as in the neighborhood of the other”. <a href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html">[2]</a></p>
 <div class="cell" data-execution_count="2">
 <details>
 <summary>Code</summary>
@@ -350,8 +351,8 @@ Number of normal samples detected: 561</code></pre>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of outliers detected: </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(prediction[prediction <span class="op">&lt;</span> <span class="dv">0</span>].<span class="bu">sum</span>()<span class="op">*-</span><span class="dv">1</span>))</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of normal samples detected: </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(prediction[prediction <span class="op">&gt;</span> <span class="dv">0</span>].<span class="bu">sum</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Number of outliers detected: 101
-Number of normal samples detected: 468</code></pre>
+<pre><code>Number of outliers detected: 86
+Number of normal samples detected: 483</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="6">
@@ -381,7 +382,7 @@ Number of normal samples detected: 468</code></pre>
 </section>
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>
-<p>When comparing DBSCAN to Isolation Forest, it is obvious to see that Isolation Forest removed a multitude more outliers than the DBSCAN algorithm. But, this is partially due to the use of default parameters in each algorithm. If the DBSCAN epsilon parameter is reduced to ~0.08, then the results more closely match what is seen with the Isolation Forest algorithm’s default contamination parameter. Finding optimal hyperparameters is an extremely important step in any machine learning algorithm, but comes with its own challenges and time consumption. A separate blog post on optimizing particular hyperparameters can be seen <a href="https://ericj96.github.io/posts/Topic_2/">here</a>.</p>
+<p>When comparing DBSCAN to Isolation Forest, it is obvious to see that Isolation Forest removed a multitude more outliers than the DBSCAN algorithm. But, this is partially due to the use of default parameters in each algorithm and could be potentially be optimized. If the DBSCAN epsilon parameter is reduced to ~0.08, then the results more closely match what is seen with the Isolation Forest algorithm’s default contamination parameter. Finding optimal hyperparameter values is an extremely important step in any machine learning algorithm, but comes with its own challenges and time consumption. A separate blog post on optimizing particular hyperparameters can be seen <a href="https://ericj96.github.io/posts/Topic_2/">here</a>.</p>
 
 
 </section>

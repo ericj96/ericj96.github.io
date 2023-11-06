@@ -1,7 +1,7 @@
 ---
-title: "Anomaly Detection on Spacecraft Telemetry"
+title: "(Old blog post) Anomaly Detection on Spacecraft Telemetry"
 author: "Eric Jackson"
-date: "2023-09-08"
+date: "2023-09-03"
 categories: [code, analysis]
 image: "image.jpg"
 toc: true
