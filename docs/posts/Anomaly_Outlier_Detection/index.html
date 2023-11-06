@@ -197,18 +197,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>In this blog post, two popular outlier detection algorithms (DBSCAN and Isolation Forest) will be used and compared against each other. Outlier detection is important for preprocessing datasets as there is the potential that outliers can throw off the results of a machine learning model. By removing outliers, it is possible to get a more accurate result. These methods can also be used for anomaly detection in time series data, spacecraft telemetry for example, to identify potential out of ordinary trends in data. This can potentially allow for a preemptive response to an issue (ex: temperature changing, so heaters are powered on/off) and reduces the amount of time that the spacecraft is out of mission.</p>
 <p>For simplicity, a known dataset will be imported and used with two features as the dataset. The breast cancer dataset from sklearn is a commonly used binary classification dataset from UC Irvine showing information of tumor characteristics in Wisconsin.</p>
 <p><a href="#fig-whisker">Figure&nbsp;1</a> shows a box and whisker plot of both sets of data for an initial look at the outliers identified through purely statistical means.</p>
-<div class="cell" data-execution_count="2">
+<div class="cell" data-execution_count="1">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>red_circle <span class="op">=</span> <span class="bu">dict</span>(markerfacecolor<span class="op">=</span><span class="st">'red'</span>, marker<span class="op">=</span><span class="st">'o'</span>, markeredgecolor<span class="op">=</span><span class="st">'white'</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="bu">len</span>(df.columns),<span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">6</span>))</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, ax <span class="kw">in</span> <span class="bu">enumerate</span>(axs.flat):</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    ax.boxplot(df.iloc[:,i], flierprops<span class="op">=</span>red_circle,vert<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    ax.set_title(df.columns[i])</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    ax.tick_params(axis<span class="op">=</span><span class="st">'y'</span>, labelsize<span class="op">=</span><span class="dv">14</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> DBSCAN</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_breast_cancer</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># using imported breast cancer dataset from sklearn</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>cancer <span class="op">=</span> load_breast_cancer() </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> pd.DataFrame(cancer[<span class="st">'data'</span>],columns <span class="op">=</span> cancer[<span class="st">'feature_names'</span>]) </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>data<span class="op">=</span>X_train[[<span class="st">"mean radius"</span>,<span class="st">"mean smoothness"</span>]]</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>df<span class="op">=</span>data<span class="op">;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>red_circle <span class="op">=</span> <span class="bu">dict</span>(markerfacecolor<span class="op">=</span><span class="st">'red'</span>, marker<span class="op">=</span><span class="st">'o'</span>, markeredgecolor<span class="op">=</span><span class="st">'white'</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="bu">len</span>(df.columns),<span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">6</span>))</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, ax <span class="kw">in</span> <span class="bu">enumerate</span>(axs.flat):</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    ax.boxplot(df.iloc[:,i], flierprops<span class="op">=</span>red_circle,vert<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    ax.set_title(df.columns[i])</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    ax.tick_params(axis<span class="op">=</span><span class="st">'y'</span>, labelsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div id="fig-whisker" class="quarto-figure quarto-figure-center anchored">
@@ -225,60 +240,90 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="density-based-spatial-clustering-of-applications-with-noise-dbscan" class="level2">
 <h2 class="anchored" data-anchor-id="density-based-spatial-clustering-of-applications-with-noise-dbscan">Density-Based Spatial Clustering of Applications with Noise (DBSCAN)</h2>
 <p>DBSCAN is a popular algorithm used mainly for clustering given sets of points. It works by grouping together points that are close together and have multiple nearest neighbors. It considers outliers to be points that are alone in low density regions. <a href="https://en.wikipedia.org/wiki/DBSCAN">[1]</a></p>
-<p>For the example in this blog, a two-dimensional set of data (mean radius and mean smoothness) is used to run through the DBSCAN algorithm. <a href="#fig-scatter">Figure&nbsp;2</a> shows the result with outlier/anomalous data points shown in orange. Since DBSCAN is most known for being a clustering algorithm, the bottom plot shows the different clusters that the algorithm identified. The default epsilon parameter value of 0.5 was used for the DBSCAN algorithm.</p>
-<div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> DBSCAN</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_breast_cancer</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># using imported breast cancer dataset from sklearn</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>cancer <span class="op">=</span> load_breast_cancer() </span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> pd.DataFrame(cancer[<span class="st">'data'</span>],columns <span class="op">=</span> cancer[<span class="st">'feature_names'</span>]) </span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># DBSCAN model training/fitting</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>dbscan<span class="op">=</span>DBSCAN()</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>dbscan.fit(X_train[[<span class="st">"mean radius"</span>,<span class="st">"mean smoothness"</span>]])</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> dbscan.labels_</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>outliers<span class="op">=</span>colors.T<span class="op">&lt;</span><span class="dv">0</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>normal<span class="op">=</span>colors.T<span class="op">&gt;=</span><span class="dv">0</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of outliers detected: </span><span class="sc">%d</span><span class="st">"</span> <span class="op">%</span> <span class="bu">sum</span>(i<span class="op">&lt;</span><span class="dv">0</span> <span class="cf">for</span> i <span class="kw">in</span> colors.T))</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of normal samples detected: </span><span class="sc">%d</span><span class="st">"</span> <span class="op">%</span> <span class="bu">sum</span>(i<span class="op">&gt;=</span><span class="dv">0</span> <span class="cf">for</span> i <span class="kw">in</span> colors.T))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>For the example in this blog, a two-dimensional set of data (mean radius and mean smoothness) is used to run through the DBSCAN algorithm. <a href="#fig-scatter">Figure&nbsp;2</a> shows the result with outlier/anomalous data points shown in orange. Since DBSCAN is most known for being a clustering algorithm, the bottom plot shows the different clusters that the algorithm identified. The default epsilon parameter value of 0.5 was used for the DBSCAN algorithm. This parameter “defines the maximum distance between two samples for one to be considered as in the neighborhood of the other”. <a href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html">[2]</a></p>
+<div class="cell" data-execution_count="2">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot code taken from https://github.com/maptv/handson-ml3/blob/main/09_unsupervised_learning.ipynb</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_dbscan(dbscan, X, size, show_xlabels<span class="op">=</span><span class="va">True</span>, show_ylabels<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    core_mask <span class="op">=</span> np.zeros_like(dbscan.labels_, dtype<span class="op">=</span><span class="bu">bool</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    core_mask[dbscan.core_sample_indices_] <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    anomalies_mask <span class="op">=</span> dbscan.labels_ <span class="op">==</span> <span class="op">-</span><span class="dv">1</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    non_core_mask <span class="op">=</span> <span class="op">~</span>(core_mask <span class="op">|</span> anomalies_mask)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    cores <span class="op">=</span> dbscan.components_</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    anomalies <span class="op">=</span> X[anomalies_mask]</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    non_cores <span class="op">=</span> X[non_core_mask]</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    plt.scatter(cores[:, <span class="dv">0</span>], cores[:, <span class="dv">1</span>],</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>                c<span class="op">=</span>dbscan.labels_[core_mask], marker<span class="op">=</span><span class="st">'o'</span>, s<span class="op">=</span>size, cmap<span class="op">=</span><span class="st">"Paired"</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    plt.scatter(cores[:, <span class="dv">0</span>], cores[:, <span class="dv">1</span>], marker<span class="op">=</span><span class="st">'*'</span>, s<span class="op">=</span><span class="dv">20</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                c<span class="op">=</span>dbscan.labels_[core_mask])</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    plt.scatter(anomalies[:, <span class="dv">0</span>], anomalies[:, <span class="dv">1</span>],</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>                c<span class="op">=</span><span class="st">"r"</span>, marker<span class="op">=</span><span class="st">"x"</span>, s<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    plt.scatter(non_cores[:, <span class="dv">0</span>], non_cores[:, <span class="dv">1</span>],</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>                c<span class="op">=</span>dbscan.labels_[non_core_mask], marker<span class="op">=</span><span class="st">"."</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> show_xlabels:</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        plt.xlabel(<span class="st">"Mean Radius"</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        plt.tick_params(labelbottom<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> show_ylabels:</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        plt.ylabel(<span class="st">"Mean Smoothness"</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        plt.tick_params(labelleft<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    plt.title(<span class="ss">f"eps=</span><span class="sc">{</span>dbscan<span class="sc">.</span>eps<span class="sc">:.2f}</span><span class="ss">, min_samples=</span><span class="sc">{</span>dbscan<span class="sc">.</span>min_samples<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    plt.grid()</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    plt.gca().set_axisbelow(<span class="va">True</span>)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> DBSCAN</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_breast_cancer</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># using imported breast cancer dataset from sklearn</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>cancer <span class="op">=</span> load_breast_cancer() </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> pd.DataFrame(cancer[<span class="st">'data'</span>],columns <span class="op">=</span> cancer[<span class="st">'feature_names'</span>]) </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># DBSCAN model training/fitting</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>dbscan<span class="op">=</span>DBSCAN()</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>dbscan.fit(X_train[[<span class="st">"mean radius"</span>,<span class="st">"mean smoothness"</span>]])</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> dbscan.labels_</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>outliers<span class="op">=</span>colors.T<span class="op">&lt;</span><span class="dv">0</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>normal<span class="op">=</span>colors.T<span class="op">&gt;=</span><span class="dv">0</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of outliers detected: </span><span class="sc">%d</span><span class="st">"</span> <span class="op">%</span> <span class="bu">sum</span>(i<span class="op">&lt;</span><span class="dv">0</span> <span class="cf">for</span> i <span class="kw">in</span> colors.T))</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of normal samples detected: </span><span class="sc">%d</span><span class="st">"</span> <span class="op">%</span> <span class="bu">sum</span>(i<span class="op">&gt;=</span><span class="dv">0</span> <span class="cf">for</span> i <span class="kw">in</span> colors.T))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Number of outliers detected: 8
 Number of normal samples detected: 561</code></pre>
 </div>
 </div>
-<div class="cell" data-execution_count="5">
+<div class="cell" data-execution_count="4">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#plotting</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">9</span>,<span class="dv">14</span>))</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">211</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>plt.plot(X_train[<span class="st">"mean radius"</span>][colors<span class="op">==</span><span class="dv">0</span>],X_train[<span class="st">"mean smoothness"</span>][colors<span class="op">==</span><span class="dv">0</span>],marker<span class="op">=</span><span class="st">'o'</span>,linestyle<span class="op">=</span><span class="st">"None"</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>plt.plot(X_train[<span class="st">"mean radius"</span>][colors<span class="op">==-</span><span class="dv">1</span>],X_train[<span class="st">"mean smoothness"</span>][colors<span class="op">==-</span><span class="dv">1</span>],marker<span class="op">=</span><span class="st">'o'</span>,linestyle<span class="op">=</span><span class="st">"None"</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">"Valid Data"</span>,<span class="st">"Data marked as outliers"</span>])</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Mean Smoothness"</span>)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Mean Radius"</span>)</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Dataset Outlier Detection via DBSCAN"</span>)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">212</span>)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>plot_dbscan(dbscan, X_train[[<span class="st">"mean radius"</span>,<span class="st">"mean smoothness"</span>]].values, size<span class="op">=</span><span class="dv">100</span>)</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#plotting</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">9</span>,<span class="dv">14</span>))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">211</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>plt.plot(X_train[<span class="st">"mean radius"</span>][colors<span class="op">==</span><span class="dv">0</span>],X_train[<span class="st">"mean smoothness"</span>][colors<span class="op">==</span><span class="dv">0</span>],marker<span class="op">=</span><span class="st">'o'</span>,linestyle<span class="op">=</span><span class="st">"None"</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>plt.plot(X_train[<span class="st">"mean radius"</span>][colors<span class="op">!=</span><span class="dv">0</span>],X_train[<span class="st">"mean smoothness"</span>][colors<span class="op">!=</span><span class="dv">0</span>],marker<span class="op">=</span><span class="st">'o'</span>,linestyle<span class="op">=</span><span class="st">"None"</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">"Valid Data"</span>,<span class="st">"Data marked as outliers"</span>])</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Mean Smoothness"</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Mean Radius"</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Dataset Outlier Detection via DBSCAN"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">212</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>plot_dbscan(dbscan, X_train[[<span class="st">"mean radius"</span>,<span class="st">"mean smoothness"</span>]].values, size<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-stderr">
-<pre><code>C:\Users\ericj\AppData\Local\Temp\ipykernel_3476\2106333029.py:3: MatplotlibDeprecationWarning:
-
-Auto-removal of overlapping axes is deprecated since 3.6 and will be removed two minor releases later; explicitly call ax.remove() as needed.
-</code></pre>
-</div>
 <div class="cell-output cell-output-display">
 <div id="fig-scatter" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="index_files/figure-html/fig-scatter-output-2.png" width="746" height="1115" class="figure-img"></p>
+<p><img src="index_files/figure-html/fig-scatter-output-1.png" width="746" height="1115" class="figure-img"></p>
 <figcaption class="figure-caption">Figure&nbsp;2: Data that the DBSCAN algorithm identifies as an outlier or not</figcaption>
 </figure>
 </div>
@@ -294,7 +339,7 @@ Auto-removal of overlapping axes is deprecated since 3.6 and will be removed two
 <li><p>Works best with large datasets</p></li>
 </ul>
 <p>Note: Below contains some modified code from <a href="https://medium.com/mlearning-ai/unsupervised-outlier-detection-with-isolation-forest-eab398c593b2">HERE</a></p>
-<div class="cell" data-execution_count="6">
+<div class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> IsolationForest</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>outliers_fraction <span class="op">=</span> <span class="bu">float</span>(<span class="fl">.03</span>)</span>
@@ -305,11 +350,11 @@ Auto-removal of overlapping axes is deprecated since 3.6 and will be removed two
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of outliers detected: </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(prediction[prediction <span class="op">&lt;</span> <span class="dv">0</span>].<span class="bu">sum</span>()<span class="op">*-</span><span class="dv">1</span>))</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of normal samples detected: </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(prediction[prediction <span class="op">&gt;</span> <span class="dv">0</span>].<span class="bu">sum</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Number of outliers detected: 96
-Number of normal samples detected: 473</code></pre>
+<pre><code>Number of outliers detected: 101
+Number of normal samples detected: 468</code></pre>
 </div>
 </div>
-<div class="cell" data-execution_count="7">
+<div class="cell" data-execution_count="6">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">9</span>,<span class="dv">7</span>))</span>
@@ -336,7 +381,7 @@ Number of normal samples detected: 473</code></pre>
 </section>
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>
-<p>It can be seen that both DBSCAN and Isolation Forest identified most of the same outlier points, but Isolation Forest identified 10 more total outlier data points, mainly due to the contamination parameter being large (3%). Both methods are valid options, with Isolation Forest being more accurate depending on how accurate the contamination parameter is. In general though, both methods reduced the number of outliers which is beneficial for any future processing of the data.</p>
+<p>When comparing DBSCAN to Isolation Forest, it is obvious to see that Isolation Forest removed a multitude more outliers than the DBSCAN algorithm. But, this is partially due to the use of default parameters in each algorithm. If the DBSCAN epsilon parameter is reduced to ~0.08, then the results more closely match what is seen with the Isolation Forest algorithm’s default contamination parameter. Finding optimal hyperparameters is an extremely important step in any machine learning algorithm, but comes with its own challenges and time consumption. A separate blog post on optimizing particular hyperparameters can be seen <a href="https://ericj96.github.io/posts/Topic_2/">here</a>.</p>
 
 
 </section>

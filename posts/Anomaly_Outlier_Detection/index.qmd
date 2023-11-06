@@ -17,7 +17,12 @@ For simplicity, a known dataset will be imported and used with two features as t
 @fig-whisker shows a box and whisker plot of both sets of data for an initial look at the outliers identified through purely statistical means.
 
 ```{python}
-#| echo: false
+#| label: fig-whisker
+#| fig-cap: "Box/whisker plot of initial data"
+#| code-fold: true
+
+import warnings
+warnings.filterwarnings("ignore")
 import pandas as pd
 import numpy as np 
 import matplotlib.pyplot as plt
@@ -29,12 +34,7 @@ cancer = load_breast_cancer()
 X_train = pd.DataFrame(cancer['data'],columns = cancer['feature_names']) 
 data=X_train[["mean radius","mean smoothness"]]
 df=data;
-```
 
-```{python}
-#| label: fig-whisker
-#| fig-cap: "Box/whisker plot of initial data"
-#| code-fold: true
 
 red_circle = dict(markerfacecolor='red', marker='o', markeredgecolor='white')
 fig, axs = plt.subplots(len(df.columns),1, figsize=(8,6))
@@ -53,12 +53,12 @@ plt.show()
 
 DBSCAN is a popular algorithm used mainly for clustering given sets of points. It works by grouping together points that are close together and have multiple nearest neighbors. It considers outliers to be points that are alone in low density regions. [\[1\]](https://en.wikipedia.org/wiki/DBSCAN)
 
-For the example in this blog, a two-dimensional set of data (mean radius and mean smoothness) is used to run through the DBSCAN algorithm. @fig-scatter shows the result with outlier/anomalous data points shown in orange. Since DBSCAN is most known for being a clustering algorithm, the bottom plot shows the different clusters that the algorithm identified. The default epsilon parameter value of 0.5 was used for the DBSCAN algorithm.
+For the example in this blog, a two-dimensional set of data (mean radius and mean smoothness) is used to run through the DBSCAN algorithm. @fig-scatter shows the result with outlier/anomalous data points shown in orange. Since DBSCAN is most known for being a clustering algorithm, the bottom plot shows the different clusters that the algorithm identified. The default epsilon parameter value of 0.5 was used for the DBSCAN algorithm. This parameter "defines the maximum distance between two samples for one to be considered as in the neighborhood of the other". [\[2\]](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html)
 
 ```{python}
 #| code-fold: true
-#| echo: false
 
+# plot code taken from https://github.com/maptv/handson-ml3/blob/main/09_unsupervised_learning.ipynb
 def plot_dbscan(dbscan, X, size, show_xlabels=True, show_ylabels=True):
     core_mask = np.zeros_like(dbscan.labels_, dtype=bool)
     core_mask[dbscan.core_sample_indices_] = True
@@ -123,7 +123,7 @@ print("Number of normal samples detected: %d" % sum(i>=0 for i in colors.T))
 fig, ax = plt.subplots(figsize=(9,14))
 plt.subplot(211)
 plt.plot(X_train["mean radius"][colors==0],X_train["mean smoothness"][colors==0],marker='o',linestyle="None")
-plt.plot(X_train["mean radius"][colors==-1],X_train["mean smoothness"][colors==-1],marker='o',linestyle="None")
+plt.plot(X_train["mean radius"][colors!=0],X_train["mean smoothness"][colors!=0],marker='o',linestyle="None")
 plt.legend(["Valid Data","Data marked as outliers"])
 plt.ylabel("Mean Smoothness")
 plt.xlabel("Mean Radius")
@@ -179,4 +179,4 @@ plt.show()
 
 # Conclusion
 
-It can be seen that both DBSCAN and Isolation Forest identified most of the same outlier points, but Isolation Forest identified 10 more total outlier data points, mainly due to the contamination parameter being large (3%). Both methods are valid options, with Isolation Forest being more accurate depending on how accurate the contamination parameter is. In general though, both methods reduced the number of outliers which is beneficial for any future processing of the data.
+When comparing DBSCAN to Isolation Forest, it is obvious to see that Isolation Forest removed a multitude more outliers than the DBSCAN algorithm. But, this is partially due to the use of default parameters in each algorithm. If the DBSCAN epsilon parameter is reduced to \~0.08, then the results more closely match what is seen with the Isolation Forest algorithm's default contamination parameter. Finding optimal hyperparameters is an extremely important step in any machine learning algorithm, but comes with its own challenges and time consumption. A separate blog post on optimizing particular hyperparameters can be seen [here](https://ericj96.github.io/posts/Topic_2/).
