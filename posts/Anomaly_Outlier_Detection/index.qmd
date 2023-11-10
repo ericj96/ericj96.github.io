@@ -179,6 +179,6 @@ plt.legend(["Valid Data","Data marked as outliers"])
 plt.show()
 ```
 
-# Conclusion
+# Results and Conclusion
 
 When comparing DBSCAN to Isolation Forest, it is obvious to see that Isolation Forest removed a multitude more outliers than the DBSCAN algorithm. But, this is partially due to the use of default parameters in each algorithm and could be potentially be optimized. If the DBSCAN epsilon parameter is reduced to \~0.08, then the results more closely match what is seen with the Isolation Forest algorithm's default contamination parameter. Finding optimal hyperparameter values is an extremely important step in any machine learning algorithm, but comes with its own challenges and time consumption. A separate blog post on optimizing particular hyperparameters can be seen [here](https://ericj96.github.io/posts/Topic_2/).

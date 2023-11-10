@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Eric Jackson">
-<meta name="dcterms.date" content="2023-10-06">
+<meta name="dcterms.date" content="2023-10-05">
 
 <title>Fall 2023 CS 5805 Blog - Anomaly/Outlier Detection</title>
 <style>
@@ -160,7 +160,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">October 6, 2023</p>
+        <p class="date">October 5, 2023</p>
       </div>
     </div>
     
@@ -182,7 +182,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#density-based-spatial-clustering-of-applications-with-noise-dbscan" id="toc-density-based-spatial-clustering-of-applications-with-noise-dbscan" class="nav-link" data-scroll-target="#density-based-spatial-clustering-of-applications-with-noise-dbscan">Density-Based Spatial Clustering of Applications with Noise (DBSCAN)</a></li>
   <li><a href="#isolation-forest" id="toc-isolation-forest" class="nav-link" data-scroll-target="#isolation-forest">Isolation Forest</a></li>
   </ul></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#results-and-conclusion" id="toc-results-and-conclusion" class="nav-link" data-scroll-target="#results-and-conclusion">Results and Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -351,8 +351,8 @@ Number of normal samples detected: 561</code></pre>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of outliers detected: </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(prediction[prediction <span class="op">&lt;</span> <span class="dv">0</span>].<span class="bu">sum</span>()<span class="op">*-</span><span class="dv">1</span>))</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of normal samples detected: </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(prediction[prediction <span class="op">&gt;</span> <span class="dv">0</span>].<span class="bu">sum</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Number of outliers detected: 95
-Number of normal samples detected: 474</code></pre>
+<pre><code>Number of outliers detected: 94
+Number of normal samples detected: 475</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="6">
@@ -380,8 +380,8 @@ Number of normal samples detected: 474</code></pre>
 </div>
 </section>
 </section>
-<section id="conclusion" class="level1">
-<h1>Conclusion</h1>
+<section id="results-and-conclusion" class="level1">
+<h1>Results and Conclusion</h1>
 <p>When comparing DBSCAN to Isolation Forest, it is obvious to see that Isolation Forest removed a multitude more outliers than the DBSCAN algorithm. But, this is partially due to the use of default parameters in each algorithm and could be potentially be optimized. If the DBSCAN epsilon parameter is reduced to ~0.08, then the results more closely match what is seen with the Isolation Forest algorithm’s default contamination parameter. Finding optimal hyperparameter values is an extremely important step in any machine learning algorithm, but comes with its own challenges and time consumption. A separate blog post on optimizing particular hyperparameters can be seen <a href="https://ericj96.github.io/posts/Topic_2/">here</a>.</p>
 
 

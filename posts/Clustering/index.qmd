@@ -1,5 +1,5 @@
 ---
-title: "Probability theory and random variables"
+title: "Clustering"
 author: "Eric Jackson"
 date: "2023-10-04"
 categories: [code, analysis]
