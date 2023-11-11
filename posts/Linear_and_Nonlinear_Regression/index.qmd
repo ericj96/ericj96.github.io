@@ -1,5 +1,5 @@
 ---
-title: "Linear and Non-Linear Regression"
+title: "Linear and Nonlinear Regression"
 author: "Eric Jackson"
 date: "2023-10-03"
 categories: [linear,nonlinear,regression]
@@ -9,3 +9,90 @@ toc-depth: 2
 ---
 
 # Background
+
+# Regression Techniques
+
+## Linear Regression
+
+```{python}
+#| code-fold: true
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+import math
+
+df=load_wine()
+df=pd.DataFrame(df['data'],columns=df['feature_names'])
+df=df[['alcohol','proline']]
+x=df.alcohol
+y=df.proline
+x=np.array(x.values).reshape(-1,1)
+y=np.array(y.values).reshape(-1,1)/100
+
+model = LinearRegression(fit_intercept=True)
+model.fit(x,y)
+
+test_predictions = model.predict(x)
+from sklearn.metrics import mean_absolute_error,mean_squared_error
+MAE = mean_absolute_error(y,test_predictions)
+MSE = mean_squared_error(y,test_predictions)
+RMSE = np.sqrt(MSE)
+print('RMSE: %3.3f' % RMSE)
+
+fig, ax = plt.subplots(figsize=(9,14))
+plt.scatter(x,y)
+plt.plot(x,test_predictions,color="red")
+plt.legend(['Data','Linear Prediction'])
+plt.xlabel('$x_{1}$')
+plt.ylabel('$x_{2}$')
+plt.show()
+```
+
+## Nonlinear Regression
+
+make plot comparing linear best fit line with non linear best fit line
+
+```{python}
+#| code-fold: true
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+import math
+
+df=load_wine()
+df=pd.DataFrame(df['data'],columns=df['feature_names'])
+df=df[['alcohol','proline']]
+x=df.alcohol
+y=df.proline
+x=np.array(x.values).reshape(-1,1)
+xp=x
+y=np.array(y.values).reshape(-1,1)/100
+yp=y
+
+from sklearn.preprocessing import PolynomialFeatures
+polynomial_converter = PolynomialFeatures(degree=2,include_bias=False)
+poly_features = polynomial_converter.fit_transform(y)
+
+x=poly_features[:,0].reshape(-1,1)
+y=poly_features[:,1].reshape(-1,1)
+
+model = LinearRegression(fit_intercept=True)
+model.fit(x,y)
+test_predictions = model.predict(x)
+
+mymodel = np.poly1d(np.polyfit(xp[:,0], yp[:,0], 1))
+myline=np.linspace(2,100,178)
+
+
+fig, ax = plt.subplots(figsize=(9,14))
+plt.scatter(x,y)
+plt.plot(x,test_predictions,color="red")
+plt.plot(xp[:,0],mymodel(myline),color='green')
+plt.show()
+```
