@@ -12,7 +12,7 @@ toc-depth: 2
 
 # Regression Techniques
 
-## Linear Regression
+## Linear Regressiony
 
 ```{python}
 #| code-fold: true
@@ -90,9 +90,18 @@ mymodel = np.poly1d(np.polyfit(xp[:,0], yp[:,0], 1))
 myline=np.linspace(2,100,178)
 
 
+lin_reg = LinearRegression() 
+lin_reg.fit(x, y) 
+polynomial_converter = PolynomialFeatures(degree=2,include_bias=False)
+poly_features = polynomial_converter.fit_transform(x)
+y_new=lin_reg.predict(x)
+
+
+
 fig, ax = plt.subplots(figsize=(9,14))
 plt.scatter(x,y)
 plt.plot(x,test_predictions,color="red")
-plt.plot(xp[:,0],mymodel(myline),color='green')
+#plt.plot(xp[:,0],mymodel(myline),color='green')
+plt.plot(poly_features,y_new,color='green')
 plt.show()
 ```
