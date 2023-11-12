@@ -15,7 +15,7 @@ toc-depth: 2
 ## Linear Regression
 
 ```{python}
-#| code-fold: true
+#| code-fold: false
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -41,7 +41,11 @@ MAE = mean_absolute_error(y,test_predictions)
 MSE = mean_squared_error(y,test_predictions)
 RMSE = np.sqrt(MSE)
 print('RMSE: %3.3f' % RMSE)
+```
 
+```{python}
+#|code-fold: true
+#|code-summary: Plotting code
 fig, ax = plt.subplots(figsize=(8,6))
 plt.scatter(x,y)
 plt.plot(x,test_predictions,color="red")
@@ -53,9 +57,11 @@ plt.show()
 
 ## Nonlinear Regression
 
-It can be seen that, for this nonlinear dataset, the linear regression line of best fit is a very poor fit and only intercepts the data twice. The nonlinear regression fits of degrees 2 and 3 fit much closer to the original data, with degree = 3 fitting the best
+It can be seen that, for this nonlinear dataset, the linear regression line of best fit is a very poor fit and only intercepts the data twice. The nonlinear regression fits of degrees 2 and 3 fit much closer to the original data, with degree = 3 fitting the best. The table below shows the R squared scores of each regression fit, with degree 3 having a perfect score of 1 and degree of 2 nearly perfect at 0.997. Both of the polynomial regression lines visually can be seen to fit closely to the data, and the linear regression fit having a much lower score of 0.697 is not surprising.
 
 ```{python}
+#| code-fold: true
+#| code-summary: Imports and dataset setup
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -86,7 +92,9 @@ y=poly_features[:,1].reshape(-1,1)*y/100
 
 x[:,0].sort()
 y[:,0].sort()
+```
 
+```{python}
 # Linear regression
 polybig_features = PolynomialFeatures(degree=1, include_bias=False)
 std_scaler = StandardScaler()
@@ -95,8 +103,6 @@ polynomial_regression = make_pipeline(polybig_features, std_scaler, lin_reg)
 polynomial_regression.fit(x, y)
 X_newlin = np.linspace(min(x), max(x), len(x)).reshape(len(x), 1)
 y_newbiglin = polynomial_regression.predict(X_newlin)
-
-num=-1
 
 # Polynomial regression with degree = 2
 polybig_features = PolynomialFeatures(degree=2, include_bias=False)
@@ -111,7 +117,11 @@ polynomial_regression = make_pipeline(polybig_features, std_scaler, lin_reg)
 polynomial_regression.fit(x, y)
 X_newlin3 = np.linspace(min(x), max(x), len(x)).reshape(len(x), 1)
 y_newbiglin3 = polynomial_regression.predict(X_new)
+```
 
+```{python}
+#| code-fold: true
+#|code-summary: Plotting code
 fig, ax = plt.subplots(figsize=(8,6))
 plt.scatter(x,y,marker='o')
 plt.plot(X_newlin, y_newbiglin,color='green')
@@ -119,10 +129,6 @@ plt.plot(X_new, y_newbig,color='red')
 plt.plot(X_newlin3, y_newbiglin3,color='black')
 plt.legend(['Data','Linear fit','Polynomial fit (deg = 2)','Polynomial fit (deg = 3)'])
 plt.show()
-```
-
-```{python}
-#| code-fold: true
 from pandas.plotting import table
 
 linscore=polynomial_regression.score(X_newlin,y_newbiglin)
@@ -132,6 +138,6 @@ linscore3=polynomial_regression.score(X_newlin3,y_newbiglin3)
 df=pd.DataFrame([[linscore,linscore2,linscore3]],columns=['Linear Regression','Polynomial Regression (deg = 2)','Polynomial Regression (deg = 3)'],index=['R squared','R^21','R^22'])
 fix, ax = plt.subplots()
 ax.axis('off')
-table(ax,df.transpose()['R squared'])
+table(ax,df.transpose()['R squared'],loc='top',cellLoc='center',colWidths=list([.6, .6]))
 plt.show()
 ```
