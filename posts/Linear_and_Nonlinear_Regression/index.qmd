@@ -10,9 +10,15 @@ toc-depth: 2
 
 # Background
 
+Regression analysis is a broad and useful field of statistical analysis, and for the purpose of this blog, only linear and nonlinear regression will be discuessed. Both linear and nonlinear regression have many practical uses and are used to estimate the relationships between two or more variables, using either lines or curves. The main use of linear or nonlinear regression are for predicting or forecasting data and thus, is used widely in machine learning situations. Regression analysis is also used to infer casual relationships between variables, otherwise called correlation. \[[1](https://en.wikipedia.org/wiki/Linear_regression)\]
+
 # Regression Techniques
 
 ## Linear Regression
+
+Linear regression is a technique that uses a straight line to model the relationship between two or more variables. There are several models that can be used for linear regression, with the most common one being the least squares method. Linear regression can also be performed by minimizing the lack of fit or by minimizing a version of the least squares cost function (ridge regression and lasso) \[[1](https://en.wikipedia.org/wiki/Linear_regression)\]. The LinearRegression model from the sklearn library utilizes the least squares method to minimize the residual sum of squares between the observed targets in the dataset, and the targets predicted by the linear approximation \[[2](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html)\].
+
+A dataset native to the sklearn library was used for this blog post (load_wine) and two features were chosen at random based on how linear the trend appeared. As can be seen in @fig-lin, the data appears random with a slight positive trend. The linear regression model was overlayed on top of the original data with a red line, and can be seen to match the positive slope of the data very closely. It also sits roughly in the middle of the data throughout, and leads to an RMSE of 2.403.
 
 ```{python}
 #| code-fold: false
@@ -21,7 +27,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
 import math
 
 df=load_wine()
@@ -46,6 +51,8 @@ print('RMSE: %3.3f' % RMSE)
 ```{python}
 #|code-fold: true
 #|code-summary: Plotting code
+#| label: fig-lin
+#| fig-cap: "Linear regression model on data"
 fig, ax = plt.subplots(figsize=(8,6))
 plt.scatter(x,y)
 plt.plot(x,test_predictions,color="red")
@@ -57,7 +64,11 @@ plt.show()
 
 ## Nonlinear Regression
 
-It can be seen that, for this nonlinear dataset, the linear regression line of best fit is a very poor fit and only intercepts the data twice. The nonlinear regression fits of degrees 2 and 3 fit much closer to the original data, with degree = 3 fitting the best. The table below shows the R squared scores of each regression fit, with degree 3 having a perfect score of 1 and degree of 2 nearly perfect at 0.997. Both of the polynomial regression lines visually can be seen to fit closely to the data, and the linear regression fit having a much lower score of 0.697 is not surprising.
+Nonlinear regression is similar to linear regression, but uses a curve to fit the data, compared to a straight line with linear regression. Most problems or data in the real world are not linear in nature, so nonlinear regression allows for a much greater accuracy when analyzing items.
+
+The dataset used for the above linear regression section was used and slightly manipulated to create a more nonlinear quadratic shape. This was done to more easily show the difference between linear and nonlinear regression.
+
+After fitting lines of best fit for varying degrees of polynomials (see @fig-poly), it can be seen that, for this nonlinear dataset, the linear regression line of best fit is a very poor fit and only intercepts the data twice. The nonlinear regression fits of degrees 2 and 3 fit much closer to the original data, with degree = 3 fitting the best. The table below (@fig-table) shows the R squared scores of each regression fit, with degree 3 having a perfect score of 1 and degree of 2 nearly perfect at 0.997. Both of the polynomial regression lines visually can be seen to fit closely to the data, and the linear regression fit having a much lower score of 0.697 is not surprising.
 
 ```{python}
 #| code-fold: true
@@ -67,7 +78,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
 import math
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
@@ -122,6 +132,9 @@ y_newbiglin3 = polynomial_regression.predict(X_new)
 ```{python}
 #| code-fold: true
 #|code-summary: Plotting code
+#| label: fig-poly
+#| fig-cap: "Polynomial/Nonlinear regression model on data"
+from pandas.plotting import table
 fig, ax = plt.subplots(figsize=(8,6))
 plt.scatter(x,y,marker='o')
 plt.plot(X_newlin, y_newbiglin,color='green')
@@ -129,15 +142,24 @@ plt.plot(X_new, y_newbig,color='red')
 plt.plot(X_newlin3, y_newbiglin3,color='black')
 plt.legend(['Data','Linear fit','Polynomial fit (deg = 2)','Polynomial fit (deg = 3)'])
 plt.show()
-from pandas.plotting import table
+```
 
+```{python}
+#| code-fold: true
+#|code-summary: Table code
+#| label: fig-table
+#| fig-cap: "R squared values for each regression model"
 linscore=polynomial_regression.score(X_newlin,y_newbiglin)
 linscore2=polynomial_regression.score(X_new,y_newbig)
 linscore3=polynomial_regression.score(X_newlin3,y_newbiglin3)
 
-df=pd.DataFrame([[linscore,linscore2,linscore3]],columns=['Linear Regression','Polynomial Regression (deg = 2)','Polynomial Regression (deg = 3)'],index=['R squared','R^21','R^22'])
-fix, ax = plt.subplots()
+df=pd.DataFrame([[linscore,linscore2,linscore3]],columns=['Linear Regression','Polynomial Regression (deg = 2)','Polynomial Regression (deg = 3)'],index=['R squared value','R^21','R^22'])
+fix, ax = plt.subplots(figsize=(8,1))
 ax.axis('off')
-table(ax,df.transpose()['R squared'],loc='top',cellLoc='center',colWidths=list([.6, .6]))
+table(ax,df.transpose()['R squared value'],loc='top',cellLoc='center',colWidths=list([.6, .6]))
 plt.show()
 ```
+
+# Conclusion
+
+As can be seen from the results of this blog post, both linear and nonlinear regression are useful tools when analyzing datasets. Each type of regression serves its own purpose and should be chosen based on the data being monitored/analyzed. For nonlinear regression, it is important to not overfit the model and apply too high of a degree to the polynomial, as this can lead to decreased accuracy.
