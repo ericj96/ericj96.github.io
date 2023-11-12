@@ -20,6 +20,7 @@ For simplicity, a known dataset will be imported and used with two features as t
 #| label: fig-whisker
 #| fig-cap: "Box/whisker plot of initial data"
 #| code-fold: true
+#| code-summary: Setup and plotting of initial data
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -34,7 +35,6 @@ cancer = load_breast_cancer()
 X_train = pd.DataFrame(cancer['data'],columns = cancer['feature_names']) 
 data=X_train[["mean radius","mean smoothness"]]
 df=data;
-
 
 red_circle = dict(markerfacecolor='red', marker='o', markeredgecolor='white')
 fig, axs = plt.subplots(len(df.columns),1, figsize=(8,6))
@@ -59,6 +59,7 @@ For the example in this blog, a two-dimensional set of data (mean radius and mea
 
 ```{python}
 #| code-fold: true
+#| code-summary: plot_dbscan function
 
 # plot code taken from https://github.com/maptv/handson-ml3/blob/main/09_unsupervised_learning.ipynb
 def plot_dbscan(dbscan, X, size, show_xlabels=True, show_ylabels=True):
@@ -114,11 +115,11 @@ outliers=colors.T<0
 normal=colors.T>=0
 print("Number of outliers detected: %d" % sum(i<0 for i in colors.T))
 print("Number of normal samples detected: %d" % sum(i>=0 for i in colors.T))
-
 ```
 
 ```{python}
 #| code-fold: true
+#|code-summary: Plotting code
 #| label: fig-scatter
 #| fig-cap: "Data that the DBSCAN algorithm identifies as an outlier or not"
 #plotting
@@ -130,7 +131,6 @@ plt.legend(["Valid Data","Data marked as outliers"])
 plt.ylabel("Mean Smoothness")
 plt.xlabel("Mean Radius")
 plt.title("Dataset Outlier Detection via DBSCAN")
-
 
 plt.subplot(212)
 plot_dbscan(dbscan, X_train[["mean radius","mean smoothness"]].values, size=100)
@@ -166,6 +166,7 @@ print("Number of normal samples detected: {}".format(prediction[prediction > 0].
 #| code-fold: true
 #| label: fig-isofor
 #| fig-cap: "Data that the Isolation Forest algorithm identifies as an outlier or not"
+#| code-summary: Plotting code
 
 fig, ax = plt.subplots(figsize=(9,7))
 normal_data = data[np.where(prediction > 0)]

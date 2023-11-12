@@ -14,6 +14,7 @@ Clustering is an
 
 ```{python}
 #| code-fold: true
+#| code-summary: plot_dbscan function
 
 # plot code taken from https://github.com/maptv/handson-ml3/blob/main/09_unsupervised_learning.ipynb
 def plot_dbscan(dbscan, X, size, show_xlabels=True, show_ylabels=True):
@@ -50,6 +51,7 @@ def plot_dbscan(dbscan, X, size, show_xlabels=True, show_ylabels=True):
 
 ```{python}
 #| code-fold: true
+#| code-summary: Plotting code
 
 import pandas as pd
 import numpy as np 

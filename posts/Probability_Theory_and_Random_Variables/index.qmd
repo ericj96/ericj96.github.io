@@ -10,6 +10,8 @@ toc-depth: 2
 
 # Background
 
+histogram of pdf
+
 ## Probability Theory
 
 ## Random Variables
