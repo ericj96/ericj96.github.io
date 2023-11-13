@@ -62,7 +62,7 @@ As seen in @fig-hist, the plot of the kde function on the data closely follows t
 #| code-summary: Plotting kde and histogram code 
 #| fig-cap: Histogram and KDE of data
 #| label: fig-hist
-fig, axs = plt.subplots(2,1,figsize =(10, 7))
+fig, axs = plt.subplots(2,1,figsize =(9, 7))
 ax1=plt.subplot(211)
 ax1.hist(data, n_bins, alpha=0.5,density=1,label='x1 data',edgecolor='black');
 ax1.plot(t_range,kde(t_range),lw=2, label='x1 kde')
