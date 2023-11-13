@@ -119,7 +119,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="../../about.html" rel="" target="">
- <span class="menu-text">About</span></a>
+ <span class="menu-text">About: Eric Jackson</span></a>
   </li>  
   <li class="nav-item compact">
     <a class="nav-link" href="https://github.com/ericj96" rel="" target=""><i class="bi bi-github" role="img">
@@ -359,12 +359,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The first step in accurately identifying anomalies with telemetry data is to forecast future data. The ARIMA model is a statistical based model that is specifically made and used for forecasting time series data. Many machine learning algorithms struggle with time series data and are prone to overfitting, so ARIMA is a great option for analyzing spacecraft telemetry data.</p>
 <p>ARIMA works best with data that is stationary, meaning that most input data will need to be differenced before running the model. This was accomplished in the preprocessing stage above, but the auto_arima function will still perform an Augmented Dickey-Fuller (ADF) test to check for stationary data by looking if a unit root is present in the data.</p>
 <p>There are 3 hyperparameters that are used as input for the auto_arima function (with 3 more parameters if seasonal modeling is desired). These parameters are used to optimize the below equation. Auto_arima will iterate through multiple variations of each parameter to find the best combination with the lowest prediction error (Akaike Information Criteria or AIC).</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://wikimedia.org/api/rest_v1/media/math/render/svg/b6ebbe31d07e994b209c391e3d6f8f5d88e267c3.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">{\displaystyle \left(1-\sum _{i=1}^{p}\varphi _{i}L^{i}\right)(1-L)^{d}X_{t}=\delta +\left(1+\sum _{i=1}^{q}\theta _{i}L^{i}\right)\varepsilon _{t}.\,}</figcaption>
-</figure>
-</div>
+<p><img src="arima.jpg" class="img-fluid" width="406"></p>
 <p>Where:</p>
 <ul>
 <li><p>p = order of auto-regressive model</p></li>
@@ -391,31 +386,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">MAE of Auto ARIMAX:"</span>, mean_absolute_error(df_valid.High, df_valid.Forecast_ARIMAX))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Performing stepwise search to minimize aic
- ARIMA(2,0,2)(0,0,0)[0] intercept   : AIC=2960.826, Time=14.89 sec
+ ARIMA(2,0,2)(0,0,0)[0] intercept   : AIC=2960.826, Time=14.76 sec
  ARIMA(0,0,0)(0,0,0)[0] intercept   : AIC=5711.667, Time=1.33 sec
- ARIMA(1,0,0)(0,0,0)[0] intercept   : AIC=3359.247, Time=10.74 sec
- ARIMA(0,0,1)(0,0,0)[0] intercept   : AIC=3726.632, Time=12.85 sec
- ARIMA(0,0,0)(0,0,0)[0]             : AIC=5709.707, Time=13.73 sec
- ARIMA(1,0,2)(0,0,0)[0] intercept   : AIC=2904.191, Time=15.25 sec
- ARIMA(0,0,2)(0,0,0)[0] intercept   : AIC=2912.739, Time=14.02 sec
- ARIMA(1,0,1)(0,0,0)[0] intercept   : AIC=3067.819, Time=13.69 sec
- ARIMA(1,0,3)(0,0,0)[0] intercept   : AIC=2930.144, Time=15.75 sec
- ARIMA(0,0,3)(0,0,0)[0] intercept   : AIC=2936.070, Time=14.81 sec
- ARIMA(2,0,1)(0,0,0)[0] intercept   : AIC=2957.813, Time=12.96 sec
- ARIMA(2,0,3)(0,0,0)[0] intercept   : AIC=2898.815, Time=16.26 sec
- ARIMA(3,0,3)(0,0,0)[0] intercept   : AIC=2805.639, Time=17.26 sec
- ARIMA(3,0,2)(0,0,0)[0] intercept   : AIC=2962.492, Time=15.66 sec
- ARIMA(4,0,3)(0,0,0)[0] intercept   : AIC=2810.038, Time=17.45 sec
- ARIMA(3,0,4)(0,0,0)[0] intercept   : AIC=2785.353, Time=21.20 sec
- ARIMA(2,0,4)(0,0,0)[0] intercept   : AIC=2897.289, Time=18.54 sec
- ARIMA(4,0,4)(0,0,0)[0] intercept   : AIC=2807.535, Time=19.51 sec
- ARIMA(3,0,5)(0,0,0)[0] intercept   : AIC=2789.723, Time=20.91 sec
- ARIMA(2,0,5)(0,0,0)[0] intercept   : AIC=2846.091, Time=20.72 sec
- ARIMA(4,0,5)(0,0,0)[0] intercept   : AIC=2791.733, Time=22.35 sec
- ARIMA(3,0,4)(0,0,0)[0]             : AIC=2809.734, Time=18.15 sec
+ ARIMA(1,0,0)(0,0,0)[0] intercept   : AIC=3359.247, Time=10.79 sec
+ ARIMA(0,0,1)(0,0,0)[0] intercept   : AIC=3726.632, Time=12.88 sec
+ ARIMA(0,0,0)(0,0,0)[0]             : AIC=5709.707, Time=13.70 sec
+ ARIMA(1,0,2)(0,0,0)[0] intercept   : AIC=2904.191, Time=15.28 sec
+ ARIMA(0,0,2)(0,0,0)[0] intercept   : AIC=2912.739, Time=14.18 sec
+ ARIMA(1,0,1)(0,0,0)[0] intercept   : AIC=3067.819, Time=14.52 sec
+ ARIMA(1,0,3)(0,0,0)[0] intercept   : AIC=2930.144, Time=16.37 sec
+ ARIMA(0,0,3)(0,0,0)[0] intercept   : AIC=2936.070, Time=14.90 sec
+ ARIMA(2,0,1)(0,0,0)[0] intercept   : AIC=2957.813, Time=12.97 sec
+ ARIMA(2,0,3)(0,0,0)[0] intercept   : AIC=2898.815, Time=16.33 sec
+ ARIMA(3,0,3)(0,0,0)[0] intercept   : AIC=2805.639, Time=17.37 sec
+ ARIMA(3,0,2)(0,0,0)[0] intercept   : AIC=2962.492, Time=15.72 sec
+ ARIMA(4,0,3)(0,0,0)[0] intercept   : AIC=2810.038, Time=17.52 sec
+ ARIMA(3,0,4)(0,0,0)[0] intercept   : AIC=2785.353, Time=21.38 sec
+ ARIMA(2,0,4)(0,0,0)[0] intercept   : AIC=2897.289, Time=18.61 sec
+ ARIMA(4,0,4)(0,0,0)[0] intercept   : AIC=2807.535, Time=19.60 sec
+ ARIMA(3,0,5)(0,0,0)[0] intercept   : AIC=2789.723, Time=21.26 sec
+ ARIMA(2,0,5)(0,0,0)[0] intercept   : AIC=2846.091, Time=20.97 sec
+ ARIMA(4,0,5)(0,0,0)[0] intercept   : AIC=2791.733, Time=22.69 sec
+ ARIMA(3,0,4)(0,0,0)[0]             : AIC=2809.734, Time=18.56 sec
 
 Best model:  ARIMA(3,0,4)(0,0,0)[0] intercept
-Total fit time: 348.045 seconds
+Total fit time: 351.694 seconds
 
 RMSE of Auto ARIMAX: 0.6141699692631081
 
