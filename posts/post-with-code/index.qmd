@@ -171,7 +171,7 @@ ARIMA works best with data that is stationary, meaning that most input data will
 
 There are 3 hyperparameters that are used as input for the auto_arima function (with 3 more parameters if seasonal modeling is desired). These parameters are used to optimize the below equation. Auto_arima will iterate through multiple variations of each parameter to find the best combination with the lowest prediction error (Akaike Information Criteria or AIC).
 
-![Generalized ARIMA model function](https://wikimedia.org/api/rest_v1/media/math/render/svg/b6ebbe31d07e994b209c391e3d6f8f5d88e267c3)
+![{\\displaystyle \\left(1-\\sum \_{i=1}\^{p}\\varphi \_{i}L\^{i}\\right)(1-L)\^{d}X\_{t}=\\delta +\\left(1+\\sum \_{i=1}\^{q}\\theta \_{i}L\^{i}\\right)\\varepsilon \_{t}.\\,}](https://wikimedia.org/api/rest_v1/media/math/render/svg/b6ebbe31d07e994b209c391e3d6f8f5d88e267c3){alt="{\\displaystyle \\left(1-\\sum _{i=1}^{p}\\varphi _{i}L^{i}\\right)(1-L)^{d}X_{t}=\\delta +\\left(1+\\sum _{i=1}^{q}\\theta _{i}L^{i}\\right)\\varepsilon _{t}.\\,}"}
 
 Where:
 

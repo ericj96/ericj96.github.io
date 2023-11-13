@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Eric Jackson">
-<meta name="dcterms.date" content="2023-09-08">
+<meta name="dcterms.date" content="2023-09-03">
 
 <title>Fall 2023 CS 5805 Blog - (Old blog post) Anomaly Detection on Spacecraft Telemetry</title>
 <style>
@@ -137,7 +137,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Anomaly Detection on Spacecraft Telemetry</h1>
+      <h1 class="title">(Old blog post) Anomaly Detection on Spacecraft Telemetry</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">code</div>
                 <div class="quarto-category">analysis</div>
@@ -158,7 +158,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">September 8, 2023</p>
+        <p class="date">September 3, 2023</p>
       </div>
     </div>
     
@@ -362,7 +362,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://wikimedia.org/api/rest_v1/media/math/render/svg/b6ebbe31d07e994b209c391e3d6f8f5d88e267c3.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Generalized ARIMA model function</figcaption>
+<figcaption class="figure-caption">{\displaystyle \left(1-\sum _{i=1}^{p}\varphi _{i}L^{i}\right)(1-L)^{d}X_{t}=\delta +\left(1+\sum _{i=1}^{q}\theta _{i}L^{i}\right)\varepsilon _{t}.\,}</figcaption>
 </figure>
 </div>
 <p>Where:</p>
@@ -391,31 +391,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">MAE of Auto ARIMAX:"</span>, mean_absolute_error(df_valid.High, df_valid.Forecast_ARIMAX))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Performing stepwise search to minimize aic
- ARIMA(2,0,2)(0,0,0)[0] intercept   : AIC=2960.826, Time=14.75 sec
- ARIMA(0,0,0)(0,0,0)[0] intercept   : AIC=5711.667, Time=1.31 sec
- ARIMA(1,0,0)(0,0,0)[0] intercept   : AIC=3359.247, Time=10.65 sec
- ARIMA(0,0,1)(0,0,0)[0] intercept   : AIC=3726.632, Time=12.86 sec
- ARIMA(0,0,0)(0,0,0)[0]             : AIC=5709.707, Time=13.51 sec
- ARIMA(1,0,2)(0,0,0)[0] intercept   : AIC=2904.191, Time=15.28 sec
- ARIMA(0,0,2)(0,0,0)[0] intercept   : AIC=2912.739, Time=14.09 sec
- ARIMA(1,0,1)(0,0,0)[0] intercept   : AIC=3067.819, Time=13.67 sec
- ARIMA(1,0,3)(0,0,0)[0] intercept   : AIC=2930.144, Time=15.86 sec
- ARIMA(0,0,3)(0,0,0)[0] intercept   : AIC=2936.070, Time=14.84 sec
- ARIMA(2,0,1)(0,0,0)[0] intercept   : AIC=2957.813, Time=12.98 sec
- ARIMA(2,0,3)(0,0,0)[0] intercept   : AIC=2898.815, Time=16.28 sec
- ARIMA(3,0,3)(0,0,0)[0] intercept   : AIC=2805.639, Time=17.29 sec
- ARIMA(3,0,2)(0,0,0)[0] intercept   : AIC=2962.492, Time=15.71 sec
- ARIMA(4,0,3)(0,0,0)[0] intercept   : AIC=2810.038, Time=17.49 sec
- ARIMA(3,0,4)(0,0,0)[0] intercept   : AIC=2785.353, Time=21.28 sec
- ARIMA(2,0,4)(0,0,0)[0] intercept   : AIC=2897.289, Time=18.64 sec
- ARIMA(4,0,4)(0,0,0)[0] intercept   : AIC=2807.535, Time=19.55 sec
- ARIMA(3,0,5)(0,0,0)[0] intercept   : AIC=2789.723, Time=20.99 sec
- ARIMA(2,0,5)(0,0,0)[0] intercept   : AIC=2846.091, Time=20.60 sec
- ARIMA(4,0,5)(0,0,0)[0] intercept   : AIC=2791.733, Time=22.31 sec
- ARIMA(3,0,4)(0,0,0)[0]             : AIC=2809.734, Time=18.16 sec
+ ARIMA(2,0,2)(0,0,0)[0] intercept   : AIC=2960.826, Time=14.89 sec
+ ARIMA(0,0,0)(0,0,0)[0] intercept   : AIC=5711.667, Time=1.33 sec
+ ARIMA(1,0,0)(0,0,0)[0] intercept   : AIC=3359.247, Time=10.74 sec
+ ARIMA(0,0,1)(0,0,0)[0] intercept   : AIC=3726.632, Time=12.85 sec
+ ARIMA(0,0,0)(0,0,0)[0]             : AIC=5709.707, Time=13.73 sec
+ ARIMA(1,0,2)(0,0,0)[0] intercept   : AIC=2904.191, Time=15.25 sec
+ ARIMA(0,0,2)(0,0,0)[0] intercept   : AIC=2912.739, Time=14.02 sec
+ ARIMA(1,0,1)(0,0,0)[0] intercept   : AIC=3067.819, Time=13.69 sec
+ ARIMA(1,0,3)(0,0,0)[0] intercept   : AIC=2930.144, Time=15.75 sec
+ ARIMA(0,0,3)(0,0,0)[0] intercept   : AIC=2936.070, Time=14.81 sec
+ ARIMA(2,0,1)(0,0,0)[0] intercept   : AIC=2957.813, Time=12.96 sec
+ ARIMA(2,0,3)(0,0,0)[0] intercept   : AIC=2898.815, Time=16.26 sec
+ ARIMA(3,0,3)(0,0,0)[0] intercept   : AIC=2805.639, Time=17.26 sec
+ ARIMA(3,0,2)(0,0,0)[0] intercept   : AIC=2962.492, Time=15.66 sec
+ ARIMA(4,0,3)(0,0,0)[0] intercept   : AIC=2810.038, Time=17.45 sec
+ ARIMA(3,0,4)(0,0,0)[0] intercept   : AIC=2785.353, Time=21.20 sec
+ ARIMA(2,0,4)(0,0,0)[0] intercept   : AIC=2897.289, Time=18.54 sec
+ ARIMA(4,0,4)(0,0,0)[0] intercept   : AIC=2807.535, Time=19.51 sec
+ ARIMA(3,0,5)(0,0,0)[0] intercept   : AIC=2789.723, Time=20.91 sec
+ ARIMA(2,0,5)(0,0,0)[0] intercept   : AIC=2846.091, Time=20.72 sec
+ ARIMA(4,0,5)(0,0,0)[0] intercept   : AIC=2791.733, Time=22.35 sec
+ ARIMA(3,0,4)(0,0,0)[0]             : AIC=2809.734, Time=18.15 sec
 
 Best model:  ARIMA(3,0,4)(0,0,0)[0] intercept
-Total fit time: 348.125 seconds
+Total fit time: 348.045 seconds
 
 RMSE of Auto ARIMAX: 0.6141699692631081
 

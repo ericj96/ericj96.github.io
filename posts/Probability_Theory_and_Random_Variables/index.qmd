@@ -14,4 +14,57 @@ histogram of pdf
 
 ## Probability Theory
 
+Utilizing a kernel density estimation (KDE) is one way to smooth as well as estimate the probability density function (PDF) of a random variable based on kernels as weights. The kernel density estimator is seen in the below equation:
+
+![](Capture.JPG){width="376"}
+
+As seen in @fig-hist, the plot of the kde function on the data closely follows the trend of the histogram for both x1 and x2 variables, which were generated randomly.
+
+```{python}
+#| code-fold: true
+#| code-summary: Setup code
+
+import numpy as np
+from scipy import stats
+from matplotlib import pyplot as plt
+import scipy.stats
+from scipy.stats import norm
+from sklearn.cluster import KMeans
+from sklearn.datasets import make_blobs
+```
+
+```{python}
+blob_centers=np.random.uniform(0,5,[5,2])
+blob_std = np.array([0.4, 0.3, 0.1, 0.1, 0.1])
+x, y = make_blobs(n_samples=2000, centers=blob_centers, cluster_std=blob_std,
+                  random_state=7)
+n_bins=75
+data=x[:,1]
+kde = stats.gaussian_kde(data,bw_method=None)
+t_range=np.linspace(min(data),max(data),len(data))
+```
+
+```{python}
+#| code-fold: true
+#| code-summary: Plotting code 
+#| fig-cap: Histogram and KDE of data
+#| label: fig-hist
+fig, axs = plt.subplots(2,1,figsize =(10, 7))
+ax1=plt.subplot(211)
+ax1.hist(data, n_bins, alpha=0.5,density=1,label='x1 data',edgecolor='black');
+ax1.plot(t_range,kde(t_range),lw=2, label='x1 kde')
+plt.xlim(x.min()-.5,x.max()+.5)
+ax1.legend(loc='best')
+ax2=plt.subplot(212)
+data=x[:,0]
+kde = stats.gaussian_kde(data,bw_method=None)
+t_range=np.linspace(min(data),max(data),len(data))
+ax2.hist(data, n_bins, alpha=0.5,density=1,label='x2 data',edgecolor='black');
+ax2.plot(t_range,kde(t_range),lw=2, label='x2 kde')
+
+ax2.legend(loc='best')
+plt.xlim(x.min()-.5,x.max()+.5)
+plt.show()
+```
+
 ## Random Variables
