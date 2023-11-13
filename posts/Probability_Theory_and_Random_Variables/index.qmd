@@ -14,11 +14,7 @@ histogram of pdf
 
 ## Probability Theory
 
-Utilizing a kernel density estimation (KDE) is one way to smooth as well as estimate the probability density function (PDF) of a random variable based on kernels as weights. The kernel density estimator is seen in the below equation:
-
-![](Capture.JPG){width="376"}
-
-As seen in @fig-hist, the plot of the kde function on the data closely follows the trend of the histogram for both x1 and x2 variables, which were generated randomly.
+One of the more realistic machine learning based scenarios to utilize probability theory methods on is random data. As seen in @fig-og, a set of 5 "blobs" are generated with random centers and varying degrees of standard deviations from said center. This was the same approach taken for my [blog post on Clustering](https://ericj96.github.io/posts/Clustering/).
 
 ```{python}
 #| code-fold: true
@@ -36,8 +32,7 @@ from sklearn.datasets import make_blobs
 ```{python}
 blob_centers=np.random.uniform(0,5,[5,2])
 blob_std = np.array([0.4, 0.3, 0.1, 0.1, 0.1])
-x, y = make_blobs(n_samples=2000, centers=blob_centers, cluster_std=blob_std,
-                  random_state=7)
+x, y = make_blobs(n_samples=2000, centers=blob_centers, cluster_std=blob_std,random_state=7)
 n_bins=75
 data=x[:,1]
 kde = stats.gaussian_kde(data,bw_method=None)
@@ -46,7 +41,25 @@ t_range=np.linspace(min(data),max(data),len(data))
 
 ```{python}
 #| code-fold: true
-#| code-summary: Plotting code 
+#| code-summary: Plotting original data code 
+#| fig-cap: Plot of random data contained to five blobs
+#| label: fig-og
+fig, axs = plt.subplots(figsize =(9, 6))
+plt.scatter(x[:,0],x[:,1])
+plt.xlabel('$x_{1}$')
+plt.ylabel('$x_{2}$')
+plt.show()
+```
+
+When working with non-normal or non-uniform data, it is hard to fit a normal distribution curve to it. Utilizing a kernel density estimation (KDE) is one way to smooth as well as estimate the probability density function (PDF) of a random variable based on kernels as weights. The kernel density estimator is seen in the below equation:
+
+![](Capture.JPG){width="376"}
+
+As seen in @fig-hist, the plot of the kde function on the data closely follows the trend of the histogram for both x1 and x2 variables, which were generated randomly.
+
+```{python}
+#| code-fold: true
+#| code-summary: Plotting kde and histogram code 
 #| fig-cap: Histogram and KDE of data
 #| label: fig-hist
 fig, axs = plt.subplots(2,1,figsize =(10, 7))

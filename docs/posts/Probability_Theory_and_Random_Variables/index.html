@@ -119,7 +119,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="../../about.html" rel="" target="">
- <span class="menu-text">About</span></a>
+ <span class="menu-text">Eric Jackson</span></a>
   </li>  
   <li class="nav-item compact">
     <a class="nav-link" href="https://github.com/ericj96" rel="" target=""><i class="bi bi-github" role="img">
@@ -193,9 +193,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>histogram of pdf</p>
 <section id="probability-theory" class="level2">
 <h2 class="anchored" data-anchor-id="probability-theory">Probability Theory</h2>
-<p>Utilizing a kernel density estimation (KDE) is one way to smooth as well as estimate the probability density function (PDF) of a random variable based on kernels as weights. The kernel density estimator is seen in the below equation:</p>
-<p><img src="Capture.JPG" class="img-fluid" width="376"></p>
-<p>As seen in <a href="#fig-hist">Figure&nbsp;1</a>, the plot of the kde function on the data closely follows the trend of the histogram for both x1 and x2 variables, which were generated randomly.</p>
+<p>One of the more realistic machine learning based scenarios to utilize probability theory methods on is random data. As seen in <a href="#fig-og">Figure&nbsp;1</a>, a set of 5 “blobs” are generated with random centers</p>
 <div class="cell" data-execution_count="1">
 <details>
 <summary>Setup code</summary>
@@ -211,38 +209,58 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>blob_centers<span class="op">=</span>np.random.uniform(<span class="dv">0</span>,<span class="dv">5</span>,[<span class="dv">5</span>,<span class="dv">2</span>])</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>blob_std <span class="op">=</span> np.array([<span class="fl">0.4</span>, <span class="fl">0.3</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>])</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>x, y <span class="op">=</span> make_blobs(n_samples<span class="op">=</span><span class="dv">2000</span>, centers<span class="op">=</span>blob_centers, cluster_std<span class="op">=</span>blob_std,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                  random_state<span class="op">=</span><span class="dv">7</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>n_bins<span class="op">=</span><span class="dv">75</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>data<span class="op">=</span>x[:,<span class="dv">1</span>]</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>kde <span class="op">=</span> stats.gaussian_kde(data,bw_method<span class="op">=</span><span class="va">None</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>t_range<span class="op">=</span>np.linspace(<span class="bu">min</span>(data),<span class="bu">max</span>(data),<span class="bu">len</span>(data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>x, y <span class="op">=</span> make_blobs(n_samples<span class="op">=</span><span class="dv">2000</span>, centers<span class="op">=</span>blob_centers, cluster_std<span class="op">=</span>blob_std,random_state<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>n_bins<span class="op">=</span><span class="dv">75</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>data<span class="op">=</span>x[:,<span class="dv">1</span>]</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>kde <span class="op">=</span> stats.gaussian_kde(data,bw_method<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>t_range<span class="op">=</span>np.linspace(<span class="bu">min</span>(data),<span class="bu">max</span>(data),<span class="bu">len</span>(data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="3">
 <details>
-<summary>Plotting code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">2</span>,<span class="dv">1</span>,figsize <span class="op">=</span>(<span class="dv">10</span>, <span class="dv">7</span>))</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ax1<span class="op">=</span>plt.subplot(<span class="dv">211</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>ax1.hist(data, n_bins, alpha<span class="op">=</span><span class="fl">0.5</span>,density<span class="op">=</span><span class="dv">1</span>,label<span class="op">=</span><span class="st">'x1 data'</span>,edgecolor<span class="op">=</span><span class="st">'black'</span>)<span class="op">;</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ax1.plot(t_range,kde(t_range),lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">'x1 kde'</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>plt.xlim(x.<span class="bu">min</span>()<span class="op">-</span><span class="fl">.5</span>,x.<span class="bu">max</span>()<span class="op">+</span><span class="fl">.5</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>ax1.legend(loc<span class="op">=</span><span class="st">'best'</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>ax2<span class="op">=</span>plt.subplot(<span class="dv">212</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>data<span class="op">=</span>x[:,<span class="dv">0</span>]</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>kde <span class="op">=</span> stats.gaussian_kde(data,bw_method<span class="op">=</span><span class="va">None</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>t_range<span class="op">=</span>np.linspace(<span class="bu">min</span>(data),<span class="bu">max</span>(data),<span class="bu">len</span>(data))</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>ax2.hist(data, n_bins, alpha<span class="op">=</span><span class="fl">0.5</span>,density<span class="op">=</span><span class="dv">1</span>,label<span class="op">=</span><span class="st">'x2 data'</span>,edgecolor<span class="op">=</span><span class="st">'black'</span>)<span class="op">;</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>ax2.plot(t_range,kde(t_range),lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">'x2 kde'</span>)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>ax2.legend(loc<span class="op">=</span><span class="st">'best'</span>)</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>plt.xlim(x.<span class="bu">min</span>()<span class="op">-</span><span class="fl">.5</span>,x.<span class="bu">max</span>()<span class="op">+</span><span class="fl">.5</span>)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<summary>Plotting original data code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(figsize <span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>plt.scatter(x[:,<span class="dv">0</span>],x[:,<span class="dv">1</span>])</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'$x_</span><span class="sc">{1}</span><span class="st">$'</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'$x_</span><span class="sc">{2}</span><span class="st">$'</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-og" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-og-output-1.png" width="725" height="503" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;1: Plot of random data contained to five blobs</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>When working with non-normal or non-uniform data, it is hard to fit a normal distribution curve to it. Utilizing a kernel density estimation (KDE) is one way to smooth as well as estimate the probability density function (PDF) of a random variable based on kernels as weights. The kernel density estimator is seen in the below equation:</p>
+<p><img src="Capture.JPG" class="img-fluid" width="376"></p>
+<p>As seen in <a href="#fig-hist">Figure&nbsp;2</a>, the plot of the kde function on the data closely follows the trend of the histogram for both x1 and x2 variables, which were generated randomly.</p>
+<div class="cell" data-execution_count="4">
+<details>
+<summary>Plotting kde and histogram code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">2</span>,<span class="dv">1</span>,figsize <span class="op">=</span>(<span class="dv">10</span>, <span class="dv">7</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>ax1<span class="op">=</span>plt.subplot(<span class="dv">211</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>ax1.hist(data, n_bins, alpha<span class="op">=</span><span class="fl">0.5</span>,density<span class="op">=</span><span class="dv">1</span>,label<span class="op">=</span><span class="st">'x1 data'</span>,edgecolor<span class="op">=</span><span class="st">'black'</span>)<span class="op">;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>ax1.plot(t_range,kde(t_range),lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">'x1 kde'</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>plt.xlim(x.<span class="bu">min</span>()<span class="op">-</span><span class="fl">.5</span>,x.<span class="bu">max</span>()<span class="op">+</span><span class="fl">.5</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>ax1.legend(loc<span class="op">=</span><span class="st">'best'</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>ax2<span class="op">=</span>plt.subplot(<span class="dv">212</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>data<span class="op">=</span>x[:,<span class="dv">0</span>]</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>kde <span class="op">=</span> stats.gaussian_kde(data,bw_method<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>t_range<span class="op">=</span>np.linspace(<span class="bu">min</span>(data),<span class="bu">max</span>(data),<span class="bu">len</span>(data))</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>ax2.hist(data, n_bins, alpha<span class="op">=</span><span class="fl">0.5</span>,density<span class="op">=</span><span class="dv">1</span>,label<span class="op">=</span><span class="st">'x2 data'</span>,edgecolor<span class="op">=</span><span class="st">'black'</span>)<span class="op">;</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>ax2.plot(t_range,kde(t_range),lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">'x2 kde'</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>ax2.legend(loc<span class="op">=</span><span class="st">'best'</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>plt.xlim(x.<span class="bu">min</span>()<span class="op">-</span><span class="fl">.5</span>,x.<span class="bu">max</span>()<span class="op">+</span><span class="fl">.5</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div id="fig-hist" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="index_files/figure-html/fig-hist-output-1.png" width="794" height="559" class="figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;1: Histogram and KDE of data</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;2: Histogram and KDE of data</figcaption>
 </figure>
 </div>
 </div>
