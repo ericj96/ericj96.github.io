@@ -8,25 +8,28 @@ toc: true
 toc-depth: 2
 ---
 
-# Background
+# Probability Theory & Random Variables
 
-histogram of pdf
+Mathematics has many broad topics, but one of the most prevalent topics in machine learning is probability. Probability theory contains topics such as discrete and continuous random variables, probability distributions, and statistics.
 
-## Probability Theory
-
-One of the more realistic machine learning based scenarios to utilize probability theory methods on is random data. As seen in @fig-og, a set of 5 "blobs" are generated with random centers and varying degrees of standard deviations from said center. This was the same approach taken for my [blog post on Clustering](https://ericj96.github.io/posts/Clustering/).
+One of the more realistic machine learning based scenarios to utilize probability theory methods on is random data. As seen in @fig-og, a set of 5 "blobs" has been generated with random centers and varying degrees of standard deviations from said center. This was the same approach taken for my [blog post on Clustering](https://ericj96.github.io/posts/Clustering/).
 
 ```{python}
 #| code-fold: true
 #| code-summary: Setup code
 
+import os
+import warnings
+warnings.filterwarnings('ignore')
 import numpy as np
+import pandas as pd
 from scipy import stats
 from matplotlib import pyplot as plt
 import scipy.stats
 from scipy.stats import norm
 from sklearn.cluster import KMeans
 from sklearn.datasets import make_blobs
+from sklearn.mixture import GaussianMixture
 ```
 
 ```{python}
@@ -55,7 +58,7 @@ When working with non-normal or non-uniform data, it is hard to fit a normal dis
 
 ![](Capture.JPG){width="376"}
 
-As seen in @fig-hist, the plot of the kde function on the data closely follows the trend of the histogram for both x1 and x2 variables, which were generated randomly.
+As seen in @fig-hist, the plot of the kde function on the above data closely follows the trend of the histogram for both x1 and x2 variables, which were generated randomly.
 
 ```{python}
 #| code-fold: true
@@ -80,4 +83,42 @@ plt.xlim(x.min()-.5,x.max()+.5)
 plt.show()
 ```
 
-## Random Variables
+Machine learning techniques commonly will use clustering to group data points together and allows the user to see the similarity of their data. One algorithm that is used for clustering is Gaussian Mixtures Model (GMM) which uses probability for clustering and density estimation, and is based on Gaussian distribution curves. Since this blog post is about probability theory, we will utilize this specific method.
+
+Since Gaussian distributions heavily depend on mean and variance of each point, GMM utilizes a statistical algorithm called Expectation-Maximization for calculating the mean and variance value of each Gaussian or cluster. The algorithm first calculates the probability that a point belongs to each cluster, then iterates the mean and covariance matrix to maximize the log likelihood value.
+
+```{python}
+#| code-fold: false
+#| code-summary: Gaussian Mixture setup and plot code
+#| fig-cap: Gaussian Mixture clustering results
+#| label: fig-clust
+gm = GaussianMixture(n_components=5, n_init=10, random_state=42)
+gm.fit(x)
+print('Gaussian Mixture model converged in %d iterations with a lower bound\non the log likelihood of the best fit of EM of %3.3f' % (gm.n_iter_,gm.lower_bound_))
+labels=gm.predict(x)
+
+fig, axs = plt.subplots(figsize =(9, 6))
+plt.scatter(x[:,0][labels==0],x[:,1][labels==0])
+plt.scatter(x[:,0][labels==1],x[:,1][labels==1])
+plt.scatter(x[:,0][labels==2],x[:,1][labels==2])
+plt.scatter(x[:,0][labels==3],x[:,1][labels==3])
+plt.scatter(x[:,0][labels==4],x[:,1][labels==4])
+plt.legend(['Cluster 1','Cluster 2','Cluster 3','Cluster 4','Cluster 5'],loc='best')
+plt.xlabel('$x_{1}$')
+plt.ylabel('$x_{2}$')
+plt.show()
+```
+
+The Gaussian Mixture function from sklearn allows one to see the probabilities that a certain point is in each of the 5 clusters (in this example). Below, you can see a table with the probabilities of several datapoints and their respective clusters. It's interesting to note that not every point is 100% certain with this algorithm, there are several points that have \< 1.0 probabilities, meaning that it might have a 95% probability of it being in one cluster, and a 5% probability of being in another cluster. Since 95% \> 5%, it assumes it is in the higher probability cluster.
+
+```{python}
+pd.DataFrame(gm.predict_proba(x).round(3),columns=['Cluster 1','Cluster 2','Cluster 3','Cluster 4','Cluster 5'])
+```
+
+Sources used for code and/or text:
+
+\[1\] <https://www.analyticsvidhya.com/blog/2019/10/gaussian-mixture-models-clustering/#:~:text=A.-,The%20Gaussian%20Mixture%20Model%20(GMM)%20is%20a%20probabilistic%20model%20used,distributions%2C%20each%20representing%20a%20cluster.>
+
+\[2\] <https://github.com/maptv/handson-ml3/blob/b8f4fd1e85247096109b175d3289b558cedc74b4/09_unsupervised_learning.ipynb>
+
+\[3\] <https://en.wikipedia.org/wiki/Probability_theory>
