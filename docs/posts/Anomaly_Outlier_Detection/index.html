@@ -139,7 +139,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div class="quarto-title column-body">
       <h1 class="title">Anomaly/Outlier Detection</h1>
                                 <div class="quarto-categories">
-                <div class="quarto-category">code</div>
                 <div class="quarto-category">outlier</div>
                 <div class="quarto-category">anomaly</div>
                 <div class="quarto-category">detection</div>
@@ -349,8 +348,8 @@ Number of normal samples detected: 561</code></pre>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of outliers detected: </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(prediction[prediction <span class="op">&lt;</span> <span class="dv">0</span>].<span class="bu">sum</span>()<span class="op">*-</span><span class="dv">1</span>))</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of normal samples detected: </span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(prediction[prediction <span class="op">&gt;</span> <span class="dv">0</span>].<span class="bu">sum</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Number of outliers detected: 94
-Number of normal samples detected: 475</code></pre>
+<pre><code>Number of outliers detected: 102
+Number of normal samples detected: 467</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="6">

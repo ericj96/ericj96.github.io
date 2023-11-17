@@ -2,7 +2,7 @@
 title: "Classification"
 author: "Eric Jackson"
 date: "2023-10-01"
-categories: [code, analysis]
+categories: [classification]
 image: "image.jpg"
 toc: true
 toc-depth: 2

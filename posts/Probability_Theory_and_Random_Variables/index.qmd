@@ -2,7 +2,7 @@
 title: "Probability theory and random variables"
 author: "Eric Jackson"
 date: "2023-10-02"
-categories: [code, analysis]
+categories: [probability,random variables]
 image: "image.jpg"
 toc: true
 toc-depth: 2

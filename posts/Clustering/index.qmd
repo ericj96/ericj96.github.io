@@ -2,7 +2,7 @@
 title: "Clustering"
 author: "Eric Jackson"
 date: "2023-10-04"
-categories: [code, analysis]
+categories: [clustering]
 image: "image.jpg"
 toc: true
 toc-depth: 2
@@ -162,7 +162,7 @@ plt.scatter(x[:,0],x[:,1],color=colors[y])
 plt.xlabel("$x_1$")
 plt.ylabel("$x_2$", rotation=0)
 plt.grid()
-#plt.show()
+plt.show()
 
 ```
 
@@ -171,8 +171,6 @@ plt.grid()
 ## Density-Based Spatial Clustering of Applications with Noise (DBSCAN)
 
 As explored in the [blog post on anomaly/outlier detection](https://ericj96.github.io/posts/Anomaly_Outlier_Detection/), the DBSCAN algorithm is a widely used machine learning algorithm for clustering given sets of points by grouping together points that are close together and have multiple nearest neighbors. While creating the clusters of the data, it will naturally identify outliers and thus, is a great algorithm to accomplish both outlier detection and clustering.
-
-OTHERS
 
 ```{python}
 import time
@@ -192,7 +190,7 @@ default_base = {
     "damping": 0.9,
     "preference": -200,
     "n_neighbors": 3,
-    "n_clusters": 3,
+    "n_clusters": 5,
     "min_samples": 7,
     "xi": 0.05,
     "min_cluster_size": 0.1,
@@ -215,7 +213,7 @@ cm = confusion_matrix(y, y_pred)
 cm_argmax = cm.argmax(axis=0)
 y_pred_ = np.array([cm_argmax[i] for i in y_pred])
 cm_ = confusion_matrix(y, y_pred)
-accuracy_score(y,y_pred_)
+print('Accuracy score: %3.3f\n' % accuracy_score(y,y_pred_))
 
 ```
 
