@@ -52,7 +52,8 @@ def plot_dbscan(dbscan, X, size, show_xlabels=True, show_ylabels=True):
 ```{python}
 #| code-fold: true
 #| code-summary: Plotting code
-
+import warnings
+warnings.filterwarnings('ignore')
 import pandas as pd
 import numpy as np 
 import matplotlib.pyplot as plt
