@@ -177,10 +177,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul class="collapse">
-  <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background">Background</a>
+  <li><a href="#background-and-setup" id="toc-background-and-setup" class="nav-link active" data-scroll-target="#background-and-setup">Background and Setup</a></li>
+  <li><a href="#classification-algorithms" id="toc-classification-algorithms" class="nav-link" data-scroll-target="#classification-algorithms">Classification Algorithms</a>
   <ul class="collapse">
-  <li><a href="#classification-algorithms" id="toc-classification-algorithms" class="nav-link" data-scroll-target="#classification-algorithms">Classification Algorithms</a></li>
+  <li><a href="#gaussian-naive-bayes" id="toc-gaussian-naive-bayes" class="nav-link" data-scroll-target="#gaussian-naive-bayes">Gaussian Naive Bayes</a></li>
+  <li><a href="#gaussian-process-classification" id="toc-gaussian-process-classification" class="nav-link" data-scroll-target="#gaussian-process-classification">Gaussian Process Classification</a></li>
+  <li><a href="#random-forest-classifier" id="toc-random-forest-classifier" class="nav-link" data-scroll-target="#random-forest-classifier">Random Forest Classifier</a></li>
   </ul></li>
+  <li><a href="#results-and-conclusion" id="toc-results-and-conclusion" class="nav-link" data-scroll-target="#results-and-conclusion">Results and Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -190,19 +194,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="background" class="level1">
-<h1>Background</h1>
+<section id="background-and-setup" class="level1">
+<h1>Background and Setup</h1>
 <p>Classification is similar to clustering (<a href="https://ericj96.github.io/posts/Clustering/">as mentioned in this blog post</a>) in the sense that they group data together into separate categories. The difference comes from the fact that classification has a predefined set of labels that are attached to each data point, and in clustering the labels are missing and the algorithm will apply those labels/groupings. These two topics are commonly referenced as supervised and unsupervised learning (classification vs clustering).</p>
 <p>Some of the downsides of classification are that there is a need to train the model before using it with test data, whereas clustering does not require such training and can group data points together immediately. But, classification can be used for much more intensive scenarios, such as handwriting recognition and spam filtering.</p>
-<p>As mentioned before, classification algorithms or models require inputs with labels predefined. For this blog post, a native sklearn dataset containing measurements of a species of flower will be used. As seen below, there are width and length measurements along with the label/target for the species of flower.</p>
+<p>As mentioned before, classification algorithms or models require inputs with labels predefined. For this blog post, a native sklearn dataset containing measurements of a species of flower will be used. As seen below, there are width and length measurements along with the label/target class for the species of flower.</p>
 <div class="cell" data-execution_count="1">
 <details>
 <summary>Setup/imports</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> classification_report, confusion_matrix</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_iris</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> classification_report, confusion_matrix</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_iris</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.naive_bayes <span class="im">import</span> GaussianNB</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.gaussian_process <span class="im">import</span> GaussianProcessClassifier</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestClassifier</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> make_pipeline</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> ConfusionMatrixDisplay</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.inspection <span class="im">import</span> DecisionBoundaryDisplay</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell" data-execution_count="2">
@@ -212,10 +224,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>target[target<span class="op">==</span><span class="dv">0</span>]<span class="op">=</span>iris.target_names[<span class="dv">0</span>]</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>target[target<span class="op">==</span><span class="dv">1</span>]<span class="op">=</span>iris.target_names[<span class="dv">1</span>]</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>target[target<span class="op">==</span><span class="dv">2</span>]<span class="op">=</span>iris.target_names[<span class="dv">2</span>]</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'target'</span>]<span class="op">=</span>target</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'target'</span>]<span class="op">=</span>target</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># breaking up data into training and test datasets</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>x_train<span class="op">=</span>df[[<span class="st">'petal length (cm)'</span>, <span class="st">'petal width (cm)'</span>]]</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>y_train<span class="op">=</span>df[<span class="st">'target'</span>]</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>x_test<span class="op">=</span>df[[<span class="st">'petal length (cm)'</span>, <span class="st">'petal width (cm)'</span>]]</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>y_test<span class="op">=</span>df[<span class="st">'target'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="3">
-<div class="cell-output cell-output-display" data-execution_count="3">
+<div class="cell-output cell-output-display" data-execution_count="23">
 <div>
 
 
@@ -330,7 +348,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell" data-execution_count="4">
 <details>
 <summary>Plotting code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(figsize <span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(figsize <span class="op">=</span>(<span class="dv">7</span>, <span class="dv">5</span>))</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>plt.scatter(df[<span class="st">'petal length (cm)'</span>][df[<span class="st">'target'</span>]<span class="op">==</span>iris.target_names[<span class="dv">0</span>]],df[<span class="st">'petal width (cm)'</span>][df[<span class="st">'target'</span>]<span class="op">==</span>iris.target_names[<span class="dv">0</span>]])</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>plt.scatter(df[<span class="st">'petal length (cm)'</span>][df[<span class="st">'target'</span>]<span class="op">==</span>iris.target_names[<span class="dv">1</span>]],df[<span class="st">'petal width (cm)'</span>][df[<span class="st">'target'</span>]<span class="op">==</span>iris.target_names[<span class="dv">1</span>]])</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>plt.scatter(df[<span class="st">'petal length (cm)'</span>][df[<span class="st">'target'</span>]<span class="op">==</span>iris.target_names[<span class="dv">2</span>]],df[<span class="st">'petal width (cm)'</span>][df[<span class="st">'target'</span>]<span class="op">==</span>iris.target_names[<span class="dv">2</span>]])</span>
@@ -342,21 +360,189 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-display">
 <div id="fig-class" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="index_files/figure-html/fig-class-output-1.png" width="738" height="503" class="figure-img"></p>
+<p><img src="index_files/figure-html/fig-class-output-1.png" width="589" height="429" class="figure-img"></p>
 <figcaption class="figure-caption">Figure&nbsp;1: Dataset values broken into their defined target labels</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<section id="classification-algorithms" class="level2">
-<h2 class="anchored" data-anchor-id="classification-algorithms">Classification Algorithms</h2>
-<p>Naive Bayes</p>
-<p>GMM</p>
-<p>some neural net?</p>
-<p>https://www.pycodemates.com/2022/05/iris-dataset-classification-with-python.html</p>
-
-
 </section>
+<section id="classification-algorithms" class="level1">
+<h1>Classification Algorithms</h1>
+<section id="gaussian-naive-bayes" class="level2">
+<h2 class="anchored" data-anchor-id="gaussian-naive-bayes">Gaussian Naive Bayes</h2>
+<p>The Gaussian Naive Bayes algorithm from the sklearn library (<a href="https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html">see here</a>) utilizes Bayes’ theorem assuming the features probability is distributed in a Gaussian or normal fashion, with the variance and mean of each data point calculated for each class. There are a multitude of Naive Bayes classifier algorithms (Bernoulli, Multinomial, etc), but the specific Gaussian probabilistic version used here is especially useful when the values are continuous and expected to follow a Gaussian distribution.</p>
+<p>As seen from <a href="#fig-nb">Figure&nbsp;2</a>, the algorithm uses circular decision boundaries to classify each set of labels. The confusion matrix on the right shows that out of 150 samples, it only incorrectly labeled 6 points leading to a mean accuracy of 96%.</p>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>nb <span class="op">=</span> GaussianNB()</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>nb.fit(x_train, y_train)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Mean accuracy score: </span><span class="sc">%3.3f%%</span><span class="st">'</span> <span class="op">%</span> (nb.score(x_test,y_test)<span class="op">*</span><span class="dv">100</span>))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>y_pred<span class="op">=</span>nb.predict(x_train)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>cm<span class="op">=</span>confusion_matrix(y_train,y_pred,labels<span class="op">=</span>iris.target_names)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean accuracy score: 96.000%</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="6">
+<details>
+<summary>Plotting code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># decision boundary code adapted from https://hackernoon.com/how-to-plot-a-decision-boundary-for-machine-learning-algorithms-in-python-3o1n3w07</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">1</span>,<span class="dv">2</span>,figsize <span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">121</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>x1grid <span class="op">=</span> np.linspace(x_train[<span class="st">'petal length (cm)'</span>].<span class="bu">min</span>()<span class="op">-</span><span class="fl">.2</span>, x_train[<span class="st">'petal length (cm)'</span>].<span class="bu">max</span>()<span class="op">+</span><span class="fl">.2</span>, <span class="bu">len</span>(x_train))</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>x2grid <span class="op">=</span> np.linspace(x_train[<span class="st">'petal width (cm)'</span>].<span class="bu">min</span>()<span class="op">-</span><span class="fl">.2</span>, x_train[<span class="st">'petal width (cm)'</span>].<span class="bu">max</span>()<span class="op">+</span><span class="fl">.2</span>, <span class="bu">len</span>(x_train))</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>xx, yy <span class="op">=</span> np.meshgrid(x1grid, x2grid)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>r1, r2 <span class="op">=</span> xx.flatten(), yy.flatten()</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>r1, r2 <span class="op">=</span> r1.reshape((<span class="bu">len</span>(r1), <span class="dv">1</span>)), r2.reshape((<span class="bu">len</span>(r2), <span class="dv">1</span>))</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>grid <span class="op">=</span> np.hstack((r1,r2))</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>y_pred_grid<span class="op">=</span>nb.predict(grid)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>zz <span class="op">=</span> y_pred_grid.reshape(xx.shape)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'setosa'</span>]<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'versicolor'</span>]<span class="op">=</span><span class="dv">2</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'virginica'</span>]<span class="op">=</span><span class="dv">3</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>xx<span class="op">=</span>np.array(xx,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>yy<span class="op">=</span>np.array(yy,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>zz<span class="op">=</span>np.array(zz,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">0</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">0</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">1</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">1</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">2</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">2</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'petal length (cm)'</span>)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'petal width (cm)'</span>)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>plt.legend(iris.target_names)</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>plt.contourf(xx, yy, zz,cmap<span class="op">=</span><span class="st">'RdBu_r'</span>)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">122</span>)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>ConfusionMatrixDisplay.from_predictions(y_train,y_pred,ax<span class="op">=</span>axs[<span class="dv">1</span>],colorbar<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()  </span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-nb" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-nb-output-1.png" width="757" height="468" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;2: Gaussian Naive Bayes classification results (with decision boundaries) and confusion matrix</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="gaussian-process-classification" class="level2">
+<h2 class="anchored" data-anchor-id="gaussian-process-classification">Gaussian Process Classification</h2>
+<p>The Gaussian Process Classification algorithm from the sklearn library (<a href="https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.GaussianProcessClassifier.html">see here</a>) uses a general form of the Gaussian probability distribution model and is based on Laplace approximation. As it uses Gaussian probability, the model can compute confidence intervals and determine if refitting of a certain section is required based on probability alone. The algorithm is kernel based, meaning multiple types of covariance functions can be utilized and used to optimize model fitting based on the input data. One downside of this algorithm is that is loses efficiency when the number of features grows larger than a few dozen.</p>
+<p>As seen from <a href="#fig-gmm">Figure&nbsp;3</a>, the algorithm uses more linear decision boundaries compared to the above Gaussian Naive to classify each set of labels. The confusion matrix on the right shows that out of 150 samples, it only incorrectly labeled 5 points leading to a mean accuracy of 96.667%. Both of these algorithms are Gaussian in nature, so it is expected that they have similar results.</p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>nb <span class="op">=</span> GaussianProcessClassifier()</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>nb.fit(x_train, y_train)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Mean accuracy score: </span><span class="sc">%3.3f%%</span><span class="st">'</span> <span class="op">%</span> (nb.score(x_test,y_test)<span class="op">*</span><span class="dv">100</span>))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>y_pred<span class="op">=</span>nb.predict(x_train)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>cm<span class="op">=</span>confusion_matrix(y_train,y_pred,labels<span class="op">=</span>iris.target_names)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean accuracy score: 96.667%</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="8">
+<details>
+<summary>Plotting code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># decision boundary code adapted from https://hackernoon.com/how-to-plot-a-decision-boundary-for-machine-learning-algorithms-in-python-3o1n3w07</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">1</span>,<span class="dv">2</span>,figsize <span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">121</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>x1grid <span class="op">=</span> np.linspace(x_train[<span class="st">'petal length (cm)'</span>].<span class="bu">min</span>()<span class="op">-</span><span class="fl">.2</span>, x_train[<span class="st">'petal length (cm)'</span>].<span class="bu">max</span>()<span class="op">+</span><span class="fl">.2</span>, <span class="bu">len</span>(x_train))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>x2grid <span class="op">=</span> np.linspace(x_train[<span class="st">'petal width (cm)'</span>].<span class="bu">min</span>()<span class="op">-</span><span class="fl">.2</span>, x_train[<span class="st">'petal width (cm)'</span>].<span class="bu">max</span>()<span class="op">+</span><span class="fl">.2</span>, <span class="bu">len</span>(x_train))</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>xx, yy <span class="op">=</span> np.meshgrid(x1grid, x2grid)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>r1, r2 <span class="op">=</span> xx.flatten(), yy.flatten()</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>r1, r2 <span class="op">=</span> r1.reshape((<span class="bu">len</span>(r1), <span class="dv">1</span>)), r2.reshape((<span class="bu">len</span>(r2), <span class="dv">1</span>))</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>grid <span class="op">=</span> np.hstack((r1,r2))</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>y_pred_grid<span class="op">=</span>nb.predict(grid)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>zz <span class="op">=</span> y_pred_grid.reshape(xx.shape)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'setosa'</span>]<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'versicolor'</span>]<span class="op">=</span><span class="dv">2</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'virginica'</span>]<span class="op">=</span><span class="dv">3</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>xx<span class="op">=</span>np.array(xx,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>yy<span class="op">=</span>np.array(yy,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>zz<span class="op">=</span>np.array(zz,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">0</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">0</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">1</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">1</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">2</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">2</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'petal length (cm)'</span>)</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'petal width (cm)'</span>)</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>plt.legend(iris.target_names)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>plt.contourf(xx, yy, zz,cmap<span class="op">=</span><span class="st">'RdBu_r'</span>)</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">122</span>)</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>ConfusionMatrixDisplay.from_predictions(y_train,y_pred,ax<span class="op">=</span>axs[<span class="dv">1</span>],colorbar<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()  </span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-gmm" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-gmm-output-1.png" width="757" height="468" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;3: Gaussian Process Classifier classification results (with decision boundaries) and confusion matrix</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="random-forest-classifier" class="level2">
+<h2 class="anchored" data-anchor-id="random-forest-classifier">Random Forest Classifier</h2>
+<p>The Random Forest Classifier as part of the sklearn library (<a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html">see here</a>) uses decision tree classifiers on multiple parts of the dataset, and then averages scores from each one to maintain a high accuracy and attempt to prevent over fitting. The default arguments were used for this algorithm, but the most important one to call out and be aware of is the number of trees/estimators in the forest is defaulted to 100. Random Forest has the additional benefit of being less computationally expensive as other classification models, such as neural networks.</p>
+<p>As seen from <a href="#fig-rf">Figure&nbsp;4</a>, the algorithm uses boxier decision boundaries than the previous two algorithms to classify each set of labels. The confusion matrix on the right shows that out of 150 samples, it only incorrectly labeled 1 point leading to a mean accuracy of 99.333%. This is by far the best accuracy score of the three algorithms and would be the best model to use for this specific dataset for further work.</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>nb <span class="op">=</span> RandomForestClassifier()</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>nb.fit(x_train, y_train)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Mean accuracy score: </span><span class="sc">%3.3f%%</span><span class="st">'</span> <span class="op">%</span> (nb.score(x_test,y_test)<span class="op">*</span><span class="dv">100</span>))</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>y_pred<span class="op">=</span>nb.predict(x_train)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>cm<span class="op">=</span>confusion_matrix(y_train,y_pred,labels<span class="op">=</span>iris.target_names)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean accuracy score: 99.333%</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="10">
+<details>
+<summary>Plotting code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># decision boundary code adapted from https://hackernoon.com/how-to-plot-a-decision-boundary-for-machine-learning-algorithms-in-python-3o1n3w07</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">1</span>,<span class="dv">2</span>,figsize <span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">121</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>x1grid <span class="op">=</span> np.linspace(x_train[<span class="st">'petal length (cm)'</span>].<span class="bu">min</span>()<span class="op">-</span><span class="fl">.2</span>, x_train[<span class="st">'petal length (cm)'</span>].<span class="bu">max</span>()<span class="op">+</span><span class="fl">.2</span>, <span class="bu">len</span>(x_train))</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>x2grid <span class="op">=</span> np.linspace(x_train[<span class="st">'petal width (cm)'</span>].<span class="bu">min</span>()<span class="op">-</span><span class="fl">.2</span>, x_train[<span class="st">'petal width (cm)'</span>].<span class="bu">max</span>()<span class="op">+</span><span class="fl">.2</span>, <span class="bu">len</span>(x_train))</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>xx, yy <span class="op">=</span> np.meshgrid(x1grid, x2grid)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>r1, r2 <span class="op">=</span> xx.flatten(), yy.flatten()</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>r1, r2 <span class="op">=</span> r1.reshape((<span class="bu">len</span>(r1), <span class="dv">1</span>)), r2.reshape((<span class="bu">len</span>(r2), <span class="dv">1</span>))</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>grid <span class="op">=</span> np.hstack((r1,r2))</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>y_pred_grid<span class="op">=</span>nb.predict(grid)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>zz <span class="op">=</span> y_pred_grid.reshape(xx.shape)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'setosa'</span>]<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'versicolor'</span>]<span class="op">=</span><span class="dv">2</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'virginica'</span>]<span class="op">=</span><span class="dv">3</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>xx<span class="op">=</span>np.array(xx,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>yy<span class="op">=</span>np.array(yy,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>zz<span class="op">=</span>np.array(zz,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">0</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">0</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">1</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">1</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">2</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">2</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'petal length (cm)'</span>)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'petal width (cm)'</span>)</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>plt.legend(iris.target_names)</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>plt.contourf(xx, yy, zz,cmap<span class="op">=</span><span class="st">'RdBu_r'</span>)</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">122</span>)</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>ConfusionMatrixDisplay.from_predictions(y_train,y_pred,ax<span class="op">=</span>axs[<span class="dv">1</span>],colorbar<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()  </span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-rf" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-rf-output-1.png" width="757" height="468" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;4: Random Forest Classifier classification results (with decision boundaries) and confusion matrix</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="results-and-conclusion" class="level1">
+<h1>Results and Conclusion</h1>
+<p>The three classification algorithms used in this blog post used a relatively small dataset to attempt and match the original labels. Both Gaussian classification models (Gaussian Naive Bayes and Gaussian Process Classification) performed similarly and had ~96% accuracy. The Random Forest classification algorithm performed much better than the previous two, with a mean accuracy score &gt; 99% and only misidentified a single data point.</p>
+
+
 </section>
 
 </main> <!-- /main -->
