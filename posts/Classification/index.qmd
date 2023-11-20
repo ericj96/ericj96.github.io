@@ -1,7 +1,7 @@
 ---
 title: "Classification"
 author: "Eric Jackson"
-date: "2023-10-01"
+date: "2023-10-04"
 categories: [classification]
 image: "image.jpg"
 toc: true

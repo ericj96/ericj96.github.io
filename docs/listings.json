@@ -3,10 +3,10 @@
     "listing": "/index.html",
     "items": [
       "/posts/Anomaly_Outlier_Detection/index.html",
-      "/posts/Clustering/index.html",
+      "/posts/Classification/index.html",
       "/posts/Linear_and_Nonlinear_Regression/index.html",
       "/posts/Probability_Theory_and_Random_Variables/index.html",
-      "/posts/Classification/index.html",
+      "/posts/Clustering/index.html",
       "/posts/post-with-code/index.html",
       "/posts/Topic_2/index.html",
       "/posts/Topic_3/index.html"

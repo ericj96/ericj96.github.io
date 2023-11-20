@@ -1,7 +1,7 @@
 ---
 title: "Clustering"
 author: "Eric Jackson"
-date: "2023-10-04"
+date: "2023-10-01"
 categories: [clustering]
 image: "image.jpg"
 toc: true
@@ -14,156 +14,17 @@ Clustering is an
 
 ```{python}
 #| code-fold: true
-#| code-summary: plot_dbscan function
-
-# plot code taken from https://github.com/maptv/handson-ml3/blob/main/09_unsupervised_learning.ipynb
-def plot_dbscan(dbscan, X, size, show_xlabels=True, show_ylabels=True):
-    core_mask = np.zeros_like(dbscan.labels_, dtype=bool)
-    core_mask[dbscan.core_sample_indices_] = True
-    anomalies_mask = dbscan.labels_ == -1
-    non_core_mask = ~(core_mask | anomalies_mask)
-
-    cores = dbscan.components_
-    anomalies = X[anomalies_mask]
-    non_cores = X[non_core_mask]
-    
-    plt.scatter(cores[:, 0], cores[:, 1],
-                c=dbscan.labels_[core_mask], marker='o', s=size, cmap="Paired")
-    plt.scatter(cores[:, 0], cores[:, 1], marker='*', s=20,
-                c=dbscan.labels_[core_mask])
-    plt.scatter(anomalies[:, 0], anomalies[:, 1],
-                c="r", marker="x", s=100)
-    plt.scatter(non_cores[:, 0], non_cores[:, 1],
-                c=dbscan.labels_[non_core_mask], marker=".")
-    if show_xlabels:
-        plt.xlabel("Mean Radius")
-    else:
-        plt.tick_params(labelbottom=False)
-    if show_ylabels:
-        plt.ylabel("Mean Smoothness")
-    else:
-        plt.tick_params(labelleft=False)
-    plt.title(f"eps={dbscan.eps:.2f}, min_samples={dbscan.min_samples}")
-    plt.grid()
-    plt.gca().set_axisbelow(True)
-    plt.show()
-```
-
-```{python}
-#| code-fold: true
-#| code-summary: Plotting code
+#| code-summary: Setup and imports
 import warnings
 warnings.filterwarnings('ignore')
 import pandas as pd
 import numpy as np 
 import matplotlib.pyplot as plt
-from sklearn.datasets import make_blobs
+from sklearn.datasets import make_blobs,make_circles
 from sklearn import cluster 
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans,DBSCAN
 from itertools import cycle, islice
 from sklearn.metrics import confusion_matrix,accuracy_score
-
-# setting up blobs code taken from https://github.com/maptv/handson-ml3/blob/main/09_unsupervised_learning.ipynb
-
-#blob_centers = np.array([[ 0.2,  2.3], [-1.5 ,  2.3], [-2.8,  1.8], [-2.8,  2.8], [-2.8,  1.3]])
-                         
-# randomize centers of blobs 
-blob_centers= np.random.randint(0,5,size=(5,2))+.116846842*.65487984
-blob_std = np.array([0.4, 0.3, 0.1, 0.1, 0.1])
-
-x, y = make_blobs(n_samples=2000, centers=blob_centers, cluster_std=blob_std,
-                  random_state=7)
-k = 5
-kmeans = KMeans(n_clusters=k, random_state=42)
-y_pred = kmeans.fit_predict(x)     
-
-cm = confusion_matrix(y, y_pred)
-cm_argmax = cm.argmax(axis=0)
-y_pred_ = np.array([cm_argmax[i] for i in y_pred])
-cm_ = confusion_matrix(y, y_pred)
-accuracy_score(y,y_pred_)
-
-from sklearn.cluster import DBSCAN
-dbscan=DBSCAN(eps=0.5)
-dbscan.fit(x)
-colors = dbscan.labels_
-y_pred=colors
-cm = confusion_matrix(y, y_pred)
-cm_argmax = cm.argmax(axis=0)
-y_pred_ = np.array([cm_argmax[i] for i in y_pred])
-cm_ = confusion_matrix(y, y_pred)
-accuracy_score(y,y_pred_)
-fig, ax = plt.subplots(figsize=(9,7))
-
-plot_dbscan(dbscan, x, size=9)
-```
-
-```{python}
-
-
-
-colors = np.array(
-    list(
-        islice(
-            cycle(
-                [
-                    "#377eb8",
-                    "#ff7f00",
-                    "#4daf4a",
-                    "#f781bf",
-                    "#a65628",
-                    "#984ea3",
-                    "#999999",
-                    "#e41a1c",
-                    "#dede00",
-                ]
-            ),
-            int(max(y_pred) + 1),
-        )
-    )
-)
-
-        
-colors = np.append(colors, ["#000000"])
-fig, ax = plt.subplots(figsize=(9,7))
-plt.scatter(x[:,0],x[:,1],color=colors[y_pred])
-plt.xlabel("$x_1$")
-plt.ylabel("$x_2$", rotation=0)
-plt.grid()
-#plt.show()
-
-
-
-colors = np.array(
-    list(
-        islice(
-            cycle(
-                [
-                    "#377eb8",
-                    "#ff7f00",
-                    "#4daf4a",
-                    "#f781bf",
-                    "#a65628",
-                    "#984ea3",
-                    "#999999",
-                    "#e41a1c",
-                    "#dede00",
-                ]
-            ),
-            int(max(y) + 1),
-        )
-    )
-)
-
-
-colors = np.append(colors, ["#000000"])
-fig, ax = plt.subplots(figsize=(9,7))
-plt.scatter(x[:,0],x[:,1],color=colors[y])
-plt.xlabel("$x_1$")
-plt.ylabel("$x_2$", rotation=0)
-plt.grid()
-plt.show()
-
 ```
 
 # Clustering Algorithms
@@ -173,282 +34,61 @@ plt.show()
 As explored in the [blog post on anomaly/outlier detection](https://ericj96.github.io/posts/Anomaly_Outlier_Detection/), the DBSCAN algorithm is a widely used machine learning algorithm for clustering given sets of points by grouping together points that are close together and have multiple nearest neighbors. While creating the clusters of the data, it will naturally identify outliers and thus, is a great algorithm to accomplish both outlier detection and clustering.
 
 ```{python}
-import time
-import warnings
-from itertools import cycle, islice
+noisy_circles = make_circles(n_samples=2500, factor=0.5, noise=0.05)
+x=noisy_circles[0]
+y=noisy_circles[1]
+dbscan=DBSCAN(eps=0.2)
+dbscan.fit(x)
+colors = dbscan.labels_
+y_pred_dbscan=colors
+```
 
-import matplotlib.pyplot as plt
-import numpy as np
+## Affinity Propagation
 
-from sklearn import cluster, datasets, mixture
-from sklearn.neighbors import kneighbors_graph
-from sklearn.preprocessing import StandardScaler
-
-default_base = {
-    "quantile": 0.3,
-    "eps": 0.3,
-    "damping": 0.9,
-    "preference": -200,
-    "n_neighbors": 3,
-    "n_clusters": 5,
-    "min_samples": 7,
-    "xi": 0.05,
-    "min_cluster_size": 0.1,
-    "allow_single_cluster": True,
-    "hdbscan_min_cluster_size": 15,
-    "hdbscan_min_samples": 3,
-    "random_state": 42,
-}
-
-params = default_base.copy()
-affinity_propagation = cluster.AffinityPropagation(
-damping=params["damping"],
-preference=params["preference"],
-random_state=params["random_state"],
-)
+```{python}
+affinity_propagation = cluster.AffinityPropagation(damping=.9,preference=-300)
 affinity_propagation.fit(x)
-y_pred = affinity_propagation.labels_.astype(int)
-accuracy_score(y,y_pred)
-cm = confusion_matrix(y, y_pred)
-cm_argmax = cm.argmax(axis=0)
-y_pred_ = np.array([cm_argmax[i] for i in y_pred])
-cm_ = confusion_matrix(y, y_pred)
-print('Accuracy score: %3.3f\n' % accuracy_score(y,y_pred_))
+y_pred_af=affinity_propagation.labels_
+```
 
+## BIRCH
+
+```{python}
+birch = cluster.Birch(n_clusters=2)
+birch.fit(x)
+y_pred_birch=birch.labels_
+```
+
+## Spectral Clustering
+
+```{python}
+spectral = cluster.SpectralClustering(n_clusters=2)
+spectral.fit(x)   
+y_pred_spectral=spectral.labels_
+```
+
+# Conclusion
+
+```{python}
+#| code-fold: true
+#| code-summary: All 4 subplot code
+fig, ax = plt.subplots(2,2,figsize=(9,8))
+ax1=plt.subplot(221)
+plt.scatter(x[:,0],x[:,1],c=y_pred_dbscan)
+plt.title('DBSCAN')
+ax1=plt.subplot(222)
+plt.scatter(x[:,0],x[:,1],c=y_pred_af)
+plt.title('Affinity Propagation')
+ax1=plt.subplot(223)
+plt.scatter(x[:,0],x[:,1],c=y_pred_birch)
+plt.title('BIRCH')
+ax1=plt.subplot(224)
+plt.scatter(x[:,0],x[:,1],c=y_pred_spectral)
+plt.title('Spectral Clustering')
+plt.show()
 ```
 
 ```{python}
-import time
-import warnings
-from itertools import cycle, islice
-
-import matplotlib.pyplot as plt
-import numpy as np
-
-from sklearn import cluster, datasets, mixture
-from sklearn.neighbors import kneighbors_graph
-from sklearn.preprocessing import StandardScaler
-
-# ============
-# Generate datasets. We choose the size big enough to see the scalability
-# of the algorithms, but not too big to avoid too long running times
-# ============
-n_samples = 500
-seed = 30
-noisy_circles = datasets.make_circles(
-    n_samples=n_samples, factor=0.5, noise=0.05, random_state=seed
-)
-noisy_moons = datasets.make_moons(n_samples=n_samples, noise=0.05, random_state=seed)
-blobs = datasets.make_blobs(n_samples=n_samples, random_state=seed)
-b,truth = datasets.make_blobs(n_samples=n_samples, random_state=seed)
-
-blob_centers= np.random.randint(0,5,size=(5,2))+.116846842*.65487984
-blob_std = np.array([0.4, 0.3, 0.1, 0.1, 0.1])
-
-#blobs = make_blobs(n_samples=2000, centers=blob_centers, cluster_std=blob_std,
-#                  random_state=7)
-#b,truth = make_blobs(n_samples=2000, centers=blob_centers, cluster_std=blob_std,
-#                 random_state=7)
-rng = np.random.RandomState(seed)
-no_structure = rng.rand(n_samples, 2), None
-
-# Anisotropicly distributed data
-random_state = 170
-X, y = datasets.make_blobs(n_samples=n_samples, random_state=random_state)
-transformation = [[0.6, -0.6], [-0.4, 0.8]]
-X_aniso = np.dot(X, transformation)
-aniso = (X_aniso, y)
-
-# blobs with varied variances
-varied = datasets.make_blobs(
-    n_samples=n_samples, cluster_std=[1.0, 2.5, 0.5], random_state=random_state
-)
-
-# ============
-# Set up cluster parameters
-# ============
-plt.figure(figsize=(9 * 2 + 3, 13))
-plt.subplots_adjust(
-    left=0.02, right=0.98, bottom=0.001, top=0.95, wspace=0.05, hspace=0.01
-)
-
-plot_num = 1
-
-default_base = {
-    "quantile": 0.3,
-    "eps": 0.3,
-    "damping": 0.9,
-    "preference": -200,
-    "n_neighbors": 3,
-    "n_clusters": 3,
-    "min_samples": 7,
-    "xi": 0.05,
-    "min_cluster_size": 0.1,
-    "allow_single_cluster": True,
-    "hdbscan_min_cluster_size": 15,
-    "hdbscan_min_samples": 3,
-    "random_state": 42,
-}
-
-datasets = [
-    
-    (blobs, {"min_samples": 7, "xi": 0.1, "min_cluster_size": 0.2}),
-   
-]
-
-for i_dataset, (dataset, algo_params) in enumerate(datasets):
-    # update parameters with dataset-specific values
-    params = default_base.copy()
-    params.update(algo_params)
-
-    X, y = dataset
-
-    # normalize dataset for easier parameter selection
-    X = StandardScaler().fit_transform(X)
-
-    # estimate bandwidth for mean shift
-    bandwidth = cluster.estimate_bandwidth(X, quantile=params["quantile"])
-
-    # connectivity matrix for structured Ward
-    connectivity = kneighbors_graph(
-        X, n_neighbors=params["n_neighbors"], include_self=False
-    )
-    # make connectivity symmetric
-    connectivity = 0.5 * (connectivity + connectivity.T)
-
-    # ============
-    # Create cluster objects
-    # ============
-    ms = cluster.MeanShift(bandwidth=bandwidth, bin_seeding=True)
-    two_means = cluster.MiniBatchKMeans(
-        n_clusters=params["n_clusters"],
-        n_init="auto",
-        random_state=params["random_state"],
-    )
-    ward = cluster.AgglomerativeClustering(
-        n_clusters=params["n_clusters"], linkage="ward", connectivity=connectivity
-    )
-    spectral = cluster.SpectralClustering(
-        n_clusters=params["n_clusters"],
-        eigen_solver="arpack",
-        affinity="nearest_neighbors",
-        random_state=params["random_state"],
-    )
-    dbscan = cluster.DBSCAN(eps=params["eps"])
-
-    optics = cluster.OPTICS(
-        min_samples=params["min_samples"],
-        xi=params["xi"],
-        min_cluster_size=params["min_cluster_size"],
-    )
-    affinity_propagation = cluster.AffinityPropagation(
-        damping=params["damping"],
-        preference=params["preference"],
-        random_state=params["random_state"],
-    )
-    average_linkage = cluster.AgglomerativeClustering(
-        linkage="average",
-        metric="cityblock",
-        n_clusters=params["n_clusters"],
-        connectivity=connectivity,
-    )
-    birch = cluster.Birch(n_clusters=params["n_clusters"])
-    gmm = mixture.GaussianMixture(
-        n_components=params["n_clusters"],
-        covariance_type="full",
-        random_state=params["random_state"],
-    )
-
-    clustering_algorithms = (
-        ("MiniBatch\nKMeans", two_means),
-        ("Affinity\nPropagation", affinity_propagation),
-        ("MeanShift", ms),
-        ("Spectral\nClustering", spectral),
-        ("Ward", ward),
-        ("Agglomerative\nClustering", average_linkage),
-        ("DBSCAN", dbscan),
-       
-        ("OPTICS", optics),
-        ("BIRCH", birch),
-        ("Gaussian\nMixture", gmm),
-    )
-
-    for name, algorithm in clustering_algorithms:
-        t0 = time.time()
-
-        # catch warnings related to kneighbors_graph
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore",
-                message="the number of connected components of the "
-                + "connectivity matrix is [0-9]{1,2}"
-                + " > 1. Completing it to avoid stopping the tree early.",
-                category=UserWarning,
-            )
-            warnings.filterwarnings(
-                "ignore",
-                message="Graph is not fully connected, spectral embedding"
-                + " may not work as expected.",
-                category=UserWarning,
-            )
-            algorithm.fit(X)
-
-        t1 = time.time()
-        if hasattr(algorithm, "labels_"):
-            y_pred = algorithm.labels_.astype(int)
-        else:
-            y_pred = algorithm.predict(X)
-        
-        cm = confusion_matrix(truth, y_pred)
-        cm_argmax = cm.argmax(axis=0)
-        y_pred_ = np.array([cm_argmax[i] for i in y_pred])
-        cm_ = confusion_matrix(y, y_pred)
-        #accuracy_score(y,y_pred_)
-        acc=accuracy_score(truth,y_pred_)
-        plt.subplot(len(datasets), len(clustering_algorithms), plot_num)
-        if i_dataset == 0:
-            plt.title(name, size=18)
-
-        colors = np.array(
-            list(
-                islice(
-                    cycle(
-                        [
-                            "#377eb8",
-                            "#ff7f00",
-                            "#4daf4a",
-                            "#f781bf",
-                            "#a65628",
-                            "#984ea3",
-                            "#999999",
-                            "#e41a1c",
-                            "#dede00",
-                        ]
-                    ),
-                    int(max(y_pred) + 1),
-                )
-            )
-        )
-        # add black color for outliers (if any)
-        colors = np.append(colors, ["#000000"])
-        plt.scatter(X[:, 0], X[:, 1], s=10, color=colors[y_pred])
-
-        plt.xlim(-2.5, 2.5)
-        plt.ylim(-2.5, 2.5)
-        plt.xticks(())
-        plt.yticks(())
-        plt.text(
-            0.99,
-            0.01,
-            #("%.2fs" % (t1 - t0)).lstrip("0"),
-            ('%3.6f' % acc),
-            transform=plt.gca().transAxes,
-            size=15,
-            horizontalalignment="right",
-        )
-        plot_num += 1
-
-plt.savefig('./pic.png')
-plt.show()
-
+df=pd.DataFrame([accuracy_score(y,y_pred_dbscan),accuracy_score(y,y_pred_af),accuracy_score(y,y_pred_birch),accuracy_score(y,y_pred_spectral)])
+df
 ```
