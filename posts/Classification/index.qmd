@@ -1,5 +1,5 @@
 ---
-title: "Classification"
+title: "Classification Methods"
 author: "Eric Jackson"
 date: "2023-10-04"
 categories: [classification]
