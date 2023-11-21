@@ -109,7 +109,7 @@
     "href": "posts/Clustering/index.html",
     "title": "Clustering",
     "section": "",
-    "text": "Clustering is an\n\n\nSetup and imports\nimport warnings\nwarnings.filterwarnings('ignore')\nimport pandas as pd\nimport numpy as np \nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import make_blobs,make_circles\nfrom sklearn import cluster \nfrom sklearn.cluster import KMeans,DBSCAN\nfrom itertools import cycle, islice\nfrom sklearn.metrics import confusion_matrix,accuracy_score"
+    "text": "Clustering is a technique commonly used in statistics and machine learning to group similar groups of data together. This allows for things like data compression, optimization of processes, and identification of oddities in data to be accomplished much easier than normal. Each of the clusters identified will share common traits, decided by the specific algorithm. For the purposes of this blog post, a random set of blob data was generated and used with 5 clusters visually obvious.\nFigure 1 shows the original data and the clusters identified as truth. In order to keep the same results throughout iterations of making this blog post, a random seed (170) was selected so the same results can be reproduced, while still being randomized. The results from the below algorithms will reference and be compared against this truth data.\n\n\nSetup and imports\nimport warnings\nwarnings.filterwarnings('ignore')\nimport pandas as pd\nimport numpy as np \nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import make_blobs,make_circles\nfrom sklearn import cluster \nfrom sklearn.cluster import KMeans,DBSCAN\nfrom itertools import cycle, islice\nfrom sklearn.metrics import confusion_matrix,accuracy_score\nfrom sklearn.metrics.cluster import adjusted_rand_score\nfrom pandas.plotting import table\n\n\n\nnoisy_circles = make_circles(n_samples=2500, factor=0.5, noise=0.05)\nx=noisy_circles[0]\ny=noisy_circles[1]\nnp.random.seed(170) \nblob_centers=np.random.uniform(0,5,[5,2])\nblob_std = np.array([.3, .3, 0.4, .3 ,.1])\nx,y=make_blobs(n_samples=2500, cluster_std=blob_std,centers=blob_centers,random_state=170)\n# plotting original data\nfig, ax = plt.subplots(figsize=(6,4))\nplt.scatter(x[:,0],x[:,1],c=y)\nplt.title('Original Data')\nplt.show()\n\n\n\n\nFigure 1: Original data with true clusters identified"
   },
   {
     "objectID": "posts/Anomaly_Outlier_Detection/index.html#density-based-spatial-clustering-of-applications-with-noise-dbscan",
@@ -137,7 +137,7 @@
     "href": "posts/Clustering/index.html#density-based-spatial-clustering-of-applications-with-noise-dbscan",
     "title": "Clustering",
     "section": "Density-Based Spatial Clustering of Applications with Noise (DBSCAN)",
-    "text": "Density-Based Spatial Clustering of Applications with Noise (DBSCAN)\nAs explored in the blog post on anomaly/outlier detection, the DBSCAN algorithm is a widely used machine learning algorithm for clustering given sets of points by grouping together points that are close together and have multiple nearest neighbors. While creating the clusters of the data, it will naturally identify outliers and thus, is a great algorithm to accomplish both outlier detection and clustering.\n\nnoisy_circles = make_circles(n_samples=2000, factor=0.5, noise=0.05)\nx=noisy_circles[0]\ny=noisy_circles[1]\ndbscan=DBSCAN(eps=0.2)\ndbscan.fit(x)\ncolors = dbscan.labels_\ny_pred_dbscan=colors"
+    "text": "Density-Based Spatial Clustering of Applications with Noise (DBSCAN)\nAs explored in the blog post on anomaly/outlier detection, the DBSCAN algorithm is a widely used machine learning algorithm for clustering given sets of points by grouping together points that are close together and have multiple nearest neighbors. While creating the clusters of the data, it will naturally identify outliers and thus, is a great algorithm to accomplish both outlier detection and clustering.\nNote: An epsilon value of 0.2 was used for the DBSCAN algorithm. This parameter “defines the maximum distance between two samples for one to be considered as in the neighborhood of the other”. [1]\n\ndbscan=DBSCAN(eps=0.2)\ndbscan.fit(x)\ncolors = dbscan.labels_\ny_pred_dbscan=colors"
   },
   {
     "objectID": "posts/Linear_and_Nonlinear_Regression/index.html#linear-regression",
@@ -207,20 +207,27 @@
     "href": "posts/Clustering/index.html#affinity-propagation",
     "title": "Clustering",
     "section": "Affinity Propagation",
-    "text": "Affinity Propagation\n\naffinity_propagation = cluster.AffinityPropagation(damping=.9,preference=-300)\naffinity_propagation.fit(x)\ny_pred_af=affinity_propagation.labels_"
+    "text": "Affinity Propagation\nUnlike the two algorithms that will be investigated below, Affinity Propagation clustering does not require the number of clusters as an argument prior to running the algorithm. It will iterate through the data and find exemplar points that are representative of each cluster. Two arguments were used for this algorithm, a damping factor value of 0.9 and a preference value of -200. The damping value is the extent that the current value is maintained relative to incoming values to avoid oscillations, and the preference value allows for points preference in the availability matrix to be set and allows the model to more accurately predict the number of clusters. [2]\n\naffinity_propagation = cluster.AffinityPropagation(damping=.9,preference=-200)\naffinity_propagation.fit(x)\ny_pred_af=affinity_propagation.labels_"
   },
   {
     "objectID": "posts/Clustering/index.html#birch",
     "href": "posts/Clustering/index.html#birch",
     "title": "Clustering",
     "section": "BIRCH",
-    "text": "BIRCH\n\nbirch = cluster.Birch(n_clusters=2)\nbirch.fit(x)\ny_pred_birch=birch.labels_"
+    "text": "BIRCH\n\nbirch = cluster.Birch(n_clusters=5)\nbirch.fit(x)\ny_pred_birch=birch.labels_"
   },
   {
     "objectID": "posts/Clustering/index.html#spectral-clustering",
     "href": "posts/Clustering/index.html#spectral-clustering",
     "title": "Clustering",
     "section": "Spectral Clustering",
-    "text": "Spectral Clustering\n\nspectral = cluster.SpectralClustering(n_clusters=2)\nspectral.fit(x)   \ny_pred_spectral=spectral.labels_"
+    "text": "Spectral Clustering\nThe Spectral Clustering algorithm works by taking the eigenvalues of the similarity matrix, reducing the dimensions, and then performing clustering but now with fewer dimensions. This method is useful for data that is non-convex or irregularly shaped, as well as high dimensional datasets. [4]\nAs mentioned above, the Spectral Clustering algorithm can take the number of clusters as an input, and since this number is known to be 5, n_clusters = 5 will be used as the only argument.\n\nspectral = cluster.SpectralClustering(n_clusters=5)\nspectral.fit(x)   \ny_pred_spectral=spectral.labels_"
+  },
+  {
+    "objectID": "posts/Clustering/index.html#balanced-iterative-reducing-and-clustering-using-hierarchies-birch",
+    "href": "posts/Clustering/index.html#balanced-iterative-reducing-and-clustering-using-hierarchies-birch",
+    "title": "Clustering",
+    "section": "Balanced Iterative Reducing and Clustering using Hierarchies (BIRCH)",
+    "text": "Balanced Iterative Reducing and Clustering using Hierarchies (BIRCH)\nThe BIRCH clustering algorithm is often used as an alternative to the K means algorithm, as it is more memory efficient and works exceptionally well with larger datasets. It works by constructing a clustering feature tree with a set of nodes and subclusters for each node. The algorithm will merge together subclusters with the smallest radius, and then see if each subcluster has any child nodes. If so, it will continue the same process until it reaches a leaf of the original tree. [3]\nAs mentioned above, the BIRCH algorithm can take the number of clusters as an input, and since this number is known to be 5, n_clusters = 5 will be used as the only argument.\n\nbirch = cluster.Birch(n_clusters=5)\nbirch.fit(x)\ny_pred_birch=birch.labels_"
   }
 ]

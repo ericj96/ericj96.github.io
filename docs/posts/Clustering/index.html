@@ -95,9 +95,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 <link rel="stylesheet" href="../../styles.css">
@@ -181,10 +178,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#density-based-spatial-clustering-of-applications-with-noise-dbscan" id="toc-density-based-spatial-clustering-of-applications-with-noise-dbscan" class="nav-link" data-scroll-target="#density-based-spatial-clustering-of-applications-with-noise-dbscan">Density-Based Spatial Clustering of Applications with Noise (DBSCAN)</a></li>
   <li><a href="#affinity-propagation" id="toc-affinity-propagation" class="nav-link" data-scroll-target="#affinity-propagation">Affinity Propagation</a></li>
-  <li><a href="#birch" id="toc-birch" class="nav-link" data-scroll-target="#birch">BIRCH</a></li>
+  <li><a href="#balanced-iterative-reducing-and-clustering-using-hierarchies-birch" id="toc-balanced-iterative-reducing-and-clustering-using-hierarchies-birch" class="nav-link" data-scroll-target="#balanced-iterative-reducing-and-clustering-using-hierarchies-birch">Balanced Iterative Reducing and Clustering using Hierarchies (BIRCH)</a></li>
   <li><a href="#spectral-clustering" id="toc-spectral-clustering" class="nav-link" data-scroll-target="#spectral-clustering">Spectral Clustering</a></li>
   </ul></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#sec-conc" id="toc-sec-conc" class="nav-link" data-scroll-target="#sec-conc">Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -196,7 +193,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="background" class="level1">
 <h1>Background</h1>
-<p>Clustering is an</p>
+<p>Clustering is a technique commonly used in statistics and machine learning to group similar groups of data together. This allows for things like data compression, optimization of processes, and identification of oddities in data to be accomplished much easier than normal. Each of the clusters identified will share common traits, decided by the specific algorithm. For the purposes of this blog post, a random set of blob data was generated and used with 5 clusters visually obvious.</p>
+<p><a href="#fig-og">Figure&nbsp;1</a> shows the original data and the clusters identified as truth. In order to keep the same results throughout iterations of making this blog post, a random seed (170) was selected so the same results can be reproduced, while still being randomized. The results from the below algorithms will reference and be compared against this truth data.</p>
 <div class="cell" data-execution_count="1">
 <details>
 <summary>Setup and imports</summary>
@@ -209,108 +207,125 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> cluster </span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans,DBSCAN</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> itertools <span class="im">import</span> cycle, islice</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> confusion_matrix,accuracy_score</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> confusion_matrix,accuracy_score</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics.cluster <span class="im">import</span> adjusted_rand_score</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pandas.plotting <span class="im">import</span> table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+</div>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>noisy_circles <span class="op">=</span> make_circles(n_samples<span class="op">=</span><span class="dv">2500</span>, factor<span class="op">=</span><span class="fl">0.5</span>, noise<span class="op">=</span><span class="fl">0.05</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>x<span class="op">=</span>noisy_circles[<span class="dv">0</span>]</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>y<span class="op">=</span>noisy_circles[<span class="dv">1</span>]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">170</span>) </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>blob_centers<span class="op">=</span>np.random.uniform(<span class="dv">0</span>,<span class="dv">5</span>,[<span class="dv">5</span>,<span class="dv">2</span>])</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>blob_std <span class="op">=</span> np.array([<span class="fl">.3</span>, <span class="fl">.3</span>, <span class="fl">0.4</span>, <span class="fl">.3</span> ,<span class="fl">.1</span>])</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>x,y<span class="op">=</span>make_blobs(n_samples<span class="op">=</span><span class="dv">2500</span>, cluster_std<span class="op">=</span>blob_std,centers<span class="op">=</span>blob_centers,random_state<span class="op">=</span><span class="dv">170</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting original data</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">6</span>,<span class="dv">4</span>))</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>plt.scatter(x[:,<span class="dv">0</span>],x[:,<span class="dv">1</span>],c<span class="op">=</span>y)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Original Data'</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="fig-og" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-og-output-1.png" width="495" height="357" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;1: Original data with true clusters identified</figcaption>
+</figure>
+</div>
+</div>
 </div>
 </section>
 <section id="clustering-algorithms" class="level1">
 <h1>Clustering Algorithms</h1>
+<p>For each of the four clustering methods used below, a brief description and the code of training the model will be shown, with the resulting data and plots being shown in <a href="#sec-conc">Section&nbsp;3</a></p>
 <section id="density-based-spatial-clustering-of-applications-with-noise-dbscan" class="level2">
 <h2 class="anchored" data-anchor-id="density-based-spatial-clustering-of-applications-with-noise-dbscan">Density-Based Spatial Clustering of Applications with Noise (DBSCAN)</h2>
 <p>As explored in the <a href="https://ericj96.github.io/posts/Anomaly_Outlier_Detection/">blog post on anomaly/outlier detection</a>, the DBSCAN algorithm is a widely used machine learning algorithm for clustering given sets of points by grouping together points that are close together and have multiple nearest neighbors. While creating the clusters of the data, it will naturally identify outliers and thus, is a great algorithm to accomplish both outlier detection and clustering.</p>
-<div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>noisy_circles <span class="op">=</span> make_circles(n_samples<span class="op">=</span><span class="dv">2000</span>, factor<span class="op">=</span><span class="fl">0.5</span>, noise<span class="op">=</span><span class="fl">0.05</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>x<span class="op">=</span>noisy_circles[<span class="dv">0</span>]</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>y<span class="op">=</span>noisy_circles[<span class="dv">1</span>]</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>dbscan<span class="op">=</span>DBSCAN(eps<span class="op">=</span><span class="fl">0.2</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>dbscan.fit(x)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> dbscan.labels_</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>y_pred_dbscan<span class="op">=</span>colors</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Note:</strong> An epsilon value of 0.2 was used for the DBSCAN algorithm. This parameter “defines the maximum distance between two samples for one to be considered as in the neighborhood of the other”. <a href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html">[1]</a></p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dbscan<span class="op">=</span>DBSCAN(eps<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>dbscan.fit(x)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> dbscan.labels_</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>y_pred_dbscan<span class="op">=</span>colors</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="affinity-propagation" class="level2">
 <h2 class="anchored" data-anchor-id="affinity-propagation">Affinity Propagation</h2>
-<div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>affinity_propagation <span class="op">=</span> cluster.AffinityPropagation(damping<span class="op">=</span><span class="fl">.9</span>,preference<span class="op">=-</span><span class="dv">300</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>affinity_propagation.fit(x)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>y_pred_af<span class="op">=</span>affinity_propagation.labels_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Unlike the two algorithms that will be investigated below, Affinity Propagation clustering does not require the number of clusters as an argument prior to running the algorithm. It will iterate through the data and find exemplar points that are representative of each cluster. Two arguments were used for this algorithm, a damping factor value of 0.9 and a preference value of -200. The damping value is the extent that the current value is maintained relative to incoming values to avoid oscillations, and the preference value allows for points preference in the availability matrix to be set and allows the model to more accurately predict the number of clusters. <a href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.AffinityPropagation.html">[2]</a></p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>affinity_propagation <span class="op">=</span> cluster.AffinityPropagation(damping<span class="op">=</span><span class="fl">.9</span>,preference<span class="op">=-</span><span class="dv">200</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>affinity_propagation.fit(x)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>y_pred_af<span class="op">=</span>affinity_propagation.labels_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="birch" class="level2">
-<h2 class="anchored" data-anchor-id="birch">BIRCH</h2>
-<div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>birch <span class="op">=</span> cluster.Birch(n_clusters<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>birch.fit(x)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>y_pred_birch<span class="op">=</span>birch.labels_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="balanced-iterative-reducing-and-clustering-using-hierarchies-birch" class="level2">
+<h2 class="anchored" data-anchor-id="balanced-iterative-reducing-and-clustering-using-hierarchies-birch">Balanced Iterative Reducing and Clustering using Hierarchies (BIRCH)</h2>
+<p>The BIRCH clustering algorithm is often used as an alternative to the K means algorithm, as it is more memory efficient and works exceptionally well with larger datasets. It works by constructing a clustering feature tree with a set of nodes and subclusters for each node. The algorithm will merge together subclusters with the smallest radius, and then see if each subcluster has any child nodes. If so, it will continue the same process until it reaches a leaf of the original tree. <a href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.Birch.html">[3]</a></p>
+<p>As mentioned above, the BIRCH algorithm can take the number of clusters as an input, and since this number is known to be 5, n_clusters = 5 will be used as the only argument.</p>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>birch <span class="op">=</span> cluster.Birch(n_clusters<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>birch.fit(x)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>y_pred_birch<span class="op">=</span>birch.labels_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="spectral-clustering" class="level2">
 <h2 class="anchored" data-anchor-id="spectral-clustering">Spectral Clustering</h2>
-<div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>spectral <span class="op">=</span> cluster.SpectralClustering(n_clusters<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>spectral.fit(x)   </span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>y_pred_spectral<span class="op">=</span>spectral.labels_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The Spectral Clustering algorithm works by taking the eigenvalues of the similarity matrix, reducing the dimensions, and then performing clustering but now with fewer dimensions. This method is useful for data that is non-convex or irregularly shaped, as well as high dimensional datasets. <a href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.SpectralClustering.html">[4]</a></p>
+<p>As mentioned above, the Spectral Clustering algorithm can take the number of clusters as an input, and since this number is known to be 5, n_clusters = 5 will be used as the only argument.</p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>spectral <span class="op">=</span> cluster.SpectralClustering(n_clusters<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>spectral.fit(x)   </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>y_pred_spectral<span class="op">=</span>spectral.labels_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
-<section id="conclusion" class="level1">
+<section id="sec-conc" class="level1">
 <h1>Conclusion</h1>
-<div class="cell" data-execution_count="6">
+<p>Since most clustering algorithms will apply arbitrary labels to the dataset passed through them, it isn’t possible to do a simple accuracy scoring or confusion matrix comparison. Therefore, an Adjusted Rand Index (ARI) comparison will be performed between the original blob labels and the predicted/fitted labels from each algorithm. This will allow all four of the clustering algorithms explored above to be compared and ranked against each other. The ARI is a version of the Rand index, which measures the similarity between two data clusterings, but is corrected for chance. It will look at all pairs of samples and compute how many are in the same or different clusters between the modeled and true data. <a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.adjusted_rand_score.html">[5]</a></p>
+<p>As seen in <a href="#fig-sub">Figure&nbsp;2</a>, the DBSCAN algorithm was able to identify 4 of the 5 clusters correctly, but combined two of the clusters into one and considered points on the edge of each cluster as a separate cluster. This could be due to the DBSCAN algorithms ability to identify outlier points, as all of the purple cluster points appear to be outliers. The remaining three algorithms all performed similarly, correctly identifying all 5 clusters to a certain degree. <a href="#fig-tab">Figure&nbsp;3</a> shows the results in terms of ARI, showing that DBSCAN obviously had the lowest score and the other methods having very high but similar scores. Spectral Clustering edged out BIRCH and Affinity Propagation slightly, with a ARI score of 0.98.</p>
+<div class="cell" data-execution_count="7">
 <details>
 <summary>All 4 subplot code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>,<span class="dv">2</span>,figsize<span class="op">=</span>(<span class="dv">9</span>,<span class="dv">8</span>))</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>ax1<span class="op">=</span>plt.subplot(<span class="dv">221</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>plt.scatter(x[:,<span class="dv">0</span>],x[:,<span class="dv">1</span>],c<span class="op">=</span>y_pred_dbscan)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'DBSCAN'</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>ax1<span class="op">=</span>plt.subplot(<span class="dv">222</span>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>plt.scatter(x[:,<span class="dv">0</span>],x[:,<span class="dv">1</span>],c<span class="op">=</span>y_pred_af)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Affinity Propagation'</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>ax1<span class="op">=</span>plt.subplot(<span class="dv">223</span>)</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>plt.scatter(x[:,<span class="dv">0</span>],x[:,<span class="dv">1</span>],c<span class="op">=</span>y_pred_birch)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'BIRCH'</span>)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>ax1<span class="op">=</span>plt.subplot(<span class="dv">224</span>)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>plt.scatter(x[:,<span class="dv">0</span>],x[:,<span class="dv">1</span>],c<span class="op">=</span>y_pred_spectral)</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Spectral Clustering'</span>)</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>,<span class="dv">2</span>,figsize<span class="op">=</span>(<span class="dv">9</span>,<span class="dv">8</span>))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>ax1<span class="op">=</span>plt.subplot(<span class="dv">221</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>plt.scatter(x[:,<span class="dv">0</span>],x[:,<span class="dv">1</span>],c<span class="op">=</span>y_pred_dbscan)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'DBSCAN'</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>ax1<span class="op">=</span>plt.subplot(<span class="dv">222</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>plt.scatter(x[:,<span class="dv">0</span>],x[:,<span class="dv">1</span>],c<span class="op">=</span>y_pred_af)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Affinity Propagation'</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>ax1<span class="op">=</span>plt.subplot(<span class="dv">223</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>plt.scatter(x[:,<span class="dv">0</span>],x[:,<span class="dv">1</span>],c<span class="op">=</span>y_pred_birch)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'BIRCH'</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>ax1<span class="op">=</span>plt.subplot(<span class="dv">224</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>plt.scatter(x[:,<span class="dv">0</span>],x[:,<span class="dv">1</span>],c<span class="op">=</span>y_pred_spectral)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Spectral Clustering'</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-7-output-1.png" width="731" height="653"></p>
+<div id="fig-sub" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-sub-output-1.png" width="718" height="653" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;2: All 4 algorithms and the clusters identified by each</figcaption>
+</figure>
 </div>
 </div>
-<div class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df<span class="op">=</span>pd.DataFrame([accuracy_score(y,y_pred_dbscan),accuracy_score(y,y_pred_af),accuracy_score(y,y_pred_birch),accuracy_score(y,y_pred_spectral)])</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="24">
-<div>
-
-
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">0</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>0.0000</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>0.3445</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>0.5035</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>0.4955</td>
-</tr>
-</tbody>
-</table>
-
+</div>
+<div class="cell" data-execution_count="8">
+<details>
+<summary>Table generation code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>scores<span class="op">=</span>[adjusted_rand_score(y, dbscan.labels_),adjusted_rand_score(y, affinity_propagation.labels_),adjusted_rand_score(y, birch.labels_) ,adjusted_rand_score(y, spectral.labels_)]</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df<span class="op">=</span>pd.DataFrame([scores,scores,scores,scores],columns<span class="op">=</span>[<span class="st">'DBSCAN'</span>,<span class="st">'Affinity Propagation'</span>,<span class="st">'BIRCH'</span>,<span class="st">'Spectral Clustering'</span>],index<span class="op">=</span>[<span class="st">'Adjusted Rand Score'</span>,<span class="st">'R^21'</span>,<span class="st">'R^22'</span>,<span class="st">'R'</span>])</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>fix, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">1</span>))</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>ax.axis(<span class="st">'off'</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>table(ax,df.transpose()[<span class="st">'Adjusted Rand Score'</span>],loc<span class="op">=</span><span class="st">'top'</span>,cellLoc<span class="op">=</span><span class="st">'center'</span>,colWidths<span class="op">=</span><span class="bu">list</span>([<span class="fl">.6</span>, <span class="fl">.6</span>]))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-tab" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-tab-output-1.png" width="653" height="173" class="figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;3: ARI for each of the 4 clustering algorithms</figcaption>
+</figure>
 </div>
 </div>
 </div>
