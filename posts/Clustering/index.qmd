@@ -50,7 +50,7 @@ plt.show()
 
 # Clustering Algorithms
 
-For each of the four clustering methods used below, a brief description and the code of training the model will be shown, with the resulting data and plots being shown in @sec-conc
+For each of the four clustering methods used below, a brief description and the code of training the model will be shown, with the resulting data and plots being shown in @sec-conc.
 
 ## Density-Based Spatial Clustering of Applications with Noise (DBSCAN)
 
@@ -103,7 +103,7 @@ y_pred_spectral=spectral.labels_
 
 Since most clustering algorithms will apply arbitrary labels to the dataset passed through them, it isn't possible to do a simple accuracy scoring or confusion matrix comparison. Therefore, an Adjusted Rand Index (ARI) comparison will be performed between the original blob labels and the predicted/fitted labels from each algorithm. This will allow all four of the clustering algorithms explored above to be compared and ranked against each other. The ARI is a version of the Rand index, which measures the similarity between two data clusterings, but is corrected for chance. It will look at all pairs of samples and compute how many are in the same or different clusters between the modeled and true data. [\[5\]](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.adjusted_rand_score.html)
 
-As seen in @fig-sub, the DBSCAN algorithm was able to identify 4 of the 5 clusters correctly, but combined two of the clusters into one and considered points on the edge of each cluster as a separate cluster. This could be due to the DBSCAN algorithms ability to identify outlier points, as all of the purple cluster points appear to be outliers. The remaining three algorithms all performed similarly, correctly identifying all 5 clusters to a certain degree. @fig-tab shows the results in terms of ARI, showing that DBSCAN obviously had the lowest score and the other methods having very high but similar scores. Spectral Clustering edged out BIRCH and Affinity Propagation slightly, with a ARI score of 0.98.
+As seen in @fig-sub, the DBSCAN algorithm was able to identify 4 of the 5 clusters correctly, but combined two of the clusters into one and considered points on the edge of each cluster as a separate cluster. This could be due to the DBSCAN algorithms ability to identify outlier points, as all of the purple cluster points appear to be outliers. The remaining three algorithms all performed similarly, correctly identifying all 5 clusters to a certain degree. @fig-tab shows the results in terms of ARI, showing that DBSCAN obviously had the lowest score and the other methods having very high but similar scores. Spectral Clustering edged out BIRCH and Affinity Propagation slightly, with an ARI score of 0.98.
 
 ```{python}
 #| code-fold: true
