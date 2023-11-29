@@ -140,7 +140,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Classification Methods</h1>
+      <div class="quarto-title-block"><div><h1 class="title">Classification Methods</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
                                 <div class="quarto-categories">
                 <div class="quarto-category">classification</div>
               </div>
@@ -185,7 +185,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#results-and-conclusion" id="toc-results-and-conclusion" class="nav-link" data-scroll-target="#results-and-conclusion">Results and Conclusion</a></li>
   </ul>
-</nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/ericj96/ericj96.github.io/blob/main/posts/Classification/index.qmd" class="toc-action">View source</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
@@ -542,6 +542,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The three classification algorithms used in this blog post used a relatively small dataset to attempt and match the original labels. Both Gaussian classification models (Gaussian Naive Bayes and Gaussian Process Classification) performed similarly and had ~96% accuracy. The Random Forest classification algorithm performed much better than the previous two, with a mean accuracy score &gt; 99% and only misidentified a single data point.</p>
 
 
+<!-- -->
+
 </section>
 
 </main> <!-- /main -->
@@ -624,6 +626,57 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
   function tippyHover(el, contentFn) {
     const config = {
       allowHTML: true,
@@ -777,7 +830,240 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
 });
-</script>
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb13" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Classification Methods"</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> "Eric Jackson"</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "2023-10-04"</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [classification]</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="an">image:</span><span class="co"> "image.jpg"</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="an">toc:</span><span class="co"> true</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="an">toc-depth:</span><span class="co"> 2</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="fu"># Background and Setup</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>Classification is similar to clustering (<span class="co">[</span><span class="ot">as mentioned in this blog post</span><span class="co">](https://ericj96.github.io/posts/Clustering/)</span>) in the sense that they group data together into separate categories. The difference comes from the fact that classification has a predefined set of labels that are attached to each data point, and in clustering the labels are missing and the algorithm will apply those labels/groupings. These two topics are commonly referenced as supervised and unsupervised learning (classification vs clustering).</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>Some of the downsides of classification are that there is a need to train the model before using it with test data, whereas clustering does not require such training and can group data points together immediately. But, classification can be used for much more intensive scenarios, such as handwriting recognition and spam filtering.</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>As mentioned before, classification algorithms or models require inputs with labels predefined. For this blog post, a native sklearn dataset containing measurements of a species of flower will be used. As seen below, there are width and length measurements along with the label/target class for the species of flower.</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Setup/imports</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> classification_report, confusion_matrix</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_iris</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.naive_bayes <span class="im">import</span> GaussianNB</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.gaussian_process <span class="im">import</span> GaussianProcessClassifier</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestClassifier</span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> make_pipeline</span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> ConfusionMatrixDisplay</span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.inspection <span class="im">import</span> DecisionBoundaryDisplay</span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>iris<span class="op">=</span>load_iris()</span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(iris[<span class="st">'data'</span>],columns <span class="op">=</span> iris[<span class="st">'feature_names'</span>])</span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a>target<span class="op">=</span>pd.DataFrame(iris[<span class="st">'target'</span>])</span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a>target[target<span class="op">==</span><span class="dv">0</span>]<span class="op">=</span>iris.target_names[<span class="dv">0</span>]</span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a>target[target<span class="op">==</span><span class="dv">1</span>]<span class="op">=</span>iris.target_names[<span class="dv">1</span>]</span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a>target[target<span class="op">==</span><span class="dv">2</span>]<span class="op">=</span>iris.target_names[<span class="dv">2</span>]</span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'target'</span>]<span class="op">=</span>target</span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a><span class="co"># breaking up data into training and test datasets</span></span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a>x_train<span class="op">=</span>df[[<span class="st">'petal length (cm)'</span>, <span class="st">'petal width (cm)'</span>]]</span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a>y_train<span class="op">=</span>df[<span class="st">'target'</span>]</span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a>x_test<span class="op">=</span>df[[<span class="st">'petal length (cm)'</span>, <span class="st">'petal width (cm)'</span>]]</span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a>y_test<span class="op">=</span>df[<span class="st">'target'</span>]</span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb13-62"><a href="#cb13-62" aria-hidden="true" tabindex="-1"></a>df</span>
+<span id="cb13-63"><a href="#cb13-63" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-64"><a href="#cb13-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-65"><a href="#cb13-65" aria-hidden="true" tabindex="-1"></a>Before the data is to be run through any classification algorithms, it is helpful to first plot the data and review what to expect. @fig-class shows the dataset visually with each color representing a different label or species of flower.</span>
+<span id="cb13-66"><a href="#cb13-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-69"><a href="#cb13-69" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb13-70"><a href="#cb13-70" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb13-71"><a href="#cb13-71" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Plotting code</span></span>
+<span id="cb13-72"><a href="#cb13-72" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: Dataset values broken into their defined target labels</span></span>
+<span id="cb13-73"><a href="#cb13-73" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-class</span></span>
+<span id="cb13-74"><a href="#cb13-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-75"><a href="#cb13-75" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(figsize <span class="op">=</span>(<span class="dv">7</span>, <span class="dv">5</span>))</span>
+<span id="cb13-76"><a href="#cb13-76" aria-hidden="true" tabindex="-1"></a>plt.scatter(df[<span class="st">'petal length (cm)'</span>][df[<span class="st">'target'</span>]<span class="op">==</span>iris.target_names[<span class="dv">0</span>]],df[<span class="st">'petal width (cm)'</span>][df[<span class="st">'target'</span>]<span class="op">==</span>iris.target_names[<span class="dv">0</span>]])</span>
+<span id="cb13-77"><a href="#cb13-77" aria-hidden="true" tabindex="-1"></a>plt.scatter(df[<span class="st">'petal length (cm)'</span>][df[<span class="st">'target'</span>]<span class="op">==</span>iris.target_names[<span class="dv">1</span>]],df[<span class="st">'petal width (cm)'</span>][df[<span class="st">'target'</span>]<span class="op">==</span>iris.target_names[<span class="dv">1</span>]])</span>
+<span id="cb13-78"><a href="#cb13-78" aria-hidden="true" tabindex="-1"></a>plt.scatter(df[<span class="st">'petal length (cm)'</span>][df[<span class="st">'target'</span>]<span class="op">==</span>iris.target_names[<span class="dv">2</span>]],df[<span class="st">'petal width (cm)'</span>][df[<span class="st">'target'</span>]<span class="op">==</span>iris.target_names[<span class="dv">2</span>]])</span>
+<span id="cb13-79"><a href="#cb13-79" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'petal length (cm)'</span>)</span>
+<span id="cb13-80"><a href="#cb13-80" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'petal width (cm)'</span>)</span>
+<span id="cb13-81"><a href="#cb13-81" aria-hidden="true" tabindex="-1"></a>plt.legend(iris.target_names)</span>
+<span id="cb13-82"><a href="#cb13-82" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb13-83"><a href="#cb13-83" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-84"><a href="#cb13-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-85"><a href="#cb13-85" aria-hidden="true" tabindex="-1"></a><span class="fu"># Classification Algorithms</span></span>
+<span id="cb13-86"><a href="#cb13-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-87"><a href="#cb13-87" aria-hidden="true" tabindex="-1"></a><span class="fu">## Gaussian Naive Bayes</span></span>
+<span id="cb13-88"><a href="#cb13-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-89"><a href="#cb13-89" aria-hidden="true" tabindex="-1"></a>The Gaussian Naive Bayes algorithm from the sklearn library (<span class="co">[</span><span class="ot">see here</span><span class="co">](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html)</span>) utilizes Bayes' theorem assuming the features probability is distributed in a Gaussian or normal fashion, with the variance and mean of each data point calculated for each class. There are a multitude of Naive Bayes classifier algorithms (Bernoulli, Multinomial, etc), but the specific Gaussian probabilistic version used here is especially useful when the values are continuous and expected to follow a Gaussian distribution.</span>
+<span id="cb13-90"><a href="#cb13-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-91"><a href="#cb13-91" aria-hidden="true" tabindex="-1"></a>As seen from @fig-nb, the algorithm uses circular decision boundaries to classify each set of labels. The confusion matrix on the right shows that out of 150 samples, it only incorrectly labeled 6 points leading to a mean accuracy of 96%.</span>
+<span id="cb13-92"><a href="#cb13-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-95"><a href="#cb13-95" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb13-96"><a href="#cb13-96" aria-hidden="true" tabindex="-1"></a>nb <span class="op">=</span> GaussianNB()</span>
+<span id="cb13-97"><a href="#cb13-97" aria-hidden="true" tabindex="-1"></a>nb.fit(x_train, y_train)</span>
+<span id="cb13-98"><a href="#cb13-98" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Mean accuracy score: </span><span class="sc">%3.3f%%</span><span class="st">'</span> <span class="op">%</span> (nb.score(x_test,y_test)<span class="op">*</span><span class="dv">100</span>))</span>
+<span id="cb13-99"><a href="#cb13-99" aria-hidden="true" tabindex="-1"></a>y_pred<span class="op">=</span>nb.predict(x_train)</span>
+<span id="cb13-100"><a href="#cb13-100" aria-hidden="true" tabindex="-1"></a>cm<span class="op">=</span>confusion_matrix(y_train,y_pred,labels<span class="op">=</span>iris.target_names)</span>
+<span id="cb13-101"><a href="#cb13-101" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-102"><a href="#cb13-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-105"><a href="#cb13-105" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb13-106"><a href="#cb13-106" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb13-107"><a href="#cb13-107" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Plotting code</span></span>
+<span id="cb13-108"><a href="#cb13-108" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-nb</span></span>
+<span id="cb13-109"><a href="#cb13-109" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: Gaussian Naive Bayes classification results (with decision boundaries) and confusion matrix </span></span>
+<span id="cb13-110"><a href="#cb13-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-111"><a href="#cb13-111" aria-hidden="true" tabindex="-1"></a><span class="co"># decision boundary code adapted from https://hackernoon.com/how-to-plot-a-decision-boundary-for-machine-learning-algorithms-in-python-3o1n3w07</span></span>
+<span id="cb13-112"><a href="#cb13-112" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">1</span>,<span class="dv">2</span>,figsize <span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb13-113"><a href="#cb13-113" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">121</span>)</span>
+<span id="cb13-114"><a href="#cb13-114" aria-hidden="true" tabindex="-1"></a>x1grid <span class="op">=</span> np.linspace(x_train[<span class="st">'petal length (cm)'</span>].<span class="bu">min</span>()<span class="op">-</span><span class="fl">.2</span>, x_train[<span class="st">'petal length (cm)'</span>].<span class="bu">max</span>()<span class="op">+</span><span class="fl">.2</span>, <span class="bu">len</span>(x_train))</span>
+<span id="cb13-115"><a href="#cb13-115" aria-hidden="true" tabindex="-1"></a>x2grid <span class="op">=</span> np.linspace(x_train[<span class="st">'petal width (cm)'</span>].<span class="bu">min</span>()<span class="op">-</span><span class="fl">.2</span>, x_train[<span class="st">'petal width (cm)'</span>].<span class="bu">max</span>()<span class="op">+</span><span class="fl">.2</span>, <span class="bu">len</span>(x_train))</span>
+<span id="cb13-116"><a href="#cb13-116" aria-hidden="true" tabindex="-1"></a>xx, yy <span class="op">=</span> np.meshgrid(x1grid, x2grid)</span>
+<span id="cb13-117"><a href="#cb13-117" aria-hidden="true" tabindex="-1"></a>r1, r2 <span class="op">=</span> xx.flatten(), yy.flatten()</span>
+<span id="cb13-118"><a href="#cb13-118" aria-hidden="true" tabindex="-1"></a>r1, r2 <span class="op">=</span> r1.reshape((<span class="bu">len</span>(r1), <span class="dv">1</span>)), r2.reshape((<span class="bu">len</span>(r2), <span class="dv">1</span>))</span>
+<span id="cb13-119"><a href="#cb13-119" aria-hidden="true" tabindex="-1"></a>grid <span class="op">=</span> np.hstack((r1,r2))</span>
+<span id="cb13-120"><a href="#cb13-120" aria-hidden="true" tabindex="-1"></a>y_pred_grid<span class="op">=</span>nb.predict(grid)</span>
+<span id="cb13-121"><a href="#cb13-121" aria-hidden="true" tabindex="-1"></a>zz <span class="op">=</span> y_pred_grid.reshape(xx.shape)</span>
+<span id="cb13-122"><a href="#cb13-122" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'setosa'</span>]<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb13-123"><a href="#cb13-123" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'versicolor'</span>]<span class="op">=</span><span class="dv">2</span></span>
+<span id="cb13-124"><a href="#cb13-124" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'virginica'</span>]<span class="op">=</span><span class="dv">3</span></span>
+<span id="cb13-125"><a href="#cb13-125" aria-hidden="true" tabindex="-1"></a>xx<span class="op">=</span>np.array(xx,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb13-126"><a href="#cb13-126" aria-hidden="true" tabindex="-1"></a>yy<span class="op">=</span>np.array(yy,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb13-127"><a href="#cb13-127" aria-hidden="true" tabindex="-1"></a>zz<span class="op">=</span>np.array(zz,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb13-128"><a href="#cb13-128" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">0</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">0</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb13-129"><a href="#cb13-129" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">1</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">1</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb13-130"><a href="#cb13-130" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">2</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">2</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb13-131"><a href="#cb13-131" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'petal length (cm)'</span>)</span>
+<span id="cb13-132"><a href="#cb13-132" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'petal width (cm)'</span>)</span>
+<span id="cb13-133"><a href="#cb13-133" aria-hidden="true" tabindex="-1"></a>plt.legend(iris.target_names)</span>
+<span id="cb13-134"><a href="#cb13-134" aria-hidden="true" tabindex="-1"></a>plt.contourf(xx, yy, zz,cmap<span class="op">=</span><span class="st">'RdBu_r'</span>)</span>
+<span id="cb13-135"><a href="#cb13-135" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">122</span>)</span>
+<span id="cb13-136"><a href="#cb13-136" aria-hidden="true" tabindex="-1"></a>ConfusionMatrixDisplay.from_predictions(y_train,y_pred,ax<span class="op">=</span>axs[<span class="dv">1</span>],colorbar<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb13-137"><a href="#cb13-137" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()  </span>
+<span id="cb13-138"><a href="#cb13-138" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb13-139"><a href="#cb13-139" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-140"><a href="#cb13-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-141"><a href="#cb13-141" aria-hidden="true" tabindex="-1"></a><span class="fu">## Gaussian Process Classification</span></span>
+<span id="cb13-142"><a href="#cb13-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-143"><a href="#cb13-143" aria-hidden="true" tabindex="-1"></a>The Gaussian Process Classification algorithm from the sklearn library (<span class="co">[</span><span class="ot">see here</span><span class="co">](https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.GaussianProcessClassifier.html)</span>) uses a general form of the Gaussian probability distribution model and is based on Laplace approximation. As it uses Gaussian probability, the model can compute confidence intervals and determine if refitting of a certain section is required based on probability alone. The algorithm is kernel based, meaning multiple types of covariance functions can be utilized and used to optimize model fitting based on the input data. One downside of this algorithm is that is loses efficiency when the number of features grows larger than a few dozen.</span>
+<span id="cb13-144"><a href="#cb13-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-145"><a href="#cb13-145" aria-hidden="true" tabindex="-1"></a>As seen from @fig-gmm, the algorithm uses more linear decision boundaries compared to the above Gaussian Naive to classify each set of labels. The confusion matrix on the right shows that out of 150 samples, it only incorrectly labeled 5 points leading to a mean accuracy of 96.667%. Both of these algorithms are Gaussian in nature, so it is expected that they have similar results.</span>
+<span id="cb13-146"><a href="#cb13-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-149"><a href="#cb13-149" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb13-150"><a href="#cb13-150" aria-hidden="true" tabindex="-1"></a>nb <span class="op">=</span> GaussianProcessClassifier()</span>
+<span id="cb13-151"><a href="#cb13-151" aria-hidden="true" tabindex="-1"></a>nb.fit(x_train, y_train)</span>
+<span id="cb13-152"><a href="#cb13-152" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Mean accuracy score: </span><span class="sc">%3.3f%%</span><span class="st">'</span> <span class="op">%</span> (nb.score(x_test,y_test)<span class="op">*</span><span class="dv">100</span>))</span>
+<span id="cb13-153"><a href="#cb13-153" aria-hidden="true" tabindex="-1"></a>y_pred<span class="op">=</span>nb.predict(x_train)</span>
+<span id="cb13-154"><a href="#cb13-154" aria-hidden="true" tabindex="-1"></a>cm<span class="op">=</span>confusion_matrix(y_train,y_pred,labels<span class="op">=</span>iris.target_names)</span>
+<span id="cb13-155"><a href="#cb13-155" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-156"><a href="#cb13-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-159"><a href="#cb13-159" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb13-160"><a href="#cb13-160" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb13-161"><a href="#cb13-161" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Plotting code</span></span>
+<span id="cb13-162"><a href="#cb13-162" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-gmm</span></span>
+<span id="cb13-163"><a href="#cb13-163" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: Gaussian Process Classifier classification results (with decision boundaries) and confusion matrix </span></span>
+<span id="cb13-164"><a href="#cb13-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-165"><a href="#cb13-165" aria-hidden="true" tabindex="-1"></a><span class="co"># decision boundary code adapted from https://hackernoon.com/how-to-plot-a-decision-boundary-for-machine-learning-algorithms-in-python-3o1n3w07</span></span>
+<span id="cb13-166"><a href="#cb13-166" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">1</span>,<span class="dv">2</span>,figsize <span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb13-167"><a href="#cb13-167" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">121</span>)</span>
+<span id="cb13-168"><a href="#cb13-168" aria-hidden="true" tabindex="-1"></a>x1grid <span class="op">=</span> np.linspace(x_train[<span class="st">'petal length (cm)'</span>].<span class="bu">min</span>()<span class="op">-</span><span class="fl">.2</span>, x_train[<span class="st">'petal length (cm)'</span>].<span class="bu">max</span>()<span class="op">+</span><span class="fl">.2</span>, <span class="bu">len</span>(x_train))</span>
+<span id="cb13-169"><a href="#cb13-169" aria-hidden="true" tabindex="-1"></a>x2grid <span class="op">=</span> np.linspace(x_train[<span class="st">'petal width (cm)'</span>].<span class="bu">min</span>()<span class="op">-</span><span class="fl">.2</span>, x_train[<span class="st">'petal width (cm)'</span>].<span class="bu">max</span>()<span class="op">+</span><span class="fl">.2</span>, <span class="bu">len</span>(x_train))</span>
+<span id="cb13-170"><a href="#cb13-170" aria-hidden="true" tabindex="-1"></a>xx, yy <span class="op">=</span> np.meshgrid(x1grid, x2grid)</span>
+<span id="cb13-171"><a href="#cb13-171" aria-hidden="true" tabindex="-1"></a>r1, r2 <span class="op">=</span> xx.flatten(), yy.flatten()</span>
+<span id="cb13-172"><a href="#cb13-172" aria-hidden="true" tabindex="-1"></a>r1, r2 <span class="op">=</span> r1.reshape((<span class="bu">len</span>(r1), <span class="dv">1</span>)), r2.reshape((<span class="bu">len</span>(r2), <span class="dv">1</span>))</span>
+<span id="cb13-173"><a href="#cb13-173" aria-hidden="true" tabindex="-1"></a>grid <span class="op">=</span> np.hstack((r1,r2))</span>
+<span id="cb13-174"><a href="#cb13-174" aria-hidden="true" tabindex="-1"></a>y_pred_grid<span class="op">=</span>nb.predict(grid)</span>
+<span id="cb13-175"><a href="#cb13-175" aria-hidden="true" tabindex="-1"></a>zz <span class="op">=</span> y_pred_grid.reshape(xx.shape)</span>
+<span id="cb13-176"><a href="#cb13-176" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'setosa'</span>]<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb13-177"><a href="#cb13-177" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'versicolor'</span>]<span class="op">=</span><span class="dv">2</span></span>
+<span id="cb13-178"><a href="#cb13-178" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'virginica'</span>]<span class="op">=</span><span class="dv">3</span></span>
+<span id="cb13-179"><a href="#cb13-179" aria-hidden="true" tabindex="-1"></a>xx<span class="op">=</span>np.array(xx,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb13-180"><a href="#cb13-180" aria-hidden="true" tabindex="-1"></a>yy<span class="op">=</span>np.array(yy,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb13-181"><a href="#cb13-181" aria-hidden="true" tabindex="-1"></a>zz<span class="op">=</span>np.array(zz,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb13-182"><a href="#cb13-182" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">0</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">0</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb13-183"><a href="#cb13-183" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">1</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">1</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb13-184"><a href="#cb13-184" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">2</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">2</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb13-185"><a href="#cb13-185" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'petal length (cm)'</span>)</span>
+<span id="cb13-186"><a href="#cb13-186" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'petal width (cm)'</span>)</span>
+<span id="cb13-187"><a href="#cb13-187" aria-hidden="true" tabindex="-1"></a>plt.legend(iris.target_names)</span>
+<span id="cb13-188"><a href="#cb13-188" aria-hidden="true" tabindex="-1"></a>plt.contourf(xx, yy, zz,cmap<span class="op">=</span><span class="st">'RdBu_r'</span>)</span>
+<span id="cb13-189"><a href="#cb13-189" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">122</span>)</span>
+<span id="cb13-190"><a href="#cb13-190" aria-hidden="true" tabindex="-1"></a>ConfusionMatrixDisplay.from_predictions(y_train,y_pred,ax<span class="op">=</span>axs[<span class="dv">1</span>],colorbar<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb13-191"><a href="#cb13-191" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()  </span>
+<span id="cb13-192"><a href="#cb13-192" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb13-193"><a href="#cb13-193" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-194"><a href="#cb13-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-195"><a href="#cb13-195" aria-hidden="true" tabindex="-1"></a><span class="fu">## Random Forest Classifier</span></span>
+<span id="cb13-196"><a href="#cb13-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-197"><a href="#cb13-197" aria-hidden="true" tabindex="-1"></a>The Random Forest Classifier as part of the sklearn library (<span class="co">[</span><span class="ot">see here</span><span class="co">](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html)</span>) uses decision tree classifiers on multiple parts of the dataset, and then averages scores from each one to maintain a high accuracy and attempt to prevent over fitting. The default arguments were used for this algorithm, but the most important one to call out and be aware of is the number of trees/estimators in the forest is defaulted to 100. Random Forest has the additional benefit of being less computationally expensive as other classification models, such as neural networks.</span>
+<span id="cb13-198"><a href="#cb13-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-199"><a href="#cb13-199" aria-hidden="true" tabindex="-1"></a>As seen from @fig-rf, the algorithm uses boxier decision boundaries than the previous two algorithms to classify each set of labels. The confusion matrix on the right shows that out of 150 samples, it only incorrectly labeled 1 point leading to a mean accuracy of 99.333%. This is by far the best accuracy score of the three algorithms and would be the best model to use for this specific dataset for further work.</span>
+<span id="cb13-200"><a href="#cb13-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-203"><a href="#cb13-203" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb13-204"><a href="#cb13-204" aria-hidden="true" tabindex="-1"></a>nb <span class="op">=</span> RandomForestClassifier()</span>
+<span id="cb13-205"><a href="#cb13-205" aria-hidden="true" tabindex="-1"></a>nb.fit(x_train, y_train)</span>
+<span id="cb13-206"><a href="#cb13-206" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Mean accuracy score: </span><span class="sc">%3.3f%%</span><span class="st">'</span> <span class="op">%</span> (nb.score(x_test,y_test)<span class="op">*</span><span class="dv">100</span>))</span>
+<span id="cb13-207"><a href="#cb13-207" aria-hidden="true" tabindex="-1"></a>y_pred<span class="op">=</span>nb.predict(x_train)</span>
+<span id="cb13-208"><a href="#cb13-208" aria-hidden="true" tabindex="-1"></a>cm<span class="op">=</span>confusion_matrix(y_train,y_pred,labels<span class="op">=</span>iris.target_names)</span>
+<span id="cb13-209"><a href="#cb13-209" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-210"><a href="#cb13-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-213"><a href="#cb13-213" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb13-214"><a href="#cb13-214" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb13-215"><a href="#cb13-215" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Plotting code</span></span>
+<span id="cb13-216"><a href="#cb13-216" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-rf</span></span>
+<span id="cb13-217"><a href="#cb13-217" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: Random Forest Classifier classification results (with decision boundaries) and confusion matrix </span></span>
+<span id="cb13-218"><a href="#cb13-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-219"><a href="#cb13-219" aria-hidden="true" tabindex="-1"></a><span class="co"># decision boundary code adapted from https://hackernoon.com/how-to-plot-a-decision-boundary-for-machine-learning-algorithms-in-python-3o1n3w07</span></span>
+<span id="cb13-220"><a href="#cb13-220" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">1</span>,<span class="dv">2</span>,figsize <span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb13-221"><a href="#cb13-221" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">121</span>)</span>
+<span id="cb13-222"><a href="#cb13-222" aria-hidden="true" tabindex="-1"></a>x1grid <span class="op">=</span> np.linspace(x_train[<span class="st">'petal length (cm)'</span>].<span class="bu">min</span>()<span class="op">-</span><span class="fl">.2</span>, x_train[<span class="st">'petal length (cm)'</span>].<span class="bu">max</span>()<span class="op">+</span><span class="fl">.2</span>, <span class="bu">len</span>(x_train))</span>
+<span id="cb13-223"><a href="#cb13-223" aria-hidden="true" tabindex="-1"></a>x2grid <span class="op">=</span> np.linspace(x_train[<span class="st">'petal width (cm)'</span>].<span class="bu">min</span>()<span class="op">-</span><span class="fl">.2</span>, x_train[<span class="st">'petal width (cm)'</span>].<span class="bu">max</span>()<span class="op">+</span><span class="fl">.2</span>, <span class="bu">len</span>(x_train))</span>
+<span id="cb13-224"><a href="#cb13-224" aria-hidden="true" tabindex="-1"></a>xx, yy <span class="op">=</span> np.meshgrid(x1grid, x2grid)</span>
+<span id="cb13-225"><a href="#cb13-225" aria-hidden="true" tabindex="-1"></a>r1, r2 <span class="op">=</span> xx.flatten(), yy.flatten()</span>
+<span id="cb13-226"><a href="#cb13-226" aria-hidden="true" tabindex="-1"></a>r1, r2 <span class="op">=</span> r1.reshape((<span class="bu">len</span>(r1), <span class="dv">1</span>)), r2.reshape((<span class="bu">len</span>(r2), <span class="dv">1</span>))</span>
+<span id="cb13-227"><a href="#cb13-227" aria-hidden="true" tabindex="-1"></a>grid <span class="op">=</span> np.hstack((r1,r2))</span>
+<span id="cb13-228"><a href="#cb13-228" aria-hidden="true" tabindex="-1"></a>y_pred_grid<span class="op">=</span>nb.predict(grid)</span>
+<span id="cb13-229"><a href="#cb13-229" aria-hidden="true" tabindex="-1"></a>zz <span class="op">=</span> y_pred_grid.reshape(xx.shape)</span>
+<span id="cb13-230"><a href="#cb13-230" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'setosa'</span>]<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb13-231"><a href="#cb13-231" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'versicolor'</span>]<span class="op">=</span><span class="dv">2</span></span>
+<span id="cb13-232"><a href="#cb13-232" aria-hidden="true" tabindex="-1"></a>zz[zz<span class="op">==</span><span class="st">'virginica'</span>]<span class="op">=</span><span class="dv">3</span></span>
+<span id="cb13-233"><a href="#cb13-233" aria-hidden="true" tabindex="-1"></a>xx<span class="op">=</span>np.array(xx,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb13-234"><a href="#cb13-234" aria-hidden="true" tabindex="-1"></a>yy<span class="op">=</span>np.array(yy,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb13-235"><a href="#cb13-235" aria-hidden="true" tabindex="-1"></a>zz<span class="op">=</span>np.array(zz,dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb13-236"><a href="#cb13-236" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">0</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">0</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb13-237"><a href="#cb13-237" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">1</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">1</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb13-238"><a href="#cb13-238" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_train[<span class="st">'petal length (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">2</span>]],x_train[<span class="st">'petal width (cm)'</span>][y_pred<span class="op">==</span>iris.target_names[<span class="dv">2</span>]],zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb13-239"><a href="#cb13-239" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'petal length (cm)'</span>)</span>
+<span id="cb13-240"><a href="#cb13-240" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'petal width (cm)'</span>)</span>
+<span id="cb13-241"><a href="#cb13-241" aria-hidden="true" tabindex="-1"></a>plt.legend(iris.target_names)</span>
+<span id="cb13-242"><a href="#cb13-242" aria-hidden="true" tabindex="-1"></a>plt.contourf(xx, yy, zz,cmap<span class="op">=</span><span class="st">'RdBu_r'</span>)</span>
+<span id="cb13-243"><a href="#cb13-243" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">122</span>)</span>
+<span id="cb13-244"><a href="#cb13-244" aria-hidden="true" tabindex="-1"></a>ConfusionMatrixDisplay.from_predictions(y_train,y_pred,ax<span class="op">=</span>axs[<span class="dv">1</span>],colorbar<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb13-245"><a href="#cb13-245" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()  </span>
+<span id="cb13-246"><a href="#cb13-246" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb13-247"><a href="#cb13-247" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-248"><a href="#cb13-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-249"><a href="#cb13-249" aria-hidden="true" tabindex="-1"></a><span class="fu"># Results and Conclusion</span></span>
+<span id="cb13-250"><a href="#cb13-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-251"><a href="#cb13-251" aria-hidden="true" tabindex="-1"></a>The three classification algorithms used in this blog post used a relatively small dataset to attempt and match the original labels. Both Gaussian classification models (Gaussian Naive Bayes and Gaussian Process Classification) performed similarly and had \~96% accuracy. The Random Forest classification algorithm performed much better than the previous two, with a mean accuracy score <span class="sc">\&gt;</span> 99% and only misidentified a single data point.</span>
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 
 

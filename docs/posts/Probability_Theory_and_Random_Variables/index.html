@@ -140,7 +140,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Probability theory and random variables</h1>
+      <div class="quarto-title-block"><div><h1 class="title">Probability theory and random variables</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
                                 <div class="quarto-categories">
                 <div class="quarto-category">probability</div>
                 <div class="quarto-category">random variables</div>
@@ -179,7 +179,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#probability-theory-random-variables" id="toc-probability-theory-random-variables" class="nav-link active" data-scroll-target="#probability-theory-random-variables">Probability Theory &amp; Random Variables</a></li>
   </ul>
-</nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/ericj96/ericj96.github.io/blob/main/posts/Probability_Theory_and_Random_Variables/index.qmd" class="toc-action">View source</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
@@ -261,7 +261,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-display">
 <div id="fig-hist" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="index_files/figure-html/fig-hist-output-1.png" width="719" height="559" class="figure-img"></p>
+<p><img src="index_files/figure-html/fig-hist-output-1.png" width="728" height="559" class="figure-img"></p>
 <figcaption class="figure-caption">Figure&nbsp;2: Histogram and KDE of data</figcaption>
 </figure>
 </div>
@@ -286,8 +286,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'$x_</span><span class="sc">{2}</span><span class="st">$'</span>)</span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Gaussian Mixture model converged in 19 iterations with a lower bound
-on the log likelihood of the best fit of EM of -0.659</code></pre>
+<pre><code>Gaussian Mixture model converged in 4 iterations with a lower bound
+on the log likelihood of the best fit of EM of -0.804</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div id="fig-clust" class="quarto-figure quarto-figure-center anchored">
@@ -301,7 +301,7 @@ on the log likelihood of the best fit of EM of -0.659</code></pre>
 <p>The Gaussian Mixture function from sklearn allows one to see the probabilities that a certain point is in each of the 5 clusters (in this example). Below, you can see a table with the probabilities of several datapoints and their respective clusters. It’s interesting to note that not every point is 100% certain with this algorithm, there are several points that have &lt; 1.0 probabilities, meaning that it might have a 95% probability of it being in one cluster, and a 5% probability of being in another cluster. Since 95% &gt; 5%, it assumes it is in the higher probability cluster.</p>
 <div class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(gm.predict_proba(x).<span class="bu">round</span>(<span class="dv">3</span>),columns<span class="op">=</span>[<span class="st">'Cluster 1'</span>,<span class="st">'Cluster 2'</span>,<span class="st">'Cluster 3'</span>,<span class="st">'Cluster 4'</span>,<span class="st">'Cluster 5'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="6">
+<div class="cell-output cell-output-display" data-execution_count="12">
 <div>
 
 
@@ -319,43 +319,43 @@ on the log likelihood of the best fit of EM of -0.659</code></pre>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>0.980</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.020</td>
+<td>0.0</td>
+<td>0.001</td>
+<td>0.0</td>
+<td>0.999</td>
+<td>0.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
+<td>0.0</td>
 <td>0.000</td>
-<td>1.000</td>
+<td>0.0</td>
 <td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
+<td>1.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
+<td>0.0</td>
 <td>1.000</td>
+<td>0.0</td>
+<td>0.000</td>
+<td>0.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
+<td>0.0</td>
 <td>0.000</td>
-<td>1.000</td>
+<td>0.0</td>
 <td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
+<td>1.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
+<td>0.0</td>
 <td>0.000</td>
-<td>0.997</td>
-<td>0.003</td>
+<td>0.0</td>
 <td>0.000</td>
-<td>0.000</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">...</td>
@@ -367,43 +367,43 @@ on the log likelihood of the best fit of EM of -0.659</code></pre>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">1995</td>
-<td>0.934</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.066</td>
+<td>0.0</td>
+<td>0.006</td>
+<td>0.0</td>
+<td>0.994</td>
+<td>0.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1996</td>
+<td>0.0</td>
 <td>0.000</td>
-<td>1.000</td>
+<td>0.0</td>
 <td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
+<td>1.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">1997</td>
+<td>1.0</td>
 <td>0.000</td>
+<td>0.0</td>
 <td>0.000</td>
-<td>0.000</td>
-<td>0.927</td>
-<td>0.073</td>
+<td>0.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1998</td>
+<td>0.0</td>
+<td>1.000</td>
+<td>0.0</td>
 <td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.286</td>
-<td>0.714</td>
+<td>0.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">1999</td>
+<td>0.0</td>
 <td>0.000</td>
-<td>0.982</td>
-<td>0.018</td>
+<td>0.0</td>
 <td>0.000</td>
-<td>0.000</td>
+<td>1.0</td>
 </tr>
 </tbody>
 </table>
@@ -417,6 +417,8 @@ on the log likelihood of the best fit of EM of -0.659</code></pre>
 <p>[2] <a href="https://github.com/maptv/handson-ml3/blob/b8f4fd1e85247096109b175d3289b558cedc74b4/09_unsupervised_learning.ipynb" class="uri">https://github.com/maptv/handson-ml3/blob/b8f4fd1e85247096109b175d3289b558cedc74b4/09_unsupervised_learning.ipynb</a></p>
 <p>[3] <a href="https://en.wikipedia.org/wiki/Probability_theory" class="uri">https://en.wikipedia.org/wiki/Probability_theory</a></p>
 
+
+<!-- -->
 
 </section>
 
@@ -500,6 +502,57 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
   function tippyHover(el, contentFn) {
     const config = {
       allowHTML: true,
@@ -653,7 +706,133 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
 });
-</script>
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb8" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Probability theory and random variables"</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> "Eric Jackson"</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "2023-10-02"</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> [probability,random variables]</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="an">image:</span><span class="co"> "image.jpg"</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="an">toc:</span><span class="co"> true</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="an">toc-depth:</span><span class="co"> 2</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="fu"># Probability Theory &amp; Random Variables</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>Mathematics has many broad topics, but one of the most prevalent topics in machine learning is probability. Probability theory contains topics such as discrete and continuous random variables, probability distributions, and statistics.</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>One of the more realistic machine learning based scenarios to utilize probability theory methods on is random data. As seen in @fig-og, a set of 5 "blobs" has been generated with random centers and varying degrees of standard deviations from said center. This was the same approach taken for my <span class="co">[</span><span class="ot">blog post on Clustering</span><span class="co">](https://ericj96.github.io/posts/Clustering/)</span>.</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Setup code</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy <span class="im">import</span> stats</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.stats</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> norm</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_blobs</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.mixture <span class="im">import</span> GaussianMixture</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>blob_centers<span class="op">=</span>np.random.uniform(<span class="dv">0</span>,<span class="dv">5</span>,[<span class="dv">5</span>,<span class="dv">2</span>])</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>blob_std <span class="op">=</span> np.array([<span class="fl">0.4</span>, <span class="fl">0.3</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>])</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>x, y <span class="op">=</span> make_blobs(n_samples<span class="op">=</span><span class="dv">2000</span>, centers<span class="op">=</span>blob_centers, cluster_std<span class="op">=</span>blob_std,random_state<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>n_bins<span class="op">=</span><span class="dv">75</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>data<span class="op">=</span>x[:,<span class="dv">1</span>]</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>kde <span class="op">=</span> stats.gaussian_kde(data,bw_method<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>t_range<span class="op">=</span>np.linspace(<span class="bu">min</span>(data),<span class="bu">max</span>(data),<span class="bu">len</span>(data))</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Plotting original data code </span></span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: Plot of random data contained to five blobs</span></span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-og</span></span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(figsize <span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>plt.scatter(x[:,<span class="dv">0</span>],x[:,<span class="dv">1</span>])</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'$x_</span><span class="sc">{1}</span><span class="st">$'</span>)</span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'$x_</span><span class="sc">{2}</span><span class="st">$'</span>)</span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>When working with non-normal or non-uniform data, it is hard to fit a normal distribution curve to it. Utilizing a kernel density estimation (KDE) is one way to smooth as well as estimate the probability density function (PDF) of a random variable based on kernels as weights. The kernel density estimator is seen in the below equation:</span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a><span class="al">![](Capture.JPG)</span>{width="376"}</span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>As seen in @fig-hist, the plot of the kde function on the above data closely follows the trend of the histogram for both x1 and x2 variables, which were generated randomly.</span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Plotting kde and histogram code </span></span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: Histogram and KDE of data</span></span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-hist</span></span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">2</span>,<span class="dv">1</span>,figsize <span class="op">=</span>(<span class="dv">9</span>, <span class="dv">7</span>))</span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>ax1<span class="op">=</span>plt.subplot(<span class="dv">211</span>)</span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>ax1.hist(data, n_bins, alpha<span class="op">=</span><span class="fl">0.5</span>,density<span class="op">=</span><span class="dv">1</span>,label<span class="op">=</span><span class="st">'x1 data'</span>,edgecolor<span class="op">=</span><span class="st">'black'</span>)<span class="op">;</span></span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>ax1.plot(t_range,kde(t_range),lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">'x1 kde'</span>)</span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>plt.xlim(x.<span class="bu">min</span>()<span class="op">-</span><span class="fl">.5</span>,x.<span class="bu">max</span>()<span class="op">+</span><span class="fl">.5</span>)</span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a>ax1.legend(loc<span class="op">=</span><span class="st">'best'</span>)</span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a>ax2<span class="op">=</span>plt.subplot(<span class="dv">212</span>)</span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a>data<span class="op">=</span>x[:,<span class="dv">0</span>]</span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a>kde <span class="op">=</span> stats.gaussian_kde(data,bw_method<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a>t_range<span class="op">=</span>np.linspace(<span class="bu">min</span>(data),<span class="bu">max</span>(data),<span class="bu">len</span>(data))</span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a>ax2.hist(data, n_bins, alpha<span class="op">=</span><span class="fl">0.5</span>,density<span class="op">=</span><span class="dv">1</span>,label<span class="op">=</span><span class="st">'x2 data'</span>,edgecolor<span class="op">=</span><span class="st">'black'</span>)<span class="op">;</span></span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a>ax2.plot(t_range,kde(t_range),lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">'x2 kde'</span>)</span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a>ax2.legend(loc<span class="op">=</span><span class="st">'best'</span>)</span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a>plt.xlim(x.<span class="bu">min</span>()<span class="op">-</span><span class="fl">.5</span>,x.<span class="bu">max</span>()<span class="op">+</span><span class="fl">.5</span>)</span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a>Machine learning techniques commonly will use clustering to group data points together and allows the user to see the similarity of their data. One algorithm that is used for clustering is Gaussian Mixtures Model (GMM) which uses probability for clustering and density estimation, and is based on Gaussian distribution curves. Since this blog post is about probability theory, we will utilize this specific method.</span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a>Since Gaussian distributions heavily depend on mean and variance of each point, GMM utilizes a statistical algorithm called Expectation-Maximization for calculating the mean and variance value of each Gaussian or cluster. The algorithm first calculates the probability that a point belongs to each cluster, then iterates the mean and covariance matrix to maximize the log likelihood value.</span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Gaussian Mixture setup and plot code</span></span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: Gaussian Mixture clustering results</span></span>
+<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-clust</span></span>
+<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a>gm <span class="op">=</span> GaussianMixture(n_components<span class="op">=</span><span class="dv">5</span>, n_init<span class="op">=</span><span class="dv">10</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a>gm.fit(x)</span>
+<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Gaussian Mixture model converged in </span><span class="sc">%d</span><span class="st"> iterations with a lower bound</span><span class="ch">\n</span><span class="st">on the log likelihood of the best fit of EM of </span><span class="sc">%3.3f</span><span class="st">'</span> <span class="op">%</span> (gm.n_iter_,gm.lower_bound_))</span>
+<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a>labels<span class="op">=</span>gm.predict(x)</span>
+<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(figsize <span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a>plt.scatter(x[:,<span class="dv">0</span>][labels<span class="op">==</span><span class="dv">0</span>],x[:,<span class="dv">1</span>][labels<span class="op">==</span><span class="dv">0</span>])</span>
+<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a>plt.scatter(x[:,<span class="dv">0</span>][labels<span class="op">==</span><span class="dv">1</span>],x[:,<span class="dv">1</span>][labels<span class="op">==</span><span class="dv">1</span>])</span>
+<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a>plt.scatter(x[:,<span class="dv">0</span>][labels<span class="op">==</span><span class="dv">2</span>],x[:,<span class="dv">1</span>][labels<span class="op">==</span><span class="dv">2</span>])</span>
+<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a>plt.scatter(x[:,<span class="dv">0</span>][labels<span class="op">==</span><span class="dv">3</span>],x[:,<span class="dv">1</span>][labels<span class="op">==</span><span class="dv">3</span>])</span>
+<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a>plt.scatter(x[:,<span class="dv">0</span>][labels<span class="op">==</span><span class="dv">4</span>],x[:,<span class="dv">1</span>][labels<span class="op">==</span><span class="dv">4</span>])</span>
+<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">'Cluster 1'</span>,<span class="st">'Cluster 2'</span>,<span class="st">'Cluster 3'</span>,<span class="st">'Cluster 4'</span>,<span class="st">'Cluster 5'</span>],loc<span class="op">=</span><span class="st">'best'</span>)</span>
+<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'$x_</span><span class="sc">{1}</span><span class="st">$'</span>)</span>
+<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'$x_</span><span class="sc">{2}</span><span class="st">$'</span>)</span>
+<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a>The Gaussian Mixture function from sklearn allows one to see the probabilities that a certain point is in each of the 5 clusters (in this example). Below, you can see a table with the probabilities of several datapoints and their respective clusters. It's interesting to note that not every point is 100% certain with this algorithm, there are several points that have <span class="sc">\&lt;</span> 1.0 probabilities, meaning that it might have a 95% probability of it being in one cluster, and a 5% probability of being in another cluster. Since 95% <span class="sc">\&gt;</span> 5%, it assumes it is in the higher probability cluster.</span>
+<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(gm.predict_proba(x).<span class="bu">round</span>(<span class="dv">3</span>),columns<span class="op">=</span>[<span class="st">'Cluster 1'</span>,<span class="st">'Cluster 2'</span>,<span class="st">'Cluster 3'</span>,<span class="st">'Cluster 4'</span>,<span class="st">'Cluster 5'</span>])</span>
+<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a>Sources used for code and/or text:</span>
+<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a><span class="sc">\[</span>1<span class="sc">\]</span> <span class="ot">&lt;https://www.analyticsvidhya.com/blog/2019/10/gaussian-mixture-models-clustering/#:~:text=A.-,The%20Gaussian%20Mixture%20Model%20(GMM)%20is%20a%20probabilistic%20model%20used,distributions%2C%20each%20representing%20a%20cluster.&gt;</span></span>
+<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a><span class="sc">\[</span>2<span class="sc">\]</span> <span class="ot">&lt;https://github.com/maptv/handson-ml3/blob/b8f4fd1e85247096109b175d3289b558cedc74b4/09_unsupervised_learning.ipynb&gt;</span></span>
+<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a><span class="sc">\[</span>3<span class="sc">\]</span> <span class="ot">&lt;https://en.wikipedia.org/wiki/Probability_theory&gt;</span></span>
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 
 

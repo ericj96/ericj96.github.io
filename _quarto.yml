@@ -9,6 +9,8 @@ website:
       - about.qmd
       - icon: github
         href: https://github.com/ericj96
+  repo-url: https://github.com/ericj96/ericj96.github.io
+  repo-actions: [source]
 format:
   html:
     theme: cosmo

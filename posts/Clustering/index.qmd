@@ -99,7 +99,7 @@ spectral.fit(x)
 y_pred_spectral=spectral.labels_
 ```
 
-# Conclusion  {#sec-conc}
+# Conclusion {#sec-conc}
 
 Since most clustering algorithms will apply arbitrary labels to the dataset passed through them, it isn't possible to do a simple accuracy scoring or confusion matrix comparison. Therefore, an Adjusted Rand Index (ARI) comparison will be performed between the original blob labels and the predicted/fitted labels from each algorithm. This will allow all four of the clustering algorithms explored above to be compared and ranked against each other. The ARI is a version of the Rand index, which measures the similarity between two data clusterings, but is corrected for chance. It will look at all pairs of samples and compute how many are in the same or different clusters between the modeled and true data. [\[5\]](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.adjusted_rand_score.html)
 
